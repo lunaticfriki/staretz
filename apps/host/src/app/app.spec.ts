@@ -27,6 +27,8 @@ describe('App', () => {
     tick();
     fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('h1')?.textContent).toContain('Staretz');
+    const logo = compiled.querySelector('img[alt="Staretz Logo"]');
+    expect(logo).toBeTruthy();
+    expect(logo?.getAttribute('src')).toContain('assets/logone.jpg');
   }));
 });
