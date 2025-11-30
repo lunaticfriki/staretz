@@ -1,0 +1,22 @@
+<header class="bg-black border-b border-gray-800 py-4">
+  <div class="container mx-auto px-4">
+    <div class="flex items-center justify-between">
+      <h1 class="text-2xl font-bold">
+        <a routerLink="/">Staretz</a>
+      </h1>
+
+      <nav class="flex space-x-6">
+        @for (item of menuItems; track item.route) {
+        <a
+          [routerLink]="item.route"
+          routerLinkActive="underline"
+          [routerLinkActiveOptions]="{ exact: item.route === '/' }"
+          class="hover:text-primary/80 transition-colors"
+        >
+          {{ item.label }}
+        </a>
+        }
+      </nav>
+    </div>
+  </div>
+</header>

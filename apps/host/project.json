@@ -7,11 +7,12 @@
   "tags": [],
   "targets": {
     "build": {
-      "executor": "@angular/build:application",
+      "executor": "@nx/angular:webpack-browser",
       "outputs": ["{options.outputPath}"],
       "options": {
         "outputPath": "dist/apps/host",
-        "browser": "apps/host/src/main.ts",
+        "index": "apps/host/src/index.html",
+        "main": "apps/host/src/main.ts",
         "polyfills": ["zone.js"],
         "tsConfig": "apps/host/tsconfig.app.json",
         "assets": [
@@ -21,11 +22,9 @@
           }
         ],
         "styles": ["apps/host/src/styles.css"],
-        "server": "apps/host/src/main.server.ts",
-        "ssr": {
-          "entry": "apps/host/src/server.ts"
-        },
-        "outputMode": "server"
+        "customWebpackConfig": {
+          "path": "apps/host/webpack.config.ts"
+        }
       },
       "configurations": {
         "production": {
@@ -41,7 +40,10 @@
               "maximumError": "8kb"
             }
           ],
-          "outputHashing": "all"
+          "outputHashing": "all",
+          "customWebpackConfig": {
+            "path": "apps/host/webpack.prod.config.ts"
+          }
         },
         "development": {
           "optimization": false,
@@ -53,7 +55,7 @@
     },
     "serve": {
       "continuous": true,
-      "executor": "@angular/build:dev-server",
+      "executor": "@nx/angular:module-federation-dev-server",
       "configurations": {
         "production": {
           "buildTarget": "host:build:production"
@@ -62,7 +64,11 @@
           "buildTarget": "host:build:development"
         }
       },
-      "defaultConfiguration": "development"
+      "defaultConfiguration": "development",
+      "options": {
+        "port": 4200,
+        "publicHost": "http://localhost:4200"
+      }
     },
     "extract-i18n": {
       "executor": "@angular/build:extract-i18n",
