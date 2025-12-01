@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@staretz/shared-ui": ["libs/shared-ui/src/index.ts"]
+      "@staretz/shared-ui": ["libs/shared-ui/src/index.ts"],
+      "blog/Module": ["apps/blog/src/remote-entry.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
