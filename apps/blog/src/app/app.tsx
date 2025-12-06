@@ -1,30 +1,29 @@
 import { useEffect } from 'react';
-import { container } from './di.config';
-import { PostReadService } from './application/services/post.read.service';
+import { PostDI } from './di.config';
 import { seedPosts } from './infrastructure/seed/post.seed';
-import type { PostRepository } from './domain/repositories/post.repository';
 import { useSignals } from '@preact/signals-react/runtime';
 import { PostsContainer } from './ui/containers/posts.container';
+import { usePostRead } from './application/hooks/usePostRead';
 
 export function App() {
   useSignals();
-  const readService = container.get(PostReadService);
-  const repository = container.get<PostRepository>('PostRepository');
+  const { posts, loading, error, loadPosts } = usePostRead();
+  const { repository } = PostDI;
 
   useEffect(() => {
     const init = async () => {
       await seedPosts(repository);
-      await readService.loadPosts();
+      await loadPosts();
     };
     init();
-  }, [readService, repository]);
+  }, []);
 
   return (
     <div>
       <h1>BLOG</h1>
-      {readService.loading.value && <p>Loading...</p>}
-      {readService.error.value && <p>{readService.error.value}</p>}
-      <PostsContainer posts={readService.posts.value} />
+      {loading.value && <p>Loading...</p>}
+      {error.value && <p>{error.value}</p>}
+      <PostsContainer posts={posts.value} />
     </div>
   );
 }

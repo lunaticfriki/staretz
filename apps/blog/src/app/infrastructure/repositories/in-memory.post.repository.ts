@@ -1,8 +1,6 @@
-import { injectable } from 'inversify';
 import { Post } from '../../domain/entities/post';
 import type { PostRepository } from '../../domain/repositories/post.repository';
 
-@injectable()
 export class InMemoryPostRepository implements PostRepository {
   private posts: Post[] = [];
 

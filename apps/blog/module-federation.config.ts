@@ -6,24 +6,6 @@ const config: ModuleFederationConfig = {
     './Module': './src/remote-entry.ts',
   },
   shared: (libraryName, defaultConfig) => {
-    if (libraryName === 'inversify') {
-      return {
-        ...defaultConfig,
-        singleton: true,
-        strictVersion: true,
-        version: '7.10.4',
-        requiredVersion: '^7.10.4',
-      };
-    }
-    if (libraryName === 'reflect-metadata') {
-      return {
-        ...defaultConfig,
-        singleton: true,
-        strictVersion: true,
-        version: '0.2.2',
-        requiredVersion: '^0.2.2',
-      };
-    }
     return defaultConfig;
   },
 };
