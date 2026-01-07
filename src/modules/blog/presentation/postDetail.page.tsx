@@ -56,7 +56,7 @@ export default function PostDetailPage({ id }: PostDetailProps) {
           <img src={viewModel.image} alt={viewModel.title} class="w-full h-full object-cover" />
         </div>
 
-        <h1 class="text-4xl md:text-5xl font-bold mb-6 text-gray-900 dark:text-white leading-tight">
+        <h1 class="text-4xl md:text-5xl font-bold mb-6 text-black dark:text-white leading-tight">
           {viewModel.title}
         </h1>
 
@@ -72,10 +72,10 @@ export default function PostDetailPage({ id }: PostDetailProps) {
           </div>
         </div>
 
-        <div class="prose dark:prose-invert max-w-none text-lg leading-relaxed text-gray-800 dark:text-zinc-300 prose-a:text-fuchsia-600 dark:prose-a:text-fuchsia-400 prose-headings:text-gray-900 dark:prose-headings:text-white">
+        <div class="prose dark:prose-invert max-w-none text-lg leading-relaxed text-zinc-950 dark:text-zinc-300 prose-a:text-fuchsia-700 dark:prose-a:text-fuchsia-400 prose-headings:text-black dark:prose-headings:text-white">
           {viewModel.content.split('\n').map((paragraph, index) =>
             paragraph ? (
-              <p key={index} class="mb-4">
+              <p key={index} class="mb-4 text-black dark:text-zinc-200">
                 {paragraph}
               </p>
             ) : (
