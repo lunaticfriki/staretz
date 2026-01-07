@@ -6,12 +6,12 @@
   line-height: 1.5;
   font-weight: 400;
 
-  /* Color Palette */
+
   --color-magenta: #ff00ff;
   --color-light-purple: #d8b4fe;
   --color-dark-purple: #581c87;
   
-  /* Light Theme Defaults */
+
   --bg-color: #f3f4f6; 
   --text-color: #1a1a1a;
   --primary-color: var(--color-dark-purple);
@@ -23,7 +23,7 @@
   color: var(--text-color);
   background-color: var(--bg-color);
 
-  font-synthesis: none;
+
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
