@@ -51,3 +51,7 @@ body {
   width: 100%;
 }
 
+
+span {
+  color: var(--primary-color);
+}

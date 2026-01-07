@@ -25,32 +25,32 @@ export function Header({ toggleTheme, currentTheme }: HeaderProps) {
       <div className="flex items-center gap-4">
         <nav className="flex gap-4">
           <Link
-            href="/about"
-            activeClassName="font-bold underline"
-            className="hover:text-(--secondary-color)"
-          >
-            About
-          </Link>
-          <Link
-            href="/programming"
-            activeClassName="font-bold underline"
-            className="hover:text-(--secondary-color)"
-          >
-            Programming
-          </Link>
-          <Link
             href="/blog"
-            activeClassName="font-bold underline"
-            className="hover:text-(--secondary-color)"
+            activeClassName="font-bold underline text-(--primary-color)"
+            className="hover:text-(--primary-color)"
           >
             Blog
           </Link>
           <Link
+            href="/programming"
+            activeClassName="font-bold underline text-(--primary-color)"
+            className="hover:text-(--primary-color)"
+          >
+            Programming
+          </Link>
+          <Link
             href="/music"
-            activeClassName="font-bold underline"
-            className="hover:text-(--secondary-color)"
+            activeClassName="font-bold underline text-(--primary-color)"
+            className="hover:text-(--primary-color)"
           >
             Music
+          </Link>
+          <Link
+            href="/about"
+            activeClassName="font-bold underline text-(--primary-color)"
+            className="hover:text-(--primary-color)"
+          >
+            About
           </Link>
         </nav>
         <button
