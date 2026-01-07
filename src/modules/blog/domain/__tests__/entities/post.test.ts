@@ -1,6 +1,5 @@
 import { PostMother } from '../mothers/post.mother';
 import { AuthorMother } from '../mothers/author.vo.mother';
-import { Author } from '../../valueObjects/author.vo';
 
 describe('Post tests', () => {
   it('should create a post', () => {
