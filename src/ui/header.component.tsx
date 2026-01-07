@@ -1,10 +1,7 @@
-import { Link as RouterLink } from 'preact-router/match';
-import type { FunctionalComponent, JSX } from 'preact';
-
-const Link = RouterLink as unknown as FunctionalComponent<
-  JSX.IntrinsicElements['a'] & { activeClassName?: string }
->;
+import { Link } from './link.component';
 import { MdWbSunny, MdDarkMode } from 'react-icons/md';
+import logoBlack from '../assets/logo-name-black.jpg';
+import logoWhite from '../assets/logo-name-whte.jpg';
 
 interface HeaderProps {
   toggleTheme: () => void;
@@ -18,8 +15,12 @@ export function Header({ toggleTheme, currentTheme }: HeaderProps) {
       style={{ backgroundColor: 'var(--header-bg)' }}
     >
       <div className="flex items-center">
-        <Link href="/" className="text-2xl font-bold" style={{ color: 'var(--primary-color)' }}>
-          staretz
+        <Link href="/" className="block">
+          <img
+            src={currentTheme === 'light' ? logoWhite : logoBlack}
+            alt="Staretz"
+            className="h-12 w-auto object-contain"
+          />
         </Link>
       </div>
       <div className="flex items-center gap-4">

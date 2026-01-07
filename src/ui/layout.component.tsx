@@ -18,7 +18,7 @@ export function Layout({ children }: LayoutProps) {
     >
       <Header toggleTheme={viewModel.toggle} currentTheme={viewModel.currentTheme.value} />
       <main className="grow p-4 w-full max-w-7xl mx-auto">{children}</main>
-      <Footer />
+      <Footer currentTheme={viewModel.currentTheme.value} />
     </div>
   );
 }

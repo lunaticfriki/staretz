@@ -11,12 +11,12 @@
   --color-dark-purple: #581c87;
   
   /* Light Theme Defaults */
-  --bg-color: #fcfcfc; /* Almost white */
+  --bg-color: #f3f4f6; 
   --text-color: #1a1a1a;
   --primary-color: var(--color-dark-purple);
   --secondary-color: var(--color-magenta);
   --header-bg: #f3f4f6;
-  --footer-bg: #f3f4f6;
+  --footer-bg: #ffffff;
 
   color-scheme: light;
   color: var(--text-color);
@@ -29,12 +29,12 @@
 }
 
 [data-theme="dark"] {
-  --bg-color: #121212; /* Almost black */
+  --bg-color: #000000; 
   --text-color: #e5e5e5;
   --primary-color: var(--color-light-purple);
   --secondary-color: var(--color-magenta);
-  --header-bg: #1e1e1e;
-  --footer-bg: #1e1e1e;
+  --header-bg: #000000;
+  --footer-bg: #000000;
   
   color-scheme: dark;
 }
