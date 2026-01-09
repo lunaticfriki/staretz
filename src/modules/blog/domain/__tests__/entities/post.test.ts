@@ -25,6 +25,7 @@ describe('Post tests', () => {
     expect(post.updatedAt).toBeInstanceOf(Date);
     expect(post.image).toBe('image-1');
     expect(post.author.name).toBe('Rodia');
+    expect(post.section).toBe('blog');
   });
 
   it('should create an empty post', () => {
@@ -37,6 +38,7 @@ describe('Post tests', () => {
     expect(post.updatedAt).toBeInstanceOf(Date);
     expect(post.image).toBe('');
     expect(post.author.name).toBe('');
+    expect(post.section).toBe('');
   });
 
   it('should create a random post', () => {

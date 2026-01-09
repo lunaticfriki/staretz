@@ -9,6 +9,7 @@ export class Post {
     public readonly updatedAt: Date,
     public readonly image: string,
     public readonly author: Author,
+    public readonly section: string,
   ) {}
 
   public static create(
@@ -19,12 +20,13 @@ export class Post {
     updatedAt: Date,
     image: string,
     author: Author,
+    section: string = 'blog',
   ) {
-    return new Post(id, title, content, createdAt, updatedAt, image, author);
+    return new Post(id, title, content, createdAt, updatedAt, image, author, section);
   }
 
   public static empty() {
-    return new Post('', '', '', new Date(), new Date(), '', Author.empty());
+    return new Post('', '', '', new Date(), new Date(), '', Author.empty(), '');
   }
 
   public isEmpty() {

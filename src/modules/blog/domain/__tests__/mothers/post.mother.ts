@@ -13,12 +13,13 @@ export class PostMother {
     updatedAt: Date,
     image: string,
     author: Author,
+    section: string = 'blog',
   ) {
-    return Post.create(id, title, content, createdAt, updatedAt, image, author);
+    return Post.create(id, title, content, createdAt, updatedAt, image, author, section);
   }
 
   public static createEmpty() {
-    return Post.create('', '', '', new Date(), new Date(), '', AuthorMother.createEmpty());
+    return Post.create('', '', '', new Date(), new Date(), '', AuthorMother.createEmpty(), '');
   }
 
   public static createRandom() {
@@ -30,6 +31,7 @@ export class PostMother {
       faker.date.recent(),
       faker.image.url(),
       AuthorMother.createRandom(),
+      faker.helpers.arrayElement(['blog', 'music', 'programming']),
     );
   }
 }

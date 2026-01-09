@@ -1,6 +1,7 @@
 import { Container } from 'inversify';
 import { TYPES } from './types';
 import { PostRepository } from '../modules/blog/domain/repositories/post.repository';
+import { HomeViewModel } from '../ui/home.viewModel';
 
 import { MarkdownPostRepository } from '../modules/blog/infrastructure/markdownPost.repository';
 import { PostReadService } from '../modules/blog/application/read.service';
@@ -16,5 +17,6 @@ container.bind<PostReadService>(TYPES.PostReadService).to(PostReadService);
 container.bind<PostWriteService>(TYPES.PostWriteService).to(PostWriteService);
 container.bind<PostStateService>(TYPES.PostStateService).to(PostStateService);
 container.bind<TextEditorComponent>(TYPES.TextEditor).toConstantValue(ReactMarkdownAdapter);
+container.bind<HomeViewModel>(TYPES.HomeViewModel).to(HomeViewModel);
 
 export { container };

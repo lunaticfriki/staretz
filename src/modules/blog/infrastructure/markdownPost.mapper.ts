@@ -22,6 +22,7 @@ export class MarkdownPostMapper {
         new Date(metadata.updatedAt || metadata.date),
         metadata.image || '',
         Author.create(metadata.author, metadata.authorEmail || '', metadata.authorAvatar || ''),
+        metadata.section || 'blog',
       );
     } catch (e) {
       console.error('Failed to parse post markdown', e);

@@ -4,4 +4,5 @@ export const TYPES = {
   PostWriteService: Symbol.for('PostWriteService'),
   PostStateService: Symbol.for('PostStateService'),
   TextEditor: Symbol.for('TextEditor'),
+  HomeViewModel: Symbol.for('HomeViewModel'),
 };
