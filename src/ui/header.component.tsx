@@ -1,7 +1,10 @@
+import { useMemo } from 'preact/hooks';
 import { Link } from './link.component';
-import { MdWbSunny, MdDarkMode } from 'react-icons/md';
+import { MdWbSunny, MdDarkMode, MdMenu, MdClose } from 'react-icons/md';
 import logoBlack from '../assets/logo-name-black.jpg';
 import logoWhite from '../assets/logo-name-whte.jpg';
+import { MenuViewModel } from './viewModels/menu.viewModel';
+import { Menu } from './menu.component';
 
 interface HeaderProps {
   toggleTheme: () => void;
@@ -9,9 +12,12 @@ interface HeaderProps {
 }
 
 export function Header({ toggleTheme, currentTheme }: HeaderProps) {
+  const menuViewModel = useMemo(() => new MenuViewModel(), []);
+  const isMenuOpen = menuViewModel.isMenuOpen.value;
+
   return (
     <header
-      className="w-full p-4 flex justify-between items-center"
+      className="w-full p-4 flex justify-between items-center relative"
       style={{ backgroundColor: 'var(--header-bg)' }}
     >
       <div className="flex items-center">
@@ -24,7 +30,8 @@ export function Header({ toggleTheme, currentTheme }: HeaderProps) {
         </Link>
       </div>
       <div className="flex items-center gap-4">
-        <nav className="flex gap-4">
+        {/* Desktop Navigation */}
+        <nav className="hidden md:flex gap-4">
           <Link
             href="/blog"
             activeClassName="font-bold underline text-(--primary-color)"
@@ -54,6 +61,7 @@ export function Header({ toggleTheme, currentTheme }: HeaderProps) {
             About
           </Link>
         </nav>
+
         <button
           onClick={toggleTheme}
           className="p-2 rounded-full cursor-pointer hover:bg-black/10 transition-colors"
@@ -62,6 +70,19 @@ export function Header({ toggleTheme, currentTheme }: HeaderProps) {
         >
           {currentTheme === 'light' ? <MdDarkMode size={24} /> : <MdWbSunny size={24} />}
         </button>
+
+        {/* Mobile Menu Button */}
+        <button
+          onClick={menuViewModel.toggleMenu}
+          className="md:hidden p-2 rounded-full cursor-pointer hover:bg-black/10 transition-colors"
+          aria-label="Toggle menu"
+          style={{ color: 'var(--primary-color)' }}
+        >
+          {isMenuOpen ? <MdClose size={24} /> : <MdMenu size={24} />}
+        </button>
+
+        {/* Mobile Menu Component */}
+        <Menu viewModel={menuViewModel} />
       </div>
     </header>
   );
