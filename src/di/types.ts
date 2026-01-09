@@ -5,4 +5,6 @@ export const TYPES = {
   PostStateService: Symbol.for('PostStateService'),
   TextEditor: Symbol.for('TextEditor'),
   HomeViewModel: Symbol.for('HomeViewModel'),
+  ErrorHandler: Symbol.for('ErrorHandler'),
+  ErrorViewModel: Symbol.for('ErrorViewModel'),
 };

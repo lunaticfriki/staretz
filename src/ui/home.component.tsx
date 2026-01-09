@@ -1,7 +1,7 @@
 import { useMemo } from 'preact/hooks';
 import { container } from '../di/container';
 import { TYPES } from '../di/types';
-import { HomeViewModel } from './home.viewModel';
+import { HomeViewModel } from './viewModels/home.viewModel';
 import { PostPreview } from '../modules/blog/presentation/postPreview.component';
 import { PostPreviewViewModel } from '../modules/blog/presentation/viewModels/postPreview.viewModel';
 

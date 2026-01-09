@@ -1,4 +1,4 @@
-import { HomeViewModel } from '../home.viewModel';
+import { HomeViewModel } from '../viewModels/home.viewModel';
 import { PostRepository } from '../../modules/blog/domain/repositories/post.repository';
 import { PostMother } from '../../modules/blog/domain/__tests__/mothers/post.mother';
 import { vi, describe, it, expect } from 'vitest';

@@ -1,9 +1,9 @@
-import { Post } from '../modules/blog/domain/entities/post';
-import { PostRepository } from '../modules/blog/domain/repositories/post.repository';
+import { Post } from '../../modules/blog/domain/entities/post';
+import { PostRepository } from '../../modules/blog/domain/repositories/post.repository';
 import { inject, injectable } from 'inversify';
 import { signal } from '@preact/signals';
 
-import { TYPES } from '../di/types';
+import { TYPES } from '../../di/types';
 
 @injectable()
 export class HomeViewModel {
