@@ -25,3 +25,5 @@ src/seeds
 *.njsproj
 *.sln
 *.sw?
+
+/content
