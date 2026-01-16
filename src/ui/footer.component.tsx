@@ -12,7 +12,7 @@ export function Footer({ currentTheme }: FooterProps) {
       style={{ backgroundColor: 'transparent', color: 'var(--text-color)' }}
     >
       <p>
-        &copy; <span>{new Date().getFullYear()}</span> staretz. All rights reserved.
+        &copy; <span>{new Date().getFullYear()}</span> staretz. Tots els drets reservats.
       </p>
       <div>
         <img

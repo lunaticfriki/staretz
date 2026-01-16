@@ -49,21 +49,21 @@ export function Menu({ viewModel }: MenuProps) {
           className="hover:text-(--primary-color)"
           onClick={() => viewModel.closeMenu()}
         >
-          Programming
+          Programació
         </Link>
         <Link
           href="/music"
           className="hover:text-(--primary-color)"
           onClick={() => viewModel.closeMenu()}
         >
-          Music
+          Música
         </Link>
         <Link
           href="/about"
           className="hover:text-(--primary-color)"
           onClick={() => viewModel.closeMenu()}
         >
-          About
+          Sobre mi
         </Link>
       </nav>
     </div>

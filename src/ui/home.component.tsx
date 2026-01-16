@@ -38,11 +38,5 @@ export function HomePage() {
     );
   }
 
-  return (
-    <div class="container mx-auto px-4 py-8">
-      {renderSection('Latest from Blog', 'blog')}
-      {renderSection('Music', 'music')}
-      {renderSection('Programming', 'programming')}
-    </div>
-  );
+  return <div class="container mx-auto px-4 py-8">{renderSection('Latest from Blog', 'blog')}</div>;
 }

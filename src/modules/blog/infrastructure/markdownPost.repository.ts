@@ -23,7 +23,7 @@ export class MarkdownPostRepository extends PostRepository {
   }
 
   private async loadPosts() {
-    const modules = import.meta.glob('../../../seeds/posts/*.md', {
+    const modules = import.meta.glob('../../../../content/posts/*.md', {
       query: '?raw',
       import: 'default',
     });

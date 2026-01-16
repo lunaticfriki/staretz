@@ -39,26 +39,26 @@ export function Header({ toggleTheme, currentTheme }: HeaderProps) {
           >
             Blog
           </Link>
-          <Link
+          {/* <Link
             href="/programming"
             activeClassName="font-bold underline text-(--primary-color)"
             className="hover:text-(--primary-color)"
           >
-            Programming
+            Programació
           </Link>
           <Link
             href="/music"
             activeClassName="font-bold underline text-(--primary-color)"
             className="hover:text-(--primary-color)"
           >
-            Music
-          </Link>
+            Música
+          </Link> */}
           <Link
             href="/about"
             activeClassName="font-bold underline text-(--primary-color)"
             className="hover:text-(--primary-color)"
           >
-            About
+            Info
           </Link>
         </nav>
 
