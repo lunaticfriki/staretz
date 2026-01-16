@@ -18,7 +18,7 @@ export function Header({ toggleTheme, currentTheme }: HeaderProps) {
   return (
     <header
       className="w-full p-4 flex justify-between items-center relative"
-      style={{ backgroundColor: 'var(--header-bg)' }}
+      style={{ backgroundColor: 'transparent' }}
     >
       <div className="flex items-center">
         <Link href="/" className="block">

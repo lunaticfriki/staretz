@@ -9,7 +9,7 @@ export function Footer({ currentTheme }: FooterProps) {
   return (
     <footer
       className="w-full p-4 flex justify-between items-center mt-auto"
-      style={{ backgroundColor: 'var(--footer-bg)', color: 'var(--text-color)' }}
+      style={{ backgroundColor: 'transparent', color: 'var(--text-color)' }}
     >
       <p>
         &copy; <span>{new Date().getFullYear()}</span> staretz. All rights reserved.
