@@ -13,12 +13,15 @@ export class TopicViewModel {
   }
 
   get topicName() {
-    return this.topic;
+    const matchingPost = this.service.posts.value.find(
+      (post: Post) => post.topic.toLowerCase() === this.topic.toLowerCase(),
+    );
+    return matchingPost ? matchingPost.topic : this.topic;
   }
 
   get posts() {
     return this.service.posts.value
-      .filter((post: Post) => post.topic === this.topic)
+      .filter((post: Post) => post.topic.toLowerCase() === this.topic.toLowerCase())
       .map((post: Post) => new PostPreviewViewModel(post));
   }
 

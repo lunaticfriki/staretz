@@ -40,16 +40,34 @@ export function Menu({ viewModel }: MenuProps) {
         <Link
           href="/blog"
           className="hover:text-(--primary-color)"
+          activeClassName="font-bold underline text-(--primary-color)"
           onClick={() => viewModel.closeMenu()}
         >
           Blog
         </Link>
         <Link
-          href="/about"
+          href="/blog/topics"
           className="hover:text-(--primary-color)"
+          activeClassName="font-bold underline text-(--primary-color)"
           onClick={() => viewModel.closeMenu()}
         >
-          Sobre mi
+          Temes
+        </Link>
+        <Link
+          href="/blog/tags"
+          className="hover:text-(--primary-color)"
+          activeClassName="font-bold underline text-(--primary-color)"
+          onClick={() => viewModel.closeMenu()}
+        >
+          Etiquetes
+        </Link>
+        <Link
+          href="/about"
+          className="hover:text-(--primary-color)"
+          activeClassName="font-bold underline text-(--primary-color)"
+          onClick={() => viewModel.closeMenu()}
+        >
+          Info
         </Link>
       </nav>
     </div>

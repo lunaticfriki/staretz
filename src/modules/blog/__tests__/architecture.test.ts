@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { filesOfProject } from 'tsarch';
-// @ts-expect-error: implicit any on path module
+
 import path from 'path';
 
 describe('Blog Module Architecture', () => {

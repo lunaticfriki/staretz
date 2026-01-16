@@ -11,7 +11,7 @@ export class TopicsViewModel {
   get topics() {
     const counts: Record<string, number> = {};
     this.service.posts.value.forEach((post: Post) => {
-      const topic = post.topic; // Keep raw topic key
+      const topic = post.topic;
       counts[topic] = (counts[topic] || 0) + 1;
     });
 

@@ -33,6 +33,12 @@ export class Post {
     return new Post('', '', '', new Date(), new Date(), '', Author.empty(), '', [], '');
   }
 
+  public calculateReadingTime(): number {
+    const wordsPerMinute = 200;
+    const words = this.content.trim().split(/\s+/).length;
+    return Math.max(1, Math.ceil(words / wordsPerMinute));
+  }
+
   public isEmpty() {
     return this.id === '' && this.title === '' && this.content === '';
   }

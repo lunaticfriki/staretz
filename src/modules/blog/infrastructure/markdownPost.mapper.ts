@@ -60,18 +60,15 @@ export class MarkdownPostMapper {
 
     if (tags.startsWith('[') && tags.endsWith(']')) {
       try {
-        // Try to parse as JSON array
         const parsed = JSON.parse(tags);
         if (Array.isArray(parsed)) {
           return parsed.map((t) => String(t).trim());
         }
       } catch (e) {
-        // If JSON parsing fails, fall back to splitting by comma
         console.warn('Failed to parse tags as JSON, falling back to comma split', e);
       }
     }
 
-    // Default: split by comma, effectively handling [tag1, tag2] or tag1, tag2
     let cleanTags = tags;
     if (cleanTags.startsWith('[') && cleanTags.endsWith(']')) {
       cleanTags = cleanTags.slice(1, -1);

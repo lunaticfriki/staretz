@@ -30,7 +30,6 @@ export function Header({ toggleTheme, currentTheme }: HeaderProps) {
         </Link>
       </div>
       <div className="flex items-center gap-4">
-        {/* Desktop Navigation */}
         <nav className="hidden md:flex gap-4">
           <Link
             href="/blog"
@@ -71,7 +70,6 @@ export function Header({ toggleTheme, currentTheme }: HeaderProps) {
           {currentTheme === 'light' ? <MdDarkMode size={24} /> : <MdWbSunny size={24} />}
         </button>
 
-        {/* Mobile Menu Button */}
         <button
           onClick={menuViewModel.toggleMenu}
           className="md:hidden p-2 rounded-full cursor-pointer hover:bg-black/10 transition-colors"
@@ -81,7 +79,6 @@ export function Header({ toggleTheme, currentTheme }: HeaderProps) {
           {isMenuOpen ? <MdClose size={24} /> : <MdMenu size={24} />}
         </button>
 
-        {/* Mobile Menu Component */}
         <Menu viewModel={menuViewModel} />
       </div>
     </header>

@@ -43,6 +43,10 @@ export class PostDetailViewModel {
     return this.post?.tags || [];
   }
 
+  get readingTime() {
+    return `${this.post?.calculateReadingTime() || 1} min de lectura`;
+  }
+
   get topic() {
     return this.post?.topic || '';
   }

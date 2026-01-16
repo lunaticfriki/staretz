@@ -88,7 +88,9 @@ export default function PostDetailPage({ id }: PostDetailProps) {
           />
           <div>
             <div class="font-medium text-gray-900 dark:text-white">{viewModel.authorName}</div>
-            <div class="text-sm text-gray-600 dark:text-zinc-400">{viewModel.date}</div>
+            <div class="text-sm text-gray-600 dark:text-zinc-400">
+              {viewModel.date} • {viewModel.readingTime}
+            </div>
           </div>
         </div>
 

@@ -37,9 +37,13 @@ export class PostPreviewViewModel {
     return this.post.tags;
   }
 
+  get readingTime() {
+    return `${this.post.calculateReadingTime()} min de lectura`;
+  }
+
   get topic() {
     const rawTopic = this.post.topic;
-    // Ensure capitalization for display consistency if needed, or just return raw
+
     return rawTopic.charAt(0).toUpperCase() + rawTopic.slice(1);
   }
 }

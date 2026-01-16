@@ -1,5 +1,7 @@
 import { PostMother } from '../mothers/post.mother';
 import { AuthorMother } from '../mothers/author.vo.mother';
+import { Post } from '../../entities/post';
+import { Author } from '../../valueObjects/author.vo';
 
 describe('Post tests', () => {
   it('should create a post', () => {
@@ -44,5 +46,39 @@ describe('Post tests', () => {
   it('should create a random post', () => {
     const post = PostMother.createRandom();
     expect(post).toBeDefined();
+  });
+
+  describe('calculateReadingTime', () => {
+    it('should return 1 minute for empty content', () => {
+      const post = Post.create('id', 'title', '', new Date(), new Date(), 'image', Author.empty());
+      expect(post.calculateReadingTime()).toBe(1);
+    });
+
+    it('should return 1 minute for short content', () => {
+      const post = Post.create(
+        'id',
+        'title',
+        'word '.repeat(100),
+        new Date(),
+        new Date(),
+        'image',
+        Author.empty(),
+      );
+      expect(post.calculateReadingTime()).toBe(1);
+    });
+
+    it('should calculate correct minutes for longer content', () => {
+      const post = Post.create(
+        'id',
+        'title',
+        'word '.repeat(400),
+        new Date(),
+        new Date(),
+        'image',
+        Author.empty(),
+      );
+      // 400 words / 200 wpm = 2 minutes
+      expect(post.calculateReadingTime()).toBe(2);
+    });
   });
 });

@@ -25,6 +25,8 @@ export function PostPreview({ viewModel }: PostPreviewProps) {
             <span>{viewModel.authorName}</span>
             <span class="mx-2">•</span>
             <span>{viewModel.date}</span>
+            <span class="mx-2">•</span>
+            <span>{viewModel.readingTime}</span>
           </div>
         </div>
 
