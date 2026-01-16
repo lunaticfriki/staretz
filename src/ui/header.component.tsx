@@ -40,6 +40,20 @@ export function Header({ toggleTheme, currentTheme }: HeaderProps) {
             Blog
           </Link>
           <Link
+            href="/blog/topics"
+            activeClassName="font-bold underline text-(--primary-color)"
+            className="hover:text-(--primary-color)"
+          >
+            Temes
+          </Link>
+          <Link
+            href="/blog/tags"
+            activeClassName="font-bold underline text-(--primary-color)"
+            className="hover:text-(--primary-color)"
+          >
+            Etiquetes
+          </Link>
+          <Link
             href="/about"
             activeClassName="font-bold underline text-(--primary-color)"
             className="hover:text-(--primary-color)"

@@ -23,6 +23,8 @@ export class MarkdownPostMapper {
         metadata.image || '',
         Author.create(metadata.author, metadata.authorEmail || '', metadata.authorAvatar || ''),
         metadata.section || 'blog',
+        this.parseTags(metadata.tags),
+        metadata.topic || 'General',
       );
     } catch (e) {
       console.error('Failed to parse post markdown', e);
@@ -49,5 +51,35 @@ export class MarkdownPostMapper {
     }
 
     return metadata;
+  }
+
+  private static parseTags(tags: string | undefined): string[] {
+    if (!tags) {
+      return [];
+    }
+
+    if (tags.startsWith('[') && tags.endsWith(']')) {
+      try {
+        // Try to parse as JSON array
+        const parsed = JSON.parse(tags);
+        if (Array.isArray(parsed)) {
+          return parsed.map((t) => String(t).trim());
+        }
+      } catch (e) {
+        // If JSON parsing fails, fall back to splitting by comma
+        console.warn('Failed to parse tags as JSON, falling back to comma split', e);
+      }
+    }
+
+    // Default: split by comma, effectively handling [tag1, tag2] or tag1, tag2
+    let cleanTags = tags;
+    if (cleanTags.startsWith('[') && cleanTags.endsWith(']')) {
+      cleanTags = cleanTags.slice(1, -1);
+    }
+
+    return cleanTags
+      .split(',')
+      .map((tag) => tag.trim())
+      .filter((tag) => tag.length > 0);
   }
 }

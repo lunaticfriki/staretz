@@ -38,4 +38,12 @@ export class PostDetailViewModel {
   get authorEmail() {
     return this.post?.author.email || '';
   }
+
+  get tags() {
+    return this.post?.tags || [];
+  }
+
+  get topic() {
+    return this.post?.topic || '';
+  }
 }

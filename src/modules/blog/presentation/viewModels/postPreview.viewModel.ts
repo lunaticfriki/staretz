@@ -32,4 +32,14 @@ export class PostPreviewViewModel {
   get authorAvatar() {
     return this.post.author.avatar;
   }
+
+  get tags() {
+    return this.post.tags;
+  }
+
+  get topic() {
+    const rawTopic = this.post.topic;
+    // Ensure capitalization for display consistency if needed, or just return raw
+    return rawTopic.charAt(0).toUpperCase() + rawTopic.slice(1);
+  }
 }

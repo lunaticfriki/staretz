@@ -10,6 +10,8 @@ export class Post {
     public readonly image: string,
     public readonly author: Author,
     public readonly section: string,
+    public readonly tags: string[],
+    public readonly topic: string,
   ) {}
 
   public static create(
@@ -21,12 +23,14 @@ export class Post {
     image: string,
     author: Author,
     section: string = 'blog',
+    tags: string[] = [],
+    topic: string = 'General',
   ) {
-    return new Post(id, title, content, createdAt, updatedAt, image, author, section);
+    return new Post(id, title, content, createdAt, updatedAt, image, author, section, tags, topic);
   }
 
   public static empty() {
-    return new Post('', '', '', new Date(), new Date(), '', Author.empty(), '');
+    return new Post('', '', '', new Date(), new Date(), '', Author.empty(), '', [], '');
   }
 
   public isEmpty() {

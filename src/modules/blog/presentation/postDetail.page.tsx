@@ -50,7 +50,7 @@ export default function PostDetailPage({ id }: PostDetailProps) {
             d="M10 19l-7-7m0 0l7-7m-7 7h18"
           />
         </svg>
-        Back to Blog
+        Tornar al Blog
       </Link>
 
       <article>
@@ -58,9 +58,27 @@ export default function PostDetailPage({ id }: PostDetailProps) {
           <img src={viewModel.image} alt={viewModel.title} class="w-full h-full object-cover" />
         </div>
 
-        <h1 class="text-4xl md:text-5xl font-bold mb-6 text-black dark:text-white leading-tight">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4 text-black dark:text-white leading-tight">
           {viewModel.title}
         </h1>
+
+        <div class="mb-6 flex flex-wrap gap-2">
+          <Link
+            href={`/blog/topics/${viewModel.topic}`}
+            class="inline-block px-3 py-1 text-sm font-semibold tracking-wide text-fuchsia-600 dark:text-fuchsia-400 bg-fuchsia-50 dark:bg-fuchsia-900/20 rounded-full hover:bg-fuchsia-100 dark:hover:bg-fuchsia-900/30 transition-colors"
+          >
+            {viewModel.topic}
+          </Link>
+          {viewModel.tags.map((tag) => (
+            <Link
+              key={tag}
+              href={`/blog/tags/${tag}`}
+              class="inline-block px-3 py-1 text-sm font-medium text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 rounded-full hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+            >
+              #{tag}
+            </Link>
+          ))}
+        </div>
 
         <div class="flex items-center gap-4 mb-10 pb-10 border-b border-zinc-200 dark:border-zinc-800">
           <img

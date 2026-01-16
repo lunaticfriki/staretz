@@ -28,6 +28,20 @@ export function PostPreview({ viewModel }: PostPreviewProps) {
           </div>
         </div>
 
+        <div class="mb-4 flex flex-wrap gap-2">
+          <span class="inline-block px-2 py-1 text-xs font-semibold tracking-wide text-fuchsia-600 dark:text-fuchsia-400 bg-fuchsia-50 dark:bg-fuchsia-900/20 rounded-md">
+            {viewModel.topic}
+          </span>
+          {viewModel.tags.map((tag) => (
+            <span
+              key={tag}
+              class="inline-block px-2 py-1 text-xs font-medium text-zinc-500 dark:text-zinc-400 bg-zinc-100 dark:bg-zinc-800 rounded-md"
+            >
+              #{tag}
+            </span>
+          ))}
+        </div>
+
         <h3 class="text-xl font-bold mb-3 text-zinc-900 dark:text-white line-clamp-2">
           {viewModel.title}
         </h3>
