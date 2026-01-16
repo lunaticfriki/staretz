@@ -39,20 +39,6 @@ export function Header({ toggleTheme, currentTheme }: HeaderProps) {
           >
             Blog
           </Link>
-          {/* <Link
-            href="/programming"
-            activeClassName="font-bold underline text-(--primary-color)"
-            className="hover:text-(--primary-color)"
-          >
-            Programació
-          </Link>
-          <Link
-            href="/music"
-            activeClassName="font-bold underline text-(--primary-color)"
-            className="hover:text-(--primary-color)"
-          >
-            Música
-          </Link> */}
           <Link
             href="/about"
             activeClassName="font-bold underline text-(--primary-color)"

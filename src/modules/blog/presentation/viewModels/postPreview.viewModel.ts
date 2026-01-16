@@ -13,7 +13,7 @@ export class PostPreviewViewModel {
 
   get excerpt() {
     return this.post.content.length > 100
-      ? this.post.content.substring(0, 100) + '...'
+      ? this.post.content.substring(0, 50) + '...'
       : this.post.content;
   }
 

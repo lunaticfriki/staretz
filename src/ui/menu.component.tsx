@@ -45,20 +45,6 @@ export function Menu({ viewModel }: MenuProps) {
           Blog
         </Link>
         <Link
-          href="/programming"
-          className="hover:text-(--primary-color)"
-          onClick={() => viewModel.closeMenu()}
-        >
-          Programació
-        </Link>
-        <Link
-          href="/music"
-          className="hover:text-(--primary-color)"
-          onClick={() => viewModel.closeMenu()}
-        >
-          Música
-        </Link>
-        <Link
           href="/about"
           className="hover:text-(--primary-color)"
           onClick={() => viewModel.closeMenu()}
