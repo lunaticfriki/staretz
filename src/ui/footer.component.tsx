@@ -1,3 +1,4 @@
+import { Link } from './link.component';
 import logoBlack from '../assets/logo-face-black.jpg';
 import logoWhite from '../assets/logo-face-white.jpg';
 
@@ -14,13 +15,13 @@ export function Footer({ currentTheme }: FooterProps) {
       <p>
         &copy; <span>{new Date().getFullYear()}</span> staretz. Tots els drets reservats.
       </p>
-      <div>
+      <Link href="/">
         <img
           src={currentTheme === 'light' ? logoWhite : logoBlack}
           alt="Staretz Logo"
           className="h-15 w-auto object-contain"
         />
-      </div>
+      </Link>
     </footer>
   );
 }
