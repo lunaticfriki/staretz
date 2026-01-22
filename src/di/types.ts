@@ -7,4 +7,5 @@ export const TYPES = {
   HomeViewModel: Symbol.for('HomeViewModel'),
   ErrorHandler: Symbol.for('ErrorHandler'),
   ErrorViewModel: Symbol.for('ErrorViewModel'),
+  ContentfulConfig: Symbol.for('ContentfulConfig'),
 };

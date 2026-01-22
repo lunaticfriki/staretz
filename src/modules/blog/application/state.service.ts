@@ -19,8 +19,9 @@ export class PostStateService {
     try {
       const posts = await this.readService.getPosts();
       this.posts.value = posts;
-    } catch (e) {
-      this.error.value = 'Failed to load posts';
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : String(e);
+      this.error.value = `Failed to load posts: ${message}`;
       console.error(e);
     } finally {
       this.isLoading.value = false;

@@ -4,6 +4,7 @@ export class Post {
   private constructor(
     public readonly id: string,
     public readonly title: string,
+    public readonly slug: string,
     public readonly content: string,
     public readonly createdAt: Date,
     public readonly updatedAt: Date,
@@ -17,6 +18,7 @@ export class Post {
   public static create(
     id: string,
     title: string,
+    slug: string,
     content: string,
     createdAt: Date,
     updatedAt: Date,
@@ -26,11 +28,23 @@ export class Post {
     tags: string[] = [],
     topic: string = 'General',
   ) {
-    return new Post(id, title, content, createdAt, updatedAt, image, author, section, tags, topic);
+    return new Post(
+      id,
+      title,
+      slug,
+      content,
+      createdAt,
+      updatedAt,
+      image,
+      author,
+      section,
+      tags,
+      topic,
+    );
   }
 
   public static empty() {
-    return new Post('', '', '', new Date(), new Date(), '', Author.empty(), '', [], '');
+    return new Post('', '', '', '', new Date(), new Date(), '', Author.empty(), '', [], '');
   }
 
   public calculateReadingTime(): number {

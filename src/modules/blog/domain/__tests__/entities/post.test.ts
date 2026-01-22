@@ -13,6 +13,7 @@ describe('Post tests', () => {
     const post = PostMother.createWithData(
       'id-1',
       'title-1',
+      'slug-1',
       'content-1',
       new Date(),
       new Date(),
@@ -50,7 +51,16 @@ describe('Post tests', () => {
 
   describe('calculateReadingTime', () => {
     it('should return 1 minute for empty content', () => {
-      const post = Post.create('id', 'title', '', new Date(), new Date(), 'image', Author.empty());
+      const post = Post.create(
+        'id',
+        'title',
+        'slug',
+        '',
+        new Date(),
+        new Date(),
+        'image',
+        Author.empty(),
+      );
       expect(post.calculateReadingTime()).toBe(1);
     });
 
@@ -58,6 +68,7 @@ describe('Post tests', () => {
       const post = Post.create(
         'id',
         'title',
+        'slug',
         'word '.repeat(100),
         new Date(),
         new Date(),
@@ -71,6 +82,7 @@ describe('Post tests', () => {
       const post = Post.create(
         'id',
         'title',
+        'slug',
         'word '.repeat(400),
         new Date(),
         new Date(),

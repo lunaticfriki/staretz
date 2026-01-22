@@ -1,24 +1,27 @@
 import { HomeViewModel } from '../viewModels/home.viewModel';
-import { PostRepository } from '../../modules/blog/domain/repositories/post.repository';
+import { PostStateService } from '../../modules/blog/application/state.service';
 import { PostMother } from '../../modules/blog/domain/__tests__/mothers/post.mother';
 import { vi, describe, it, expect } from 'vitest';
+import { signal } from '@preact/signals';
 
 describe('HomeViewModel', () => {
   it('should load posts on initialization', async () => {
-    const mockRepo = {
-      getAll: vi.fn().mockResolvedValue([]),
-    } as unknown as PostRepository;
+    const mockStateService = {
+      loadPosts: vi.fn(),
+      posts: signal([]),
+      isLoading: signal(false),
+    } as unknown as PostStateService;
 
-    new HomeViewModel(mockRepo);
-    await new Promise((resolve) => setTimeout(resolve, 0));
+    new HomeViewModel(mockStateService);
 
-    expect(mockRepo.getAll).toHaveBeenCalled();
+    expect(mockStateService.loadPosts).toHaveBeenCalled();
   });
 
   it('should filter posts by section', async () => {
     const blogPost = PostMother.createWithData(
       '1',
       't1',
+      'slug-1',
       'c1',
       new Date(),
       new Date(),
@@ -29,6 +32,7 @@ describe('HomeViewModel', () => {
     const musicPost = PostMother.createWithData(
       '2',
       't2',
+      'slug-2',
       'c2',
       new Date(),
       new Date(),
@@ -37,13 +41,13 @@ describe('HomeViewModel', () => {
       'music',
     );
 
-    const mockRepo = {
-      getAll: vi.fn().mockResolvedValue([blogPost, musicPost]),
-    } as unknown as PostRepository;
+    const mockStateService = {
+      loadPosts: vi.fn(),
+      posts: signal([blogPost, musicPost]),
+      isLoading: signal(false),
+    } as unknown as PostStateService;
 
-    const viewModel = new HomeViewModel(mockRepo);
-
-    await new Promise((resolve) => setTimeout(resolve, 10));
+    const viewModel = new HomeViewModel(mockStateService);
 
     const blogPosts = viewModel.getLatestPosts('blog');
     expect(blogPosts).toHaveLength(1);

@@ -8,6 +8,7 @@ export class PostMother {
   public static createWithData(
     id: string,
     title: string,
+    slug: string,
     content: string,
     createdAt: Date,
     updatedAt: Date,
@@ -15,17 +16,18 @@ export class PostMother {
     author: Author,
     section: string = 'blog',
   ) {
-    return Post.create(id, title, content, createdAt, updatedAt, image, author, section);
+    return Post.create(id, title, slug, content, createdAt, updatedAt, image, author, section);
   }
 
   public static createEmpty() {
-    return Post.create('', '', '', new Date(), new Date(), '', AuthorMother.createEmpty(), '');
+    return Post.create('', '', '', '', new Date(), new Date(), '', AuthorMother.createEmpty(), '');
   }
 
   public static createRandom() {
     return Post.create(
       faker.string.uuid(),
       faker.lorem.sentence(),
+      faker.lorem.slug(),
       faker.lorem.paragraph(),
       faker.date.past(),
       faker.date.recent(),

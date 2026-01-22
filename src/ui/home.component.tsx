@@ -6,13 +6,19 @@ import { PostPreview } from '../modules/blog/presentation/postPreview.component'
 import { PostPreviewViewModel } from '../modules/blog/presentation/viewModels/postPreview.viewModel';
 
 export function HomePage() {
+  console.log('HomePage rendering');
   const viewModel = useMemo(() => container.get<HomeViewModel>(TYPES.HomeViewModel), []);
+  console.log('HomePage viewModel loading:', viewModel.loading.value);
 
   const renderSection = (title: string, sectionKey: string) => {
     const posts = viewModel.getLatestPosts(sectionKey);
+
     return (
       <section class="mb-12">
-        <h2 class="text-3xl font-bold mb-6 text-zinc-900 dark:text-white capitalize">{title}</h2>
+        <h2 class="text-3xl font-bold mb-6 text-zinc-900 dark:text-white capitalize">
+          {title} ({posts.length})
+        </h2>
+
         {posts.length > 0 ? (
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {posts.map((post) => (
@@ -34,6 +40,14 @@ export function HomePage() {
     return (
       <div class="flex justify-center p-10">
         <span class="text-xl">Loading...</span>
+      </div>
+    );
+  }
+
+  if (viewModel.error.value) {
+    return (
+      <div class="flex justify-center p-10 text-red-500">
+        <span class="text-xl">Error: {viewModel.error.value}</span>
       </div>
     );
   }

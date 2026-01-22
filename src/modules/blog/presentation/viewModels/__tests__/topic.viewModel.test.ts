@@ -9,6 +9,7 @@ describe('TopicViewModel', () => {
     const post = Post.create(
       '1',
       'Test Title',
+      'test-title',
       'Content',
       new Date(),
       new Date(),
@@ -35,6 +36,7 @@ describe('TopicViewModel', () => {
     const post = Post.create(
       '1',
       'Test Title',
+      'test-title',
       'Content',
       new Date(),
       new Date(),

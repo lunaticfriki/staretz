@@ -17,6 +17,7 @@ export class MarkdownPostMapper {
       return Post.create(
         metadata.id,
         metadata.title,
+        metadata.slug || '',
         content.trim(),
         new Date(metadata.date),
         new Date(metadata.updatedAt || metadata.date),

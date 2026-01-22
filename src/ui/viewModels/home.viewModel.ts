@@ -1,34 +1,36 @@
 import { Post } from '../../modules/blog/domain/entities/post';
-import { PostRepository } from '../../modules/blog/domain/repositories/post.repository';
+import { PostStateService } from '../../modules/blog/application/state.service';
 import { inject, injectable } from 'inversify';
-import { signal } from '@preact/signals';
 
 import { TYPES } from '../../di/types';
 
 @injectable()
 export class HomeViewModel {
-  public posts = signal<Post[]>([]);
-  public loading = signal<boolean>(true);
-
-  constructor(@inject(TYPES.PostRepository) private readonly postRepository: PostRepository) {
-    this.loadPosts();
+  constructor(@inject(TYPES.PostStateService) private readonly stateService: PostStateService) {
+    this.stateService.loadPosts();
   }
 
-  async loadPosts() {
-    this.loading.value = true;
-    try {
-      const allPosts = await this.postRepository.getAll();
-      this.posts.value = allPosts;
-    } catch (error) {
-      console.error('Failed to load posts', error);
-    } finally {
-      this.loading.value = false;
-    }
+  get posts() {
+    return this.stateService.posts;
+  }
+
+  get loading() {
+    return this.stateService.isLoading;
+  }
+
+  get error() {
+    return this.stateService.error;
   }
 
   getLatestPosts(section: string, limit: number = 3): Post[] {
-    return this.posts.value
-      .filter((post) => post.section && post.section.toLowerCase() === section.toLowerCase())
+    const allPosts = this.stateService.posts.value;
+    const filtered = allPosts
+      .filter((post) => {
+        const postSection = post.section ? post.section.toLowerCase() : 'undefined';
+        const targetSection = section.toLowerCase();
+        return postSection === targetSection;
+      })
       .slice(0, limit);
+    return filtered;
   }
 }
