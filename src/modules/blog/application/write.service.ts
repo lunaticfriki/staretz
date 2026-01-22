@@ -4,5 +4,5 @@ import { PostRepository } from '../domain/repositories/post.repository';
 
 @injectable()
 export class PostWriteService {
-  constructor(@inject(TYPES.PostRepository) _repository: PostRepository) {}
+  constructor(@inject(TYPES.PostRepository) private repository: PostRepository) {}
 }
