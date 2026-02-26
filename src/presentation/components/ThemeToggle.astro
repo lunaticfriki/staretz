@@ -39,6 +39,14 @@ import ThemeIconDark from './ThemeIconDark.astro';
         display: none;
     }
 
+    .dark-icon:hover {
+        color: var(--accent-magenta);
+    }
+
+    .light-icon:hover {
+        color: var(--accent-yellow);
+    }
+
     :global(html:not([data-theme])) .dark-icon { display: block; }
     :global(html:not([data-theme])) .light-icon { display: none; }
 
