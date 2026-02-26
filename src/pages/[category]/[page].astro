@@ -1,0 +1,291 @@
+---
+import { postDI } from '../../application/di/post.di';
+import Header from '../../presentation/components/Header.astro';
+import Footer from '../../presentation/components/Footer.astro';
+import { VALID_CATEGORIES } from '../../domain/valueObjects/post-category';
+import type { Post } from '../../domain/entities/post';
+
+export async function getStaticPaths() {
+    const { postReadService, postStateService } = postDI;
+    
+    await postReadService.execute();
+    const allPosts = postStateService.getPosts();
+
+    return VALID_CATEGORIES.flatMap((category) => {
+        const categoryPosts = allPosts.filter(p => p.category.getValue() === category);
+        
+        if (categoryPosts.length === 0) {
+            return [{
+                params: { category, page: '1' },
+                props: { post: null as Post | null, currentIndex: 1, total: 0 }
+            }];
+        }
+
+        return categoryPosts.map((post, index) => {
+            return {
+                params: { 
+                    category, 
+                    page: (index + 1).toString() 
+                },
+                props: { 
+                    post: post as Post | null, 
+                    currentIndex: index + 1, 
+                    total: categoryPosts.length 
+                }
+            };
+        });
+    });
+}
+
+
+const { category } = Astro.params;
+const { post, currentIndex, total } = Astro.props;
+
+const prevPage = currentIndex > 1 ? currentIndex - 1 : null;
+const nextPage = currentIndex < total ? currentIndex + 1 : null;
+---
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+		<link rel="icon" href="/favicon.ico" />
+		<meta name="viewport" content="width=device-width" />
+		<meta name="generator" content={Astro.generator} />
+		<title>STARETZ | {category?.toUpperCase() || ''}</title>
+        <style is:global>
+            /* Color Schema */
+            :root {
+                --color-black: #000000;
+                --color-white: #ffffff;
+                --accent-magenta: #ff00ff;
+                --accent-yellow: #ffff00;
+            }
+
+            /* Light Theme Defaults */
+            :root, [data-theme='light'] {
+                --bg-color: var(--color-white);
+                --text-color: var(--color-black);
+                --header-bg: #f9f9f9;
+                --header-text: var(--color-black);
+                --card-bg: var(--color-white);
+                --card-border: #ccc;
+                --card-text: #222;
+                --card-muted: #555;
+            }
+
+            [data-theme='dark'] {
+                --bg-color: #121212;
+                --text-color: var(--color-white);
+                --header-bg: var(--color-black);
+                --header-text: var(--color-white);
+                --card-bg: #1e1e1e;
+                --card-border: #333;
+                --card-text: #fff;
+                --card-muted: #bbb;
+            }
+
+            *, *::before, *::after {
+                box-sizing: border-box;
+            }
+
+            html, body {
+                margin: 0;
+                padding: 0;
+                height: 100vh;
+                overflow: hidden; /* Prevent full page scroll */
+            }
+
+            body {
+                font-family: system-ui, sans-serif;
+                background-color: var(--bg-color);
+                color: var(--text-color);
+                display: flex;
+                flex-direction: column;
+                transition: background-color 0.3s ease, color 0.3s ease;
+            }
+            
+            main {
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                padding: 0;
+                overflow: hidden; /* Contain inner layout */
+            }
+
+            .post-container {
+                width: 100%;
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .post-layout {
+                display: flex;
+                flex-direction: row;
+                height: 100%;
+                width: 100%;
+                overflow: hidden;
+            }
+
+            @media (max-width: 768px) {
+                .post-layout {
+                    flex-direction: column;
+                    overflow-y: auto; /* Mobile needs to scroll the whole thing */
+                }
+                .post-left {
+                    height: 40vh !important;
+                    flex: none !important;
+                }
+                .post-right {
+                    overflow-y: visible !important;
+                }
+            }
+
+            .post-left {
+                flex: 1;
+                position: relative;
+                height: 100%;
+            }
+
+            .post-left::after {
+                content: '';
+                position: absolute;
+                top: 0;
+                right: -1px; /* Overlap slightly to prevent gaps */
+                bottom: 0;
+                width: 150px;
+                background: linear-gradient(to right, transparent 20%, var(--bg-color) 100%);
+                backdrop-filter: blur(3px);
+                -webkit-backdrop-filter: blur(3px);
+                pointer-events: none;
+            }
+
+            .post-right {
+                flex: 1;
+                height: 100%;
+                overflow-y: auto; /* Only text scrolls vertically */
+                padding: 2rem 4rem 4rem 2rem;
+                display: flex;
+                flex-direction: column;
+            }
+
+            .post-header-inline {
+                display: flex;
+                align-items: baseline;
+                justify-content: space-between;
+                margin-bottom: 2rem;
+                flex-wrap: wrap;
+                gap: 1rem;
+            }
+
+            .post-meta {
+                display: flex;
+                align-items: baseline;
+                gap: 1rem;
+            }
+
+            .post-index {
+                color: var(--accent-magenta);
+                font-weight: bold;
+                font-size: 1.5rem;
+                font-family: monospace;
+            }
+
+            .post-date {
+                color: var(--card-muted);
+                font-family: monospace;
+                font-size: 1rem;
+            }
+
+            .pagination {
+                display: flex;
+                gap: 1.5rem;
+                align-items: center;
+            }
+
+            .page-arrow {
+                color: var(--text-color);
+                text-decoration: none;
+                font-size: 1.5rem;
+                font-weight: bold;
+                user-select: none;
+            }
+
+            .page-arrow:hover {
+                color: var(--accent-magenta);
+            }
+
+            .page-arrow.disabled {
+                opacity: 0.3;
+                pointer-events: none;
+            }
+
+            .post-image {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
+
+            .post-title {
+                margin: 0 0 1rem 0;
+                font-size: 2.5rem;
+                color: var(--text-color);
+            }
+
+            .post-content {
+                color: var(--card-muted);
+                line-height: 1.8;
+                font-size: 1.1rem;
+            }
+            
+            .empty-state {
+                text-align: center;
+                color: var(--card-muted);
+                padding: 4rem 0;
+            }
+        </style>
+	</head>
+	<body>
+        <Header />
+        
+        <main>
+            <div class="post-container">
+                {post ? (
+                    <>
+                        <div class="post-layout">
+                            <div class="post-left">
+                                {post.image && post.image.value && (
+                                    <img src={post.image.value} alt={post.title.value} class="post-image" loading="lazy" />
+                                )}
+                            </div>
+                            <div class="post-right">
+                                <div class="post-header-inline">
+                                    <div class="post-meta">
+                                        <span class="post-index">{currentIndex}</span>
+                                        <span class="post-date">{post.formattedDate}</span>
+                                    </div>
+                                    <div class="pagination">
+                                        <a href={prevPage ? `/${category}/${prevPage}` : '#'} class={`page-arrow ${!prevPage ? 'disabled' : ''}`} aria-label="Previous Post">&lt;</a>
+                                        <a href={nextPage ? `/${category}/${nextPage}` : '#'} class={`page-arrow ${!nextPage ? 'disabled' : ''}`} aria-label="Next Post">&gt;</a>
+                                    </div>
+                                </div>
+                                
+                                <h2 class="post-title">{post.title.value}</h2>
+                                <p class="post-content">{post.content.value}</p>
+                            </div>
+                        </div>
+                    </>
+                ) : (
+                    <div class="empty-state">
+                        <h2>No posts yet.</h2>
+                        <p>There are currently no posts available in the <strong>{category}</strong> category.</p>
+                    </div>
+                )}
+            </div>
+        </main>
+
+        <Footer />
+	</body>
+</html>

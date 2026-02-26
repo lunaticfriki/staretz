@@ -1,4 +1,4 @@
-import { expect, test, describe, beforeEach } from 'vitest';
+import { test, describe, beforeEach } from 'vitest';
 import { mock, instance, when, verify } from 'ts-mockito';
 import { PostReadService } from '../post.read.service';
 import { PostStateService } from '../post.state.service';
@@ -8,6 +8,7 @@ import { PostId } from '../../../domain/valueObjects/post-id';
 import { PostTitle } from '../../../domain/valueObjects/post-title';
 import { PostContent } from '../../../domain/valueObjects/post-content';
 import { PostImage } from '../../../domain/valueObjects/post-image';
+import { PostCategory } from '../../../domain/valueObjects/post-category';
 
 describe('PostReadService', () => {
     let mockRepository: PostRepository;
@@ -30,6 +31,7 @@ describe('PostReadService', () => {
                 PostTitle.create('Title 1'),
                 PostContent.create('Content 1'),
                 PostImage.create('https://picsum.photos/400'),
+                new PostCategory('music'),
             ),
         ];
 

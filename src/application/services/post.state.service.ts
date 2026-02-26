@@ -10,6 +10,12 @@ export class PostStateService {
         return this.posts;
     }
 
+    getPostsByCategory(category: string): Post[] {
+        return this.posts.filter(
+            (post) => post.category.getValue() === category,
+        );
+    }
+
     setPosts(posts: Post[]): void {
         this.posts = posts;
     }

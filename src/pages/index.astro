@@ -1,42 +1,17 @@
 ---
-import { postDI } from '../application/di/post.di';
-import PostList from '../presentation/components/PostList.astro';
-
-const { postReadService, postStateService } = postDI;
-
-await postReadService.execute();
-const posts = postStateService.getPosts();
 ---
 
+<!DOCTYPE html>
 <html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>STARETZ</title>
-        <style>
-            body {
-                font-family: system-ui, sans-serif;
-                margin: 0;
-                padding: 0;
-                background-color: #f9f9f9;
-                color: #333;
-            }
-            h1 {
-                text-align: center;
-                padding: 2rem 0;
-                margin: 0;
-                background-color: #fff;
-                border-bottom: 1px solid #eaeaea;
-            }
-        </style>
-	</head>
-	<body>
-		<h1>STARETZ</h1>
-        <main>
-            <PostList posts={posts} />
-        </main>
-	</body>
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="refresh" content="0;url=/music/1" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>STARETZ - Redirecting</title>
+</head>
+<body>
+    <div style="display: flex; height: 100vh; justify-content: center; align-items: center; background: black; color: magenta; font-family: monospace;">
+        Redirecting to default category...
+    </div>
+</body>
 </html>

@@ -1,0 +1,77 @@
+---
+import ThemeIconLight from './ThemeIconLight.astro';
+import ThemeIconDark from './ThemeIconDark.astro';
+---
+
+<button id="theme-toggle" aria-label="Toggle Dark Mode">
+    <span class="icon light-icon">
+        <ThemeIconLight />
+    </span>
+    <span class="icon dark-icon">
+        <ThemeIconDark />
+    </span>
+</button>
+
+<style>
+    #theme-toggle {
+        background: transparent;
+        border: none;
+        color: var(--header-text); 
+        cursor: pointer;
+        padding: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.2s ease;
+    }
+
+    #theme-toggle svg {
+        width: 32px;
+        height: 32px;
+        display: block;
+    }
+
+    #theme-toggle:hover {
+        transform: scale(1.1); 
+    }
+    
+    .light-icon, .dark-icon {
+        display: none;
+    }
+
+    :global(html:not([data-theme])) .dark-icon { display: block; }
+    :global(html:not([data-theme])) .light-icon { display: none; }
+
+    :global([data-theme='dark']) .light-icon { display: block; }
+    :global([data-theme='dark']) .dark-icon { display: none; }
+    
+    :global([data-theme='light']) .light-icon { display: none; }
+    :global([data-theme='light']) .dark-icon { display: block; }
+</style>
+
+<script is:inline>
+    function setupTheme() {
+        const themeToggle = document.getElementById('theme-toggle');
+        const storedTheme = localStorage.getItem('theme');
+        const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        
+        const initialTheme = storedTheme || (systemPrefersDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', initialTheme);
+
+        if (themeToggle) {
+            const newToggle = themeToggle.cloneNode(true);
+            themeToggle.parentNode.replaceChild(newToggle, themeToggle);
+            
+            newToggle.addEventListener('click', () => {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+            });
+        }
+    }
+
+    setupTheme();
+    document.addEventListener('astro:after-swap', setupTheme);
+</script>

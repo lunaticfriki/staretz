@@ -3,6 +3,7 @@ import { PostId } from '../../../valueObjects/post-id';
 import { PostTitle } from '../../../valueObjects/post-title';
 import { PostContent } from '../../../valueObjects/post-content';
 import { PostImage } from '../../../valueObjects/post-image';
+import { PostCategory } from '../../../valueObjects/post-category';
 
 export class PostMother {
     static createRandom(): Post {
@@ -11,6 +12,7 @@ export class PostMother {
             PostTitle.create('random-title'),
             PostContent.create('random-content'),
             PostImage.create('https://picsum.photos/seed/placeholder/400/300'),
+            new PostCategory('music'),
         );
     }
 
@@ -19,6 +21,7 @@ export class PostMother {
         title: string;
         content: string;
         image?: string;
+        category?: string;
     }): Post {
         return Post.create(
             PostId.create(data.id),
@@ -27,6 +30,7 @@ export class PostMother {
             PostImage.create(
                 data.image || 'https://picsum.photos/seed/placeholder/400/300',
             ),
+            new PostCategory(data.category || 'music'),
         );
     }
 
@@ -40,6 +44,7 @@ export class PostMother {
             PostTitle.create(title),
             PostContent.create('random-content'),
             PostImage.create('https://picsum.photos/seed/placeholder/400/300'),
+            new PostCategory('music'),
         );
     }
 
@@ -49,6 +54,7 @@ export class PostMother {
             PostTitle.create('random-title'),
             PostContent.create(content),
             PostImage.create('https://picsum.photos/seed/placeholder/400/300'),
+            new PostCategory('music'),
         );
     }
 
@@ -58,6 +64,7 @@ export class PostMother {
             PostTitle.create('random-title'),
             PostContent.create('random-content'),
             PostImage.create('https://picsum.photos/seed/placeholder/400/300'),
+            new PostCategory('music'),
         );
     }
 
@@ -67,6 +74,7 @@ export class PostMother {
             PostTitle.create(title),
             PostContent.create(content),
             PostImage.create('https://picsum.photos/seed/placeholder/400/300'),
+            new PostCategory('music'),
         );
     }
 
@@ -76,6 +84,7 @@ export class PostMother {
             PostTitle.create(title),
             PostContent.create('random-content'),
             PostImage.create('https://picsum.photos/seed/placeholder/400/300'),
+            new PostCategory('music'),
         );
     }
 
@@ -85,6 +94,7 @@ export class PostMother {
             PostTitle.create('random-title'),
             PostContent.create(content),
             PostImage.create('https://picsum.photos/seed/placeholder/400/300'),
+            new PostCategory('music'),
         );
     }
 }

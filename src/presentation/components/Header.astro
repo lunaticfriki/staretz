@@ -1,0 +1,90 @@
+---
+import ThemeToggle from './ThemeToggle.astro';
+import { VALID_CATEGORIES } from '../../domain/valueObjects/post-category';
+
+const currentPath = Astro.url.pathname;
+const activeCategory = currentPath === '/' 
+    ? 'music' 
+    : VALID_CATEGORIES.find(cat => currentPath.startsWith(`/${cat}`)) || 'music';
+---
+
+<header class="site-header">
+    <div class="header-content">
+        <span class="logo">STARETZ</span>
+        
+        <nav class="category-nav">
+            {VALID_CATEGORIES.map((cat, index) => (
+                <>
+                    <a 
+                        href={`/${cat}/1`} 
+                        class={`category-link ${cat === activeCategory ? 'active' : ''}`}
+                    >
+                        {cat}
+                    </a>
+                    {index < VALID_CATEGORIES.length - 1 && <span class="separator">|</span>}
+                </>
+            ))}
+        </nav>
+
+        <ThemeToggle />
+    </div>
+</header>
+
+<style>
+    .site-header {
+        position: sticky;
+        top: 0;
+        z-index: 100;
+        background-color: var(--header-bg);
+        color: var(--header-text);
+        padding: 1rem 2rem;
+        transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    .header-content {
+        width: 100%;
+        margin: 0;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .logo {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--header-text);
+        letter-spacing: 2px;
+    }
+
+    .category-nav {
+        display: flex;
+        gap: 0.5rem;
+        flex-wrap: wrap; /* in case screen is small */
+        justify-content: center;
+        align-items: center;
+    }
+
+    .category-link {
+        color: var(--header-text);
+        text-decoration: none;
+        font-family: monospace;
+        font-size: 1.1rem;
+        text-transform: lowercase;
+        transition: color 0.2s;
+    }
+
+    .category-link:hover {
+        color: var(--accent-magenta);
+    }
+
+    .category-link.active {
+        color: var(--accent-magenta);
+        font-weight: bold;
+    }
+
+    .separator {
+        color: var(--header-text);
+        opacity: 0.5;
+        user-select: none;
+    }
+</style>

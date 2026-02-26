@@ -1,0 +1,75 @@
+---
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+    <div class="footer-content">
+        <div class="footer-text">
+            <span>staretz || </span>
+            <a href="https://github.com/lunaticfriki" target="_blank" rel="noopener noreferrer">@lunaticfriki, </a>
+            <span class="year">{year}</span>
+        </div>
+        <img src="/logo-name-face-black.jpg" alt="Logo" class="footer-logo" />
+    </div>
+</footer>
+
+<style>
+    .site-footer {
+        position: sticky;
+        bottom: 0;
+        z-index: 100;
+        background-color: #000000; 
+        color: #ffffff; 
+        padding: 2rem;
+        margin-top: auto;
+    }
+
+    .footer-content {
+        width: 100%;
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+    }
+
+    .footer-text {
+        text-align: center;
+        font-family: monospace;
+        font-size: 0.9rem;
+    }
+
+    .footer-text a {
+        color: #ffffff;
+        text-decoration: none;
+        transition: color 0.3s ease;
+    }
+
+    .footer-text a:hover {
+        color: var(--accent-yellow); 
+        text-decoration: underline;
+    }
+
+    .year {
+        color: var(--accent-magenta);
+        font-weight: bold;
+    }
+
+    .footer-logo {
+        position: absolute;
+        right: 0;
+        height: 50px;
+        width: auto;
+        border-radius: 4px; 
+    }
+
+    @media (max-width: 600px) {
+        .footer-content {
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+        .footer-logo {
+            position: static;
+        }
+    }
+</style>
