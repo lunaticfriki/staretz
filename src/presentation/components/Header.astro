@@ -10,7 +10,10 @@ const activeCategory = currentPath === '/'
 
 <header class="site-header">
     <div class="header-content">
-        <span class="logo">STARETZ</span>
+        <a href="/" aria-label="Home" class="logo-link">
+            <img src="/logo-name.jpg" alt="STARETZ Logo" class="logo-img light-logo" />
+            <img src="/logo-name-black.jpg" alt="STARETZ Logo" class="logo-img dark-logo" />
+        </a>
         
         <nav class="category-nav">
             {VALID_CATEGORIES.map((cat, index) => (
@@ -49,17 +52,30 @@ const activeCategory = currentPath === '/'
         align-items: center;
     }
 
-    .logo {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: var(--header-text);
-        letter-spacing: 2px;
+    .logo-img {
+        height: 35px;
+        width: auto;
+    }
+
+   
+    .dark-logo {
+        display: none;
+    }
+    .light-logo {
+        display: block;
+    }
+
+    :global([data-theme='dark']) .light-logo {
+        display: none;
+    }
+    :global([data-theme='dark']) .dark-logo {
+        display: block;
     }
 
     .category-nav {
         display: flex;
         gap: 0.5rem;
-        flex-wrap: wrap; /* in case screen is small */
+        flex-wrap: wrap;
         justify-content: center;
         align-items: center;
     }
@@ -68,7 +84,7 @@ const activeCategory = currentPath === '/'
         color: var(--header-text);
         text-decoration: none;
         font-family: monospace;
-        font-size: 1.1rem;
+        font-size: 0.9rem;
         text-transform: lowercase;
         transition: color 0.2s;
     }

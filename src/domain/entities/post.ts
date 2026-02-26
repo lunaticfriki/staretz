@@ -27,7 +27,7 @@ export class Post {
         this.image =
             image ||
             PostImage.create('https://picsum.photos/seed/placeholder/400/300');
-        this.category = category || new PostCategory('music'); // Default
+        this.category = category || new PostCategory('music');
         this.createdAt = new Date();
         this.updatedAt = new Date();
         this.publishedAt = new Date();

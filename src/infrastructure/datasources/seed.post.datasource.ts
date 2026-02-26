@@ -15,7 +15,6 @@ import type { PostDatasource } from '../../domain/datasources/post.datasource';
 export class SeedPostDatasource implements PostDatasource {
     async getPosts(): Promise<Post[]> {
         const posts: Post[] = [];
-        // Distribute approximately evenly across the 7 categories
         for (let i = 1; i <= 21; i++) {
             const catIndex = i % VALID_CATEGORIES.length;
             const category = VALID_CATEGORIES[catIndex];
