@@ -26,4 +26,35 @@ export class Post {
     static empty() {
         return new Post();
     }
+
+    updateTitle(title: PostTitle) {
+        this.title = title;
+        this.updatedAt = new Date();
+    }
+
+    updateContent(content: PostContent) {
+        this.content = content;
+        this.updatedAt = new Date();
+    }
+
+    publish() {
+        this.publishedAt = new Date();
+    }
+
+    update(title: PostTitle, content: PostContent) {
+        this.title = title;
+        this.content = content;
+        this.updatedAt = new Date();
+    }
+
+    get value() {
+        return {
+            id: this.id.value,
+            title: this.title.value,
+            content: this.content.value,
+            createdAt: this.createdAt,
+            updatedAt: this.updatedAt,
+            publishedAt: this.publishedAt,
+        };
+    }
 }
