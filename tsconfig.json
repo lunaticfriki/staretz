@@ -1,7 +1,9 @@
 {
     "extends": "astro/tsconfigs/strict",
     "compilerOptions": {
-        "types": ["vitest/globals"]
+        "types": ["vitest/globals"],
+        "experimentalDecorators": true,
+        "emitDecoratorMetadata": true
     },
     "include": [".astro/types.d.ts", "**/*"],
     "exclude": ["dist"]

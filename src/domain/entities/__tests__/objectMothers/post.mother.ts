@@ -2,6 +2,7 @@ import { Post } from '../../post';
 import { PostId } from '../../../valueObjects/post-id';
 import { PostTitle } from '../../../valueObjects/post-title';
 import { PostContent } from '../../../valueObjects/post-content';
+import { PostImage } from '../../../valueObjects/post-image';
 
 export class PostMother {
     static createRandom(): Post {
@@ -9,6 +10,7 @@ export class PostMother {
             PostId.create('random-id'),
             PostTitle.create('random-title'),
             PostContent.create('random-content'),
+            PostImage.create('https://picsum.photos/seed/placeholder/400/300'),
         );
     }
 
@@ -16,11 +18,15 @@ export class PostMother {
         id: string;
         title: string;
         content: string;
+        image?: string;
     }): Post {
         return Post.create(
             PostId.create(data.id),
             PostTitle.create(data.title),
             PostContent.create(data.content),
+            PostImage.create(
+                data.image || 'https://picsum.photos/seed/placeholder/400/300',
+            ),
         );
     }
 
@@ -33,6 +39,7 @@ export class PostMother {
             PostId.create('random-id'),
             PostTitle.create(title),
             PostContent.create('random-content'),
+            PostImage.create('https://picsum.photos/seed/placeholder/400/300'),
         );
     }
 
@@ -41,6 +48,7 @@ export class PostMother {
             PostId.create('random-id'),
             PostTitle.create('random-title'),
             PostContent.create(content),
+            PostImage.create('https://picsum.photos/seed/placeholder/400/300'),
         );
     }
 
@@ -49,6 +57,7 @@ export class PostMother {
             PostId.create(id),
             PostTitle.create('random-title'),
             PostContent.create('random-content'),
+            PostImage.create('https://picsum.photos/seed/placeholder/400/300'),
         );
     }
 
@@ -57,6 +66,7 @@ export class PostMother {
             PostId.create('random-id'),
             PostTitle.create(title),
             PostContent.create(content),
+            PostImage.create('https://picsum.photos/seed/placeholder/400/300'),
         );
     }
 
@@ -65,6 +75,7 @@ export class PostMother {
             PostId.create(id),
             PostTitle.create(title),
             PostContent.create('random-content'),
+            PostImage.create('https://picsum.photos/seed/placeholder/400/300'),
         );
     }
 
@@ -73,6 +84,7 @@ export class PostMother {
             PostId.create(id),
             PostTitle.create('random-title'),
             PostContent.create(content),
+            PostImage.create('https://picsum.photos/seed/placeholder/400/300'),
         );
     }
 }

@@ -8,12 +8,15 @@
         "preview": "astro preview",
         "astro": "astro",
         "test": "vitest",
-        "tmux": "bash src/scripts/tmux.sh"
+        "start": "bash src/scripts/tmux.sh"
     },
     "dependencies": {
-        "astro": "^5.17.1"
+        "astro": "^5.17.1",
+        "inversify": "^7.11.0",
+        "reflect-metadata": "^0.2.2"
     },
     "devDependencies": {
+        "ts-mockito": "^2.6.1",
         "vitest": "^4.0.18"
     }
 }
