@@ -1,15 +1,13 @@
 #!/bin/bash
 
 # Define the ports your apps use
-DEV_PORT=3000
-TEST_PORT=3001
+DEV_PORT=4321
 
 # Function to kill processes on exit
 cleanup() {
-    echo "Cleaning up ports $DEV_PORT and $TEST_PORT..."
+    echo "Cleaning up ports $DEV_PORT..."
     # Find PIDs using the ports and kill them
     fuser -k $DEV_PORT/tcp > /dev/null 2>&1
-    fuser -k $TEST_PORT/tcp > /dev/null 2>&1
     echo "Done. Goodbye!"
 }
 
