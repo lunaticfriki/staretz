@@ -1,13 +1,13 @@
 import { expect, test, describe, beforeEach } from 'vitest';
 import { mock, instance, when, verify } from 'ts-mockito';
-import { PostReadService } from './post.read.service';
-import { PostStateService } from './post.state.service';
-import type { PostRepository } from '../../domain/repositories/post.repository';
-import { Post } from '../../domain/entities/post';
-import { PostId } from '../../domain/valueObjects/post-id';
-import { PostTitle } from '../../domain/valueObjects/post-title';
-import { PostContent } from '../../domain/valueObjects/post-content';
-import { PostImage } from '../../domain/valueObjects/post-image';
+import { PostReadService } from '../post.read.service';
+import { PostStateService } from '../post.state.service';
+import type { PostRepository } from '../../../domain/repositories/post.repository';
+import { Post } from '../../../domain/entities/post';
+import { PostId } from '../../../domain/valueObjects/post-id';
+import { PostTitle } from '../../../domain/valueObjects/post-title';
+import { PostContent } from '../../../domain/valueObjects/post-content';
+import { PostImage } from '../../../domain/valueObjects/post-image';
 
 describe('PostReadService', () => {
     let mockRepository: PostRepository;
