@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../application/cubit/post_cubit.dart';
 import '../../application/cubit/post_state.dart';
 import '../../core/di/injection.dart';
+import '../widgets/blog_header.dart';
+import '../widgets/blog_footer.dart';
 import '../widgets/post_list_item.dart';
 
 class HomeScreen extends StatelessWidget {
@@ -13,17 +15,9 @@ class HomeScreen extends StatelessWidget {
     return BlocProvider(
       create: (_) => getIt<PostCubit>(),
       child: Scaffold(
-        appBar: AppBar(title: const Text('staretz blog'), centerTitle: true),
+        appBar: const BlogHeader(),
         body: const HomeContent(),
-        bottomNavigationBar: const BottomAppBar(
-          child: Padding(
-            padding: EdgeInsets.all(16.0),
-            child: Text(
-              '© 2026 staretz blog. Built with Flutter & DDD.',
-              textAlign: TextAlign.center,
-            ),
-          ),
-        ),
+        bottomNavigationBar: const BlogFooter(),
       ),
     );
   }

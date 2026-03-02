@@ -84,7 +84,7 @@ class PostListItem extends StatelessWidget {
                         visualDensity: VisualDensity.compact,
                         backgroundColor: Theme.of(
                           context,
-                        ).primaryColor.withOpacity(0.1),
+                        ).primaryColor.withValues(alpha: 0.1),
                       );
                     }).toList(),
                   ),
