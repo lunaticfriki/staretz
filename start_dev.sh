@@ -11,7 +11,7 @@ if [ $? != 0 ]; then
     tmux new-session -d -s $SESSION
 
     # Pane 0 (Left side): Run the Flutter web server
-    tmux send-keys -t $SESSION:0.0 'flutter run -d web-server --web-port 8081' C-m
+    tmux send-keys -t $SESSION:0.0 'flutter run -d web-server --web-port 8080' C-m
 
     # Split the window horizontally (Creates Pane 1 on the right)
     tmux split-window -h -t $SESSION:0
