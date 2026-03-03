@@ -65,18 +65,23 @@ class HomeContent extends StatelessWidget {
             child: Text('${AppTranslations.errorPrefix}${state.message}'),
           );
         } else if (state is PostLoaded) {
-          return Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 800),
-              child: ListView.builder(
-                padding: const EdgeInsets.all(16.0),
-                itemCount: state.posts.length,
-                itemBuilder: (context, index) {
-                  final post = state.posts[index];
-                  return PostListItem(post: post);
-                },
-              ),
+          return ListView.builder(
+            padding: const EdgeInsets.only(
+              left: 16.0,
+              right: 16.0,
+              top: 48.0,
+              bottom: 16.0,
             ),
+            itemCount: state.posts.length,
+            itemBuilder: (context, index) {
+              final post = state.posts[index];
+              return Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 800),
+                  child: PostListItem(post: post),
+                ),
+              );
+            },
           );
         }
         return const Center(child: Text(AppTranslations.unknownState));
