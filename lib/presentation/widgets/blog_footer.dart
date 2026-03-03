@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../config/constants.dart';
+import '../../config/translations.dart';
 
 class BlogFooter extends StatelessWidget {
   const BlogFooter({super.key});
@@ -20,7 +21,10 @@ class BlogFooter extends StatelessWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Text('© ', style: TextStyle(color: Colors.white)),
+                  const Text(
+                    AppTranslations.copyright,
+                    style: TextStyle(color: Colors.white),
+                  ),
                   Text(
                     '$year',
                     style: TextStyle(
@@ -28,7 +32,8 @@ class BlogFooter extends StatelessWidget {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  const Text(' staretz', style: TextStyle(color: Colors.white)),
+                  Padding(padding: EdgeInsets.symmetric(horizontal: 4)),
+                  Image.asset(AppConstants.logoNameBlack, height: 24),
                 ],
               ),
             ),
@@ -36,7 +41,7 @@ class BlogFooter extends StatelessWidget {
           Positioned(
             right: 16,
             bottom: 16,
-            child: Image.asset(AppConstants.logoNameFaceBlack, height: 24),
+            child: Image.asset(AppConstants.logoNameFaceBlack, height: 28),
           ),
         ],
       ),

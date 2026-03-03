@@ -7,16 +7,16 @@ class AppTheme {
   static ThemeData get light => ThemeData(
     useMaterial3: true,
     brightness: Brightness.light,
-    scaffoldBackgroundColor: Colors.white,
+    scaffoldBackgroundColor: Color.fromARGB(244, 244, 244, 244),
     colorScheme: const ColorScheme.light(
       primary: Colors.purple,
       secondary: Colors.yellow,
-      surface: Color.fromARGB(255, 244, 244, 244),
+      surface: Color.fromARGB(244, 244, 244, 244),
       onSurface: Colors.black,
     ),
     textTheme: _textTheme,
     appBarTheme: AppBarTheme(
-      backgroundColor: Colors.white,
+      backgroundColor: Color.fromARGB(244, 244, 244, 244),
       foregroundColor: Colors.black,
       elevation: 0,
       titleTextStyle: _textTheme.titleLarge?.copyWith(

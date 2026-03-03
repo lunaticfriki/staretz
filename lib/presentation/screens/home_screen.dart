@@ -7,6 +7,8 @@ import '../widgets/blog_header.dart';
 import '../widgets/blog_footer.dart';
 import '../widgets/post_list_item.dart';
 
+import '../../config/translations.dart';
+
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -33,7 +35,9 @@ class HomeContent extends StatelessWidget {
         if (state is PostLoading || state is PostInitial) {
           return const Center(child: CircularProgressIndicator());
         } else if (state is PostError) {
-          return Center(child: Text('Error: ${state.message}'));
+          return Center(
+            child: Text('${AppTranslations.errorPrefix}${state.message}'),
+          );
         } else if (state is PostLoaded) {
           return Center(
             child: ConstrainedBox(
@@ -49,7 +53,7 @@ class HomeContent extends StatelessWidget {
             ),
           );
         }
-        return const Center(child: Text('Unknown State'));
+        return const Center(child: Text(AppTranslations.unknownState));
       },
     );
   }
