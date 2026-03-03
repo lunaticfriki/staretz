@@ -5,38 +5,54 @@ import '../../application/cubit/theme_state.dart';
 
 import '../../config/constants.dart';
 import 'package:pixelarticons/pixel.dart';
+import 'package:go_router/go_router.dart';
+import 'nav_menu.dart';
 
 class BlogHeader extends StatelessWidget implements PreferredSizeWidget {
   const BlogHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return AppBar(
-      title: BlocBuilder<ThemeCubit, ThemeState>(
-        builder: (context, state) {
-          return Image.asset(
-            state.isDarkMode
-                ? AppConstants.logoNameBlack
-                : AppConstants.logoNameWhite,
-            height: 40,
-            fit: BoxFit.contain,
-          );
-        },
-      ),
-      centerTitle: true,
-      actions: [
-        BlocBuilder<ThemeCubit, ThemeState>(
-          builder: (context, state) {
-            return IconButton(
-              icon: Icon(
-                state.isDarkMode ? Pixel.sun : Pixel.moon,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              onPressed: () => context.read<ThemeCubit>().toggleTheme(),
-            );
-          },
-        ),
-      ],
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isDesktop = constraints.maxWidth > 800;
+
+        return AppBar(
+          title: BlocBuilder<ThemeCubit, ThemeState>(
+            builder: (context, state) {
+              return InkWell(
+                hoverColor: Colors.transparent,
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+                onTap: () => context.go('/'),
+                child: Image.asset(
+                  state.isDarkMode
+                      ? AppConstants.logoNameBlack
+                      : AppConstants.logoNameWhite,
+                  height: 40,
+                  fit: BoxFit.contain,
+                ),
+              );
+            },
+          ),
+          centerTitle: !isDesktop, // Center on mobile, left on desktop
+          actions: [
+            if (isDesktop) const NavMenu(),
+            BlocBuilder<ThemeCubit, ThemeState>(
+              builder: (context, state) {
+                return IconButton(
+                  icon: Icon(
+                    state.isDarkMode ? Pixel.sun : Pixel.moon,
+                    color: Theme.of(context).colorScheme.primary,
+                  ),
+                  onPressed: () => context.read<ThemeCubit>().toggleTheme(),
+                );
+              },
+            ),
+            const SizedBox(width: 16),
+          ],
+        );
+      },
     );
   }
 

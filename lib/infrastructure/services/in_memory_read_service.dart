@@ -34,15 +34,15 @@ class InMemoryReadService implements ReadService {
 
 ${faker.lorem.sentences(5).join(' ')}
 
-![Content Image](${faker.image.image(random: true)})
+![Content Image](${faker.image.loremPicsum()})
 
 ${faker.lorem.sentences(5).join(' ')}
 
-![Content Image](${faker.image.image(random: true)})
+![Content Image](${faker.image.loremPicsum()})
 
 ${faker.lorem.sentences(5).join(' ')}
 
-![Content Image](${faker.image.image(random: true)})
+![Content Image](${faker.image.loremPicsum()})
 ''';
 
       posts.add(
@@ -64,10 +64,10 @@ ${faker.lorem.sentences(5).join(' ')}
                 .replaceAll(RegExp(r'[^a-z0-9\-]'), ''),
           ),
           images: [
-            PostImage(faker.image.image(random: true), isHero: true),
-            PostImage(faker.image.image(random: true)),
-            PostImage(faker.image.image(random: true)),
-            PostImage(faker.image.image(random: true)),
+            PostImage(faker.image.loremPicsum(), isHero: true),
+            PostImage(faker.image.loremPicsum()),
+            PostImage(faker.image.loremPicsum()),
+            PostImage(faker.image.loremPicsum()),
           ],
         ),
       );
@@ -79,7 +79,14 @@ ${faker.lorem.sentences(5).join(' ')}
   }
 
   @override
-  Stream<List<Post>> getPosts() => _postsSubject.stream;
+  Stream<List<Post>> getPosts({String? tag}) {
+    if (tag == null) {
+      return _postsSubject.stream;
+    }
+    return _postsSubject.stream.map(
+      (posts) => posts.where((p) => p.tags.any((t) => t.value == tag)).toList(),
+    );
+  }
 
   @override
   Stream<Post?> getPost(String id) {

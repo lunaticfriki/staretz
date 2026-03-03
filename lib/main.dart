@@ -4,7 +4,7 @@ import 'application/cubit/theme_cubit.dart';
 import 'application/cubit/theme_state.dart';
 import 'core/di/injection.dart';
 import 'core/theme/app_theme.dart';
-import 'presentation/screens/home_screen.dart';
+import 'core/router/app_router.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,13 +21,13 @@ class MyApp extends StatelessWidget {
       create: (_) => getIt<ThemeCubit>(),
       child: BlocBuilder<ThemeCubit, ThemeState>(
         builder: (context, themeState) {
-          return MaterialApp(
+          return MaterialApp.router(
             title: 'staretz',
             debugShowCheckedModeBanner: false,
             themeMode: themeState.isDarkMode ? ThemeMode.dark : ThemeMode.light,
             theme: AppTheme.light,
             darkTheme: AppTheme.dark,
-            home: const HomeScreen(),
+            routerConfig: appRouter,
           );
         },
       ),

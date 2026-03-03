@@ -1,7 +1,9 @@
 import 'package:get_it/get_it.dart';
 import '../../application/cubit/post_cubit.dart';
 import '../../application/cubit/theme_cubit.dart';
-import '../../application/services/post_app_service.dart';
+import '../../application/services/read_app_service.dart';
+import '../../application/services/write_app_service.dart';
+import '../../application/services/state_app_service.dart';
 import '../../domain/services/read_service.dart';
 import '../../domain/services/state_service.dart';
 import '../../domain/services/write_service.dart';
@@ -28,15 +30,23 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<StateService>(() => InMemoryStateService());
 
   // Application Layer
-  getIt.registerFactory<PostAppService>(
-    () => PostAppService(
-      getIt<ReadService>(),
-      getIt<WriteService>(),
-      getIt<StateService>(),
-    ),
+  getIt.registerFactory<ReadAppService>(
+    () => ReadAppService(getIt<ReadService>()),
+  );
+  getIt.registerFactory<WriteAppService>(
+    () => WriteAppService(getIt<WriteService>()),
+  );
+  getIt.registerFactory<StateAppService>(
+    () => StateAppService(getIt<StateService>()),
   );
 
   // Presentation Layer - Cubits
-  getIt.registerFactory<PostCubit>(() => PostCubit(getIt<PostAppService>()));
+  getIt.registerFactory<PostCubit>(
+    () => PostCubit(
+      getIt<ReadAppService>(),
+      getIt<WriteAppService>(),
+      getIt<StateAppService>(),
+    ),
+  );
   getIt.registerFactory<ThemeCubit>(() => ThemeCubit(getIt<ThemeService>()));
 }
