@@ -69,7 +69,7 @@ class PostListItem extends StatelessWidget {
                       ),
                       const SizedBox(width: 4),
                       Text(
-                        '${post.createdAt.year}-${post.createdAt.month.toString().padLeft(2, '0')}-${post.createdAt.day.toString().padLeft(2, '0')}',
+                        '${post.createdAt.day.toString().padLeft(2, '0')}/${post.createdAt.month.toString().padLeft(2, '0')}/${post.createdAt.year}',
                         style: Theme.of(
                           context,
                         ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
@@ -83,9 +83,7 @@ class PostListItem extends StatelessWidget {
                       return ActionChip(
                         label: Text(
                           tag.value,
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.onPrimary,
-                          ),
+                          style: const TextStyle(color: Colors.white),
                         ),
                         visualDensity: VisualDensity.compact,
                         backgroundColor: Theme.of(context).colorScheme.primary,
