@@ -4,6 +4,7 @@ import '../../application/cubit/theme_cubit.dart';
 import '../../application/cubit/theme_state.dart';
 
 import '../../config/constants.dart';
+import 'package:pixelarticons/pixel.dart';
 
 class BlogHeader extends StatelessWidget implements PreferredSizeWidget {
   const BlogHeader({super.key});
@@ -28,7 +29,7 @@ class BlogHeader extends StatelessWidget implements PreferredSizeWidget {
           builder: (context, state) {
             return IconButton(
               icon: Icon(
-                state.isDarkMode ? Icons.light_mode : Icons.dark_mode,
+                state.isDarkMode ? Pixel.sun : Pixel.moon,
                 color: Theme.of(context).colorScheme.primary,
               ),
               onPressed: () => context.read<ThemeCubit>().toggleTheme(),
