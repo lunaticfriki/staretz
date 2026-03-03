@@ -1,6 +1,6 @@
 # Staretz Flutter Blog Application
 
-Welcome to the `staretz` Flutter project! This is a modern, themeable blog application built from the ground-up focusing on scalable architecture and clean code principles.
+Welcome to the `staretz`! This is a modern, themeable blog application built from the ground-up focusing on scalable architecture and clean code principles.
 
 ## Architecture: Domain-Driven Design (DDD) / Hexagonal
 
