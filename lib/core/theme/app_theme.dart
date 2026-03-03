@@ -19,6 +19,7 @@ class AppTheme {
       backgroundColor: Color.fromARGB(244, 244, 244, 244),
       foregroundColor: Colors.black,
       elevation: 0,
+      scrolledUnderElevation: 0,
       titleTextStyle: _textTheme.titleLarge?.copyWith(
         color: Colors.black,
         fontWeight: FontWeight.bold,
@@ -44,6 +45,7 @@ class AppTheme {
       backgroundColor: Colors.black,
       foregroundColor: Colors.white,
       elevation: 0,
+      scrolledUnderElevation: 0,
       titleTextStyle: _textTheme.titleLarge?.copyWith(
         color: Colors.white,
         fontWeight: FontWeight.bold,
