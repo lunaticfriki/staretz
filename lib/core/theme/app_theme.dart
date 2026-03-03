@@ -11,7 +11,7 @@ class AppTheme {
     colorScheme: const ColorScheme.light(
       primary: Colors.purple,
       secondary: Colors.yellow,
-      surface: Colors.white,
+      surface: Color.fromARGB(255, 244, 244, 244),
       onSurface: Colors.black,
     ),
     textTheme: _textTheme,

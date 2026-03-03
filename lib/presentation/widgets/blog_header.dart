@@ -3,13 +3,25 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../application/cubit/theme_cubit.dart';
 import '../../application/cubit/theme_state.dart';
 
+import '../../config/constants.dart';
+
 class BlogHeader extends StatelessWidget implements PreferredSizeWidget {
   const BlogHeader({super.key});
 
   @override
   Widget build(BuildContext context) {
     return AppBar(
-      title: const Text('staretz'),
+      title: BlocBuilder<ThemeCubit, ThemeState>(
+        builder: (context, state) {
+          return Image.asset(
+            state.isDarkMode
+                ? AppConstants.logoNameBlack
+                : AppConstants.logoNameWhite,
+            height: 40,
+            fit: BoxFit.contain,
+          );
+        },
+      ),
       centerTitle: true,
       actions: [
         BlocBuilder<ThemeCubit, ThemeState>(
