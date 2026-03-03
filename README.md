@@ -1,4 +1,4 @@
-# Staretz Flutter Blog Application
+# Staretz
 
 Welcome to the `staretz`! This is a modern, themeable blog application built from the ground-up focusing on scalable architecture and clean code principles.
 
