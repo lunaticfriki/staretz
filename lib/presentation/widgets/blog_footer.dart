@@ -41,7 +41,7 @@ class BlogFooter extends StatelessWidget {
           Positioned(
             right: 16,
             bottom: 16,
-            child: Image.asset(AppConstants.logoNameFaceBlack, height: 28),
+            child: Image.asset(AppConstants.logoNameFaceBlack, height: 42),
           ),
         ],
       ),
