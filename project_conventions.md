@@ -31,3 +31,6 @@ The app supports both Light and Dark modes.
 ## 5. Testing
 - Object Mothers and Data Builders are used to create test data.
 - Domain logic must be heavily unit-tested.
+
+## 6. Code Style & Formatting
+- **No Comments**: Remove or avoid using inline code comments (`//` or `/* */`). Code should be self-documenting and expressive enough that external comments explaining the logic are not needed.

@@ -17,11 +17,9 @@ import '../../infrastructure/services/shared_prefs_theme_service.dart';
 final getIt = GetIt.instance;
 
 Future<void> setupDependencyInjection() async {
-  // Await shared preferences init
   final prefs = await SharedPreferences.getInstance();
   getIt.registerLazySingleton<SharedPreferences>(() => prefs);
 
-  // Infrastructure Layer
   getIt.registerLazySingleton<ThemeService>(
     () => SharedPrefsThemeService(getIt<SharedPreferences>()),
   );
@@ -29,7 +27,6 @@ Future<void> setupDependencyInjection() async {
   getIt.registerLazySingleton<WriteService>(() => InMemoryWriteService());
   getIt.registerLazySingleton<StateService>(() => InMemoryStateService());
 
-  // Application Layer
   getIt.registerFactory<ReadAppService>(
     () => ReadAppService(getIt<ReadService>()),
   );
@@ -40,7 +37,6 @@ Future<void> setupDependencyInjection() async {
     () => StateAppService(getIt<StateService>()),
   );
 
-  // Presentation Layer - Cubits
   getIt.registerFactory<PostCubit>(
     () => PostCubit(
       getIt<ReadAppService>(),

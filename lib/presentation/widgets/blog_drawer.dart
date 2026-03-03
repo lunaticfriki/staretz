@@ -49,7 +49,7 @@ class BlogDrawer extends StatelessWidget {
               ),
               selected: isActive,
               onTap: () {
-                Navigator.pop(context); // Close drawer
+                Navigator.pop(context);
                 context.go(item['path']!);
               },
             );

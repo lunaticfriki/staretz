@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import '../../domain/entities/post.dart';
 
 class PostListItem extends StatelessWidget {
@@ -16,11 +17,9 @@ class PostListItem extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 24.0),
       clipBehavior: Clip.antiAlias,
       elevation: 4,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       child: InkWell(
-        onTap: () {
-          // Future navigation to post detail screen
-        },
+        onTap: () {},
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -38,7 +37,9 @@ class PostListItem extends StatelessWidget {
                   ),
                 ),
               ),
-            Padding(
+            Container(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              width: double.infinity,
               padding: const EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,9 +57,9 @@ class PostListItem extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         post.author.value,
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey[700],
-                        ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
                       ),
                       const SizedBox(width: 16),
                       const Icon(
@@ -69,9 +70,9 @@ class PostListItem extends StatelessWidget {
                       const SizedBox(width: 4),
                       Text(
                         '${post.createdAt.year}-${post.createdAt.month.toString().padLeft(2, '0')}-${post.createdAt.day.toString().padLeft(2, '0')}',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                          color: Colors.grey[700],
-                        ),
+                        style: Theme.of(
+                          context,
+                        ).textTheme.bodyMedium?.copyWith(color: Colors.grey),
                       ),
                     ],
                   ),
@@ -79,12 +80,22 @@ class PostListItem extends StatelessWidget {
                   Wrap(
                     spacing: 8.0,
                     children: post.tags.map((tag) {
-                      return Chip(
-                        label: Text(tag.value),
+                      return ActionChip(
+                        label: Text(
+                          tag.value,
+                          style: TextStyle(
+                            color: Theme.of(context).colorScheme.onPrimary,
+                          ),
+                        ),
                         visualDensity: VisualDensity.compact,
-                        backgroundColor: Theme.of(
-                          context,
-                        ).primaryColor.withValues(alpha: 0.1),
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius: BorderRadius.zero,
+                          side: BorderSide(color: Colors.transparent),
+                        ),
+                        onPressed: () {
+                          context.go('/tag/${tag.value}');
+                        },
                       );
                     }).toList(),
                   ),

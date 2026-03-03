@@ -73,7 +73,6 @@ ${faker.lorem.sentences(5).join(' ')}
       );
     }
 
-    // Sort by created at descending
     posts.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     _postsSubject.add(posts);
   }

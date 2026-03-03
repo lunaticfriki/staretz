@@ -35,7 +35,7 @@ class BlogHeader extends StatelessWidget implements PreferredSizeWidget {
               );
             },
           ),
-          centerTitle: !isDesktop, // Center on mobile, left on desktop
+          centerTitle: !isDesktop,
           actions: [
             if (isDesktop) const NavMenu(),
             BlocBuilder<ThemeCubit, ThemeState>(

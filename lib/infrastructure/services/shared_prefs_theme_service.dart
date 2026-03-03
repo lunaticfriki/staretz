@@ -10,7 +10,10 @@ class SharedPrefsThemeService implements ThemeService {
   late final BehaviorSubject<bool> _isDarkModeSubject;
 
   SharedPrefsThemeService(this._prefs) {
-    // Read the initial theme from shared preferences (default to false / light mode)
+    _initTheme();
+  }
+
+  void _initTheme() {
     final isDark = _prefs.getBool(_themeKey) ?? false;
     _isDarkModeSubject = BehaviorSubject<bool>.seeded(isDark);
   }
