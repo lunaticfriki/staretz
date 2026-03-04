@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../config/translations.dart';
 
 class NavMenu extends StatefulWidget {
   const NavMenu({super.key});
@@ -10,11 +11,11 @@ class NavMenu extends StatefulWidget {
 
 class _NavMenuState extends State<NavMenu> {
   final List<Map<String, String>> _menuItems = [
-    {'label': 'Music', 'path': '/tag/music'},
-    {'label': 'Videogames', 'path': '/tag/videogames'},
-    {'label': 'Philosophy', 'path': '/tag/philosophy'},
-    {'label': 'Programming', 'path': '/tag/programming'},
-    {'label': 'About', 'path': '/about'},
+    {'label': AppTranslations.menuMusic, 'path': '/tag/music'},
+    {'label': AppTranslations.menuVideogames, 'path': '/tag/videogames'},
+    {'label': AppTranslations.menuPhilosophy, 'path': '/tag/philosophy'},
+    {'label': AppTranslations.menuProgramming, 'path': '/tag/programming'},
+    {'label': AppTranslations.menuAbout, 'path': '/about'},
   ];
 
   @override

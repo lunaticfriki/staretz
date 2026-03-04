@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../config/constants.dart';
+import '../../config/translations.dart';
 
 class BlogDrawer extends StatelessWidget {
   const BlogDrawer({super.key});
@@ -11,12 +12,12 @@ class BlogDrawer extends StatelessWidget {
     final String currentRoute = GoRouterState.of(context).uri.toString();
 
     final List<Map<String, String>> menuItems = [
-      {'label': 'Home', 'path': '/'},
-      {'label': 'Music', 'path': '/tag/music'},
-      {'label': 'Videogames', 'path': '/tag/videogames'},
-      {'label': 'Philosophy', 'path': '/tag/philosophy'},
-      {'label': 'Programming', 'path': '/tag/programming'},
-      {'label': 'About', 'path': '/about'},
+      {'label': AppTranslations.menuHome, 'path': '/'},
+      {'label': AppTranslations.menuMusic, 'path': '/tag/music'},
+      {'label': AppTranslations.menuVideogames, 'path': '/tag/videogames'},
+      {'label': AppTranslations.menuPhilosophy, 'path': '/tag/philosophy'},
+      {'label': AppTranslations.menuProgramming, 'path': '/tag/programming'},
+      {'label': AppTranslations.menuAbout, 'path': '/about'},
     ];
 
     return Drawer(
