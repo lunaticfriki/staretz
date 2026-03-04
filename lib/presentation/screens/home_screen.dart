@@ -58,23 +58,31 @@ class HomeContent extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<PostCubit, PostState>(
       builder: (context, state) {
-        if (state is PostLoading || state is PostInitial) {
-          return const Center(child: CircularProgressIndicator());
-        } else if (state is PostError) {
-          return Center(
-            child: Text('${AppTranslations.errorPrefix}${state.message}'),
-          );
-        } else if (state is PostLoaded) {
-          return ListView.builder(
+        return switch (state) {
+          PostInitial() ||
+          PostLoading() => const Center(child: CircularProgressIndicator()),
+          PostError(message: final msg) => Center(
+            child: Text('${AppTranslations.errorPrefix}$msg'),
+          ),
+          PostLoaded(posts: final posts) when posts.isEmpty => Center(
+            child: Text(
+              AppTranslations.comingSoon,
+              style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: Theme.of(context).colorScheme.primary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          PostLoaded(posts: final posts) => ListView.builder(
             padding: const EdgeInsets.only(
               left: 16.0,
               right: 16.0,
               top: 48.0,
               bottom: 16.0,
             ),
-            itemCount: state.posts.length,
+            itemCount: posts.length,
             itemBuilder: (context, index) {
-              final post = state.posts[index];
+              final post = posts[index];
               return Center(
                 child: ConstrainedBox(
                   constraints: const BoxConstraints(maxWidth: 800),
@@ -82,9 +90,9 @@ class HomeContent extends StatelessWidget {
                 ),
               );
             },
-          );
-        }
-        return const Center(child: Text(AppTranslations.unknownState));
+          ),
+          _ => const Center(child: Text(AppTranslations.unknownState)),
+        };
       },
     );
   }
