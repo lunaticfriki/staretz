@@ -19,7 +19,7 @@ The `lib/` directory is divided into the following main layers:
 ## 3. Configuration & Hardcoded Values
 We avoid "magic strings" and hardcoded values scattered throughout the codebase.
 - **Constants**: All asset paths, configuration values, and non-UI constants are stored in `lib/config/constants.dart` under the `AppConstants` class.
-- **Translations/UI Strings**: All user-facing text and UI strings are stored in `lib/config/translations.dart` under the `AppTranslations` class.
+- **Translations/UI Strings**: All user-facing text and UI strings are stored in `lib/config/translations.dart` under the `AppTranslations` class. This includes static text like the About page's Title, Version, or Author. Hardcoding these strings in UI files is strictly prohibited.
 
 ## 4. Theming & Styling
 The app supports both Light and Dark modes.

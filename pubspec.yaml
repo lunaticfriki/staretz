@@ -20,6 +20,7 @@ dependencies:
   pixelarticons: ^0.4.0
   rxdart: ^0.28.0
   shared_preferences: ^2.5.4
+  url_launcher: ^6.3.2
   uuid: ^4.5.3
 
 dev_dependencies:
