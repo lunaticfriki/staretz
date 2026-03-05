@@ -49,11 +49,7 @@ class _NavItemState extends State<_NavItem> {
     final bool isActive = currentRoute == widget.path;
 
     Color itemColor = theme.textTheme.bodyMedium?.color ?? Colors.black;
-    if (isActive) {
-      itemColor = theme.colorScheme.primary;
-    } else if (_isHovered) {
-      itemColor = theme.colorScheme.secondary;
-    }
+    if (isActive || _isHovered) itemColor = theme.colorScheme.primary;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16.0),
