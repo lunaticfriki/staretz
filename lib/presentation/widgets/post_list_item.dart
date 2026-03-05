@@ -19,7 +19,9 @@ class PostListItem extends StatelessWidget {
       elevation: 4,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          context.push('/post/${post.id}', extra: post);
+        },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

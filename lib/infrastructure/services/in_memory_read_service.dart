@@ -1,4 +1,5 @@
 import 'package:faker/faker.dart';
+import 'package:flutter/services.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:uuid/uuid.dart';
 
@@ -19,37 +20,47 @@ class InMemoryReadService implements ReadService {
     _initSeedData();
   }
 
-  void _initSeedData() {
+  Future<void> _initSeedData() async {
     final faker = Faker();
     const uuid = Uuid();
     final List<Post> posts = [];
 
     final possibleTags = ['music', 'videogames', 'philosophy', 'programming'];
 
+    final templates = [
+      await rootBundle.loadString('assets/seed/posts/template_1.mdx'),
+      await rootBundle.loadString('assets/seed/posts/template_2.mdx'),
+      await rootBundle.loadString('assets/seed/posts/template_3.mdx'),
+    ];
+
     for (int i = 0; i < 20; i++) {
       final title = faker.lorem.sentence();
-      final content =
-          '''
-# ${faker.lorem.sentence()}
+      final authorName = faker.person.name();
 
-${faker.lorem.sentences(5).join(' ')}
+      String templateContent = templates[i % templates.length];
 
-![Content Image](${faker.image.loremPicsum()})
-
-${faker.lorem.sentences(5).join(' ')}
-
-![Content Image](${faker.image.loremPicsum()})
-
-${faker.lorem.sentences(5).join(' ')}
-
-![Content Image](${faker.image.loremPicsum()})
-''';
+      String content = templateContent
+          .replaceAll('{{title}}', faker.lorem.sentence())
+          .replaceAll('{{sentence_1}}', faker.lorem.sentence())
+          .replaceAll('{{sentence_2}}', faker.lorem.sentence())
+          .replaceAll('{{sentence_3}}', faker.lorem.sentence())
+          .replaceAll('{{sentence_4}}', faker.lorem.sentence())
+          .replaceAll('{{paragraph_1}}', faker.lorem.sentences(25).join(' '))
+          .replaceAll('{{paragraph_2}}', faker.lorem.sentences(30).join(' '))
+          .replaceAll('{{paragraph_3}}', faker.lorem.sentences(20).join(' '))
+          .replaceAll('{{paragraph_4}}', faker.lorem.sentences(35).join(' '))
+          .replaceAll('{{words_1}}', faker.lorem.words(4).join(' '))
+          .replaceAll('{{words_2}}', faker.lorem.words(3).join(' '))
+          .replaceAll('{{image_1}}', faker.image.loremPicsum())
+          .replaceAll('{{image_2}}', faker.image.loremPicsum())
+          .replaceAll('{{image_3}}', faker.image.loremPicsum())
+          .replaceAll('{{author}}', authorName);
 
       posts.add(
         Post.create(
           id: uuid.v4(),
           title: Title(title),
-          author: Author(faker.person.name()),
+          author: Author(authorName),
           createdAt: faker.date.dateTime(minYear: 2023, maxYear: 2026),
           content: Content(content),
           tags: [
