@@ -92,6 +92,11 @@ class PostScreen extends StatelessWidget {
                       child: MarkdownBody(
                         data: post.content.value,
                         selectable: true,
+                        sizedImageBuilder: (config) {
+                          return Center(
+                            child: Image.network(config.uri.toString()),
+                          );
+                        },
                         styleSheet: MarkdownStyleSheet(
                           p: Theme.of(
                             context,
