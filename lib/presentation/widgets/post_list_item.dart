@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import '../../config/translations.dart';
 import '../../domain/entities/post.dart';
 
 class PostListItem extends StatelessWidget {
@@ -87,7 +88,7 @@ class PostListItem extends StatelessWidget {
                     children: post.tags.map((tag) {
                       return ActionChip(
                         label: Text(
-                          tag.value,
+                          AppTranslations.translateTag(tag.value),
                           style: const TextStyle(color: Colors.white),
                         ),
                         visualDensity: VisualDensity.compact,

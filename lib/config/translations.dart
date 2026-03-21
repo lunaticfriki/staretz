@@ -19,4 +19,22 @@ class AppTranslations {
   static const String menuProgramming = 'Programació';
   static const String menuJapan = 'Japó';
   static const String menuAbout = 'Info';
+
+  static String translateTag(String tag) {
+    switch (tag.toLowerCase()) {
+      case 'music':
+        return menuMusic;
+      case 'videogames':
+        return menuVideogames;
+      case 'philosophy':
+        return menuPhilosophy;
+      case 'programming':
+        return menuProgramming;
+      case 'japan':
+        return menuJapan;
+      default:
+        if (tag.isEmpty) return tag;
+        return tag[0].toUpperCase() + tag.substring(1).toLowerCase();
+    }
+  }
 }
