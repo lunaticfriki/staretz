@@ -25,7 +25,13 @@ class InMemoryReadService implements ReadService {
     const uuid = Uuid();
     final List<Post> posts = [];
 
-    final possibleTags = ['music', 'videogames', 'philosophy', 'programming'];
+    final possibleTags = [
+      'music',
+      'videogames',
+      'philosophy',
+      'programming',
+      'japan',
+    ];
 
     final templates = [
       await rootBundle.loadString('assets/seed/posts/template_1.mdx'),

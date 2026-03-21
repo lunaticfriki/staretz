@@ -15,6 +15,7 @@ class _NavMenuState extends State<NavMenu> {
     {'label': AppTranslations.menuVideogames, 'path': '/tag/videogames'},
     {'label': AppTranslations.menuPhilosophy, 'path': '/tag/philosophy'},
     {'label': AppTranslations.menuProgramming, 'path': '/tag/programming'},
+    {'label': AppTranslations.menuJapan, 'path': '/tag/japan'},
     {'label': AppTranslations.menuAbout, 'path': '/about'},
   ];
 

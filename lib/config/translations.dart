@@ -17,5 +17,6 @@ class AppTranslations {
   static const String menuVideogames = 'Videojocs';
   static const String menuPhilosophy = 'Filosofia';
   static const String menuProgramming = 'Programació';
+  static const String menuJapan = 'Japó';
   static const String menuAbout = 'Info';
 }
