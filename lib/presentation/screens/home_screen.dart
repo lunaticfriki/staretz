@@ -3,10 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../application/cubit/post_cubit.dart';
 import '../../application/cubit/post_state.dart';
 import '../../core/di/injection.dart';
-import '../widgets/blog_header.dart';
-import '../widgets/blog_footer.dart';
 import '../widgets/post_list_item.dart';
-import '../widgets/blog_drawer.dart';
 
 import '../../config/translations.dart';
 
@@ -37,17 +34,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDesktop = MediaQuery.of(context).size.width > 800;
-
-    return BlocProvider.value(
-      value: _postCubit,
-      child: Scaffold(
-        appBar: const BlogHeader(),
-        drawer: isDesktop ? null : const BlogDrawer(),
-        body: const HomeContent(),
-        bottomNavigationBar: const BlogFooter(),
-      ),
-    );
+    return BlocProvider.value(value: _postCubit, child: const HomeContent());
   }
 }
 
