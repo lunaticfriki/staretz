@@ -1,0 +1,36 @@
+---
+import "@fontsource/inconsolata";
+import "../styles/global.css";
+
+interface Props {
+  title: string;
+}
+
+const { title } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="A simpler Staretz blog" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+  </head>
+  <body class="antialiased min-h-screen p-8 max-w-4xl mx-auto">
+    <header
+      class="mb-12 border-b border-gray-800 pb-4 flex justify-between items-end"
+    >
+      <div>
+        <h1 class="text-4xl font-bold"><span>Staretz</span> Blog</h1>
+      </div>
+      <nav class="flex gap-6">
+        <a href="/" class="hover:underline text-gray-300">Home</a>
+        <a href="/about" class="hover:underline text-gray-300">About</a>
+      </nav>
+    </header>
+    <slot />
+  </body>
+</html>

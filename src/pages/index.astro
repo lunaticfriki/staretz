@@ -1,0 +1,43 @@
+---
+import Layout from "../layouts/Layout.astro";
+import { AstroContentPostRepositoryAdapter } from "../core/infrastructure/adapters/AstroContentPostRepositoryAdapter";
+
+const repository = AstroContentPostRepositoryAdapter.create();
+const posts = await repository.getAllPosts();
+---
+
+<Layout title="Staretz Blog Home">
+  <main>
+    <div class="grid gap-12">
+      {
+        posts.map((post) => (
+          <article class="flex flex-col md:flex-row gap-6 border-b border-gray-800 pb-12 last:border-0 last:pb-0">
+            <div class="md:w-1/3">
+              {post.heroImage && (
+                <img
+                  src={post.heroImage.value}
+                  alt={post.title.value}
+                  class="w-full h-48 object-cover rounded-md"
+                />
+              )}
+            </div>
+            <div class="md:w-2/3 flex flex-col justify-center">
+              <h3 class="text-3xl font-bold mb-2">
+                <a
+                  href={`/blog/${post.id.value}`}
+                  class="hover:underline transition-all"
+                >
+                  {post.title.value}
+                </a>
+              </h3>
+              <p class="text-gray-500 mb-4">{post.date.value.toDateString()}</p>
+              <p class="text-gray-300 leading-relaxed">
+                {post.description.value}
+              </p>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </main>
+</Layout>

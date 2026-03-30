@@ -1,0 +1,47 @@
+---
+import { getCollection, render } from "astro:content";
+import Layout from "../../layouts/Layout.astro";
+import { AstroContentPostRepositoryAdapter } from "../../core/infrastructure/adapters/AstroContentPostRepositoryAdapter";
+import { PostId } from "../../core/domain/valueObjects/PostId";
+
+export async function getStaticPaths() {
+  const posts = await getCollection("blog");
+  return posts.map((post) => ({
+    params: { slug: post.id },
+    props: { astroPost: post },
+  }));
+}
+
+const { astroPost } = Astro.props;
+const repository = AstroContentPostRepositoryAdapter.create();
+const post = await repository.getPostById(PostId.create(astroPost.id));
+
+if (!post) {
+  throw new Error("Post not found");
+}
+
+const { Content } = await render(astroPost);
+---
+
+<Layout title={post.title.value}>
+  <article class="max-w-3xl mx-auto">
+    <img
+      src={post.heroImage?.value}
+      alt={post.title.value}
+      class="w-full h-96 object-cover rounded-xl mb-12 shadow-2xl"
+    />
+
+    <header class="mb-12 text-center">
+      <h1 class="text-5xl font-bold mb-4">{post.title.value}</h1>
+      <p class="text-gray-500 text-lg uppercase tracking-widest">
+        {post.date.value.toDateString()}
+      </p>
+    </header>
+
+    <div
+      class="prose prose-invert prose-p:text-gray-300 prose-headings:text-[#ff00ff] prose-a:text-[#ff00ff] max-w-none text-xl leading-loose font-sans"
+    >
+      <Content />
+    </div>
+  </article>
+</Layout>

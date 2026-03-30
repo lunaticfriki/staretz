@@ -1,0 +1,21 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    background-color: #000000;
+    color: #e5e7eb; /* grayish text for readability against black */
+    font-family: "Inconsolata", monospace;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  span {
+    color: #ff00ff; /* Magenta */
+  }
+}
