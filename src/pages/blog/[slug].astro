@@ -1,8 +1,7 @@
 ---
 import { getCollection, render } from "astro:content";
 import Layout from "../../layouts/Layout.astro";
-import { AstroContentPostRepositoryAdapter } from "../../core/infrastructure/adapters/AstroContentPostRepositoryAdapter";
-import { PostId } from "../../core/domain/valueObjects/PostId";
+import { DependencyLocator } from "../../core/di/DependencyLocator";
 
 export async function getStaticPaths() {
   const posts = await getCollection("blog");
@@ -13,8 +12,10 @@ export async function getStaticPaths() {
 }
 
 const { astroPost } = Astro.props;
-const repository = AstroContentPostRepositoryAdapter.create();
-const post = await repository.getPostById(PostId.create(astroPost.id));
+const readService = DependencyLocator.getPostReadService();
+
+// Direct read logic delegated to App Layer completely independent of concrete Framework Adapter logic.
+const post = await readService.getPostById(astroPost.id);
 
 if (!post) {
   throw new Error("Post not found");
@@ -33,6 +34,9 @@ const { Content } = await render(astroPost);
 
     <header class="mb-12 text-center">
       <h1 class="text-5xl font-bold mb-4">{post.title.value}</h1>
+      <p class="text-[#ff00ff] font-bold text-xl mb-2">
+        By {post.author.value}
+      </p>
       <p class="text-gray-500 text-lg uppercase tracking-widest">
         {post.date.value.toDateString()}
       </p>

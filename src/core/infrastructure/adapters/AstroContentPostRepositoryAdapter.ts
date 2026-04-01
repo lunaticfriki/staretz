@@ -5,6 +5,7 @@ import { PostDescription } from "../../domain/valueObjects/PostDescription";
 import { PostHeroImage } from "../../domain/valueObjects/PostHeroImage";
 import { PostId } from "../../domain/valueObjects/PostId";
 import { PostTitle } from "../../domain/valueObjects/PostTitle";
+import { PostAuthor } from "../../domain/valueObjects/PostAuthor";
 import { PostRepositoryPort } from "../../application/ports/PostRepositoryPort";
 
 export class AstroContentPostRepositoryAdapter implements PostRepositoryPort {
@@ -20,6 +21,7 @@ export class AstroContentPostRepositoryAdapter implements PostRepositoryPort {
             PostTitle.create(post.data.title),
             PostDescription.create(post.data.description),
             PostDate.create(post.data.pubDate),
+            PostAuthor.create(post.data.author),
             post.data.heroImage ? PostHeroImage.create(post.data.heroImage) : undefined
         );
     }

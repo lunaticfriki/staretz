@@ -3,6 +3,7 @@ title: "Scaling PNPM in Monorepos"
 description: "Why we standardized on pnpm for all Staretz JS/TS projects."
 pubDate: 2026-03-27
 heroImage: "https://picsum.photos/seed/post5/800/400"
+author: "Vania"
 ---
 
 Since we updated our guidelines today to strictly employ **pnpm**, let's review why:

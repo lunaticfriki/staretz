@@ -3,6 +3,7 @@ import { PostDescription } from "../valueObjects/PostDescription";
 import { PostHeroImage } from "../valueObjects/PostHeroImage";
 import { PostId } from "../valueObjects/PostId";
 import { PostTitle } from "../valueObjects/PostTitle";
+import { PostAuthor } from "../valueObjects/PostAuthor";
 
 export class Post {
     private constructor(
@@ -10,6 +11,7 @@ export class Post {
         public readonly title: PostTitle,
         public readonly description: PostDescription,
         public readonly date: PostDate,
+        public readonly author: PostAuthor,
         public readonly heroImage?: PostHeroImage,
     ) {}
 
@@ -18,9 +20,10 @@ export class Post {
         title: PostTitle,
         description: PostDescription,
         date: PostDate,
+        author: PostAuthor,
         heroImage?: PostHeroImage
     ): Post {
-        return new Post(id, title, description, date, heroImage);
+        return new Post(id, title, description, date, author, heroImage);
     }
 
     public static empty(): Post {
@@ -29,6 +32,7 @@ export class Post {
             PostTitle.create(""),
             PostDescription.create(""),
             PostDate.create(new Date()),
+            PostAuthor.create(""),
             undefined
         );
     }
