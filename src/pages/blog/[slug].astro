@@ -14,7 +14,6 @@ export async function getStaticPaths() {
 const { astroPost } = Astro.props;
 const readService = DependencyLocator.getPostReadService();
 
-// Direct read logic delegated to App Layer completely independent of concrete Framework Adapter logic.
 const post = await readService.getPostById(astroPost.id);
 
 if (!post) {
@@ -32,9 +31,9 @@ const { Content } = await render(astroPost);
       class="w-full h-96 object-cover rounded-xl mb-12 shadow-2xl"
     />
 
-    <header class="mb-12 text-center">
-      <h1 class="text-5xl font-bold mb-4">{post.title.value}</h1>
-      <p class="text-[#ff00ff] font-bold text-xl mb-2">
+    <header class="mb-12 w-full text-left">
+      <h1 class="text-5xl font-bold mb-4 w-full">{post.title.value}</h1>
+      <p class="text-brand font-bold text-xl mb-2">
         By {post.author.value}
       </p>
       <p class="text-gray-500 text-lg uppercase tracking-widest">

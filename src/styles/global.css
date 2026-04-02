@@ -1,11 +1,19 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-brand: #df14df;
+}
 
 @layer base {
+  * {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+  }
+
   body {
     background-color: #000000;
-    color: #e5e7eb; /* grayish text for readability against black */
+    color: #e5e7eb;
     font-family: "Inconsolata", monospace;
   }
 
@@ -16,6 +24,6 @@
   h5,
   h6,
   span {
-    color: #ff00ff; /* Magenta */
+    color: var(--color-brand);
   }
 }

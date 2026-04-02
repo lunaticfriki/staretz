@@ -19,12 +19,14 @@ const { title } = Astro.props;
     <meta name="generator" content={Astro.generator} />
     <title>{title}</title>
   </head>
-  <body class="antialiased min-h-screen p-8 max-w-4xl mx-auto">
+  <body class="antialiased min-h-screen">
     <header
-      class="mb-12 border-b border-gray-800 pb-4 flex justify-between items-end"
+      class="mb-12 border-b border-gray-800 p-4 flex justify-between items-end"
     >
       <div>
-        <h1 class="text-4xl font-bold"><span>Staretz</span> Blog</h1>
+        <a href="/" class="hover:opacity-80 transition-opacity">
+          <h1 class="text-4xl font-bold"><span>Staretz</span> Blog</h1>
+        </a>
       </div>
       <nav class="flex gap-6">
         <a href="/" class="hover:underline text-gray-300">Home</a>

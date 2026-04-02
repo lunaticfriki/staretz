@@ -12,37 +12,41 @@ const postsToRender = stateService.posts;
 ---
 
 <Layout title="Staretz Blog Home">
-  <main>
-    <div class="grid gap-12">
+  <main class="p-4">
+    <div class="flex flex-row flex-wrap justify-center gap-6 w-full mt-10">
       {
         postsToRender.map((post) => (
-          <article class="flex flex-col md:flex-row gap-6 border-b border-gray-800 pb-12 last:border-0 last:pb-0">
-            <div class="md:w-1/3">
-              {post.heroImage && (
-                <img
-                  src={post.heroImage.value}
-                  alt={post.title.value}
-                  class="w-full h-48 object-cover rounded-md"
-                />
-              )}
-            </div>
-            <div class="md:w-2/3 flex flex-col justify-center">
-              <h3 class="text-3xl font-bold mb-2">
-                <a
-                  href={`/blog/${post.id.value}`}
-                  class="hover:underline transition-all text-[#ff00ff]"
-                >
-                  {post.title.value}
-                </a>
-              </h3>
-              <p class="text-[#ff00ff] font-bold mb-1">
-                By {post.author.value}
+          <article class="flex flex-col w-1/4 p-4 mb-4">
+            {post.heroImage && (
+              <img
+                src={post.heroImage.value}
+                alt={post.title.value}
+                class="w-full h-56 object-cover rounded-lg shadow-md mb-6 block"
+              />
+            )}
+
+            <div class="flex flex-row justify-between items-start mb-4">
+              <div class="flex flex-col text-left mr-4">
+                <h3 class="text-2xl font-bold leading-none m-0 p-0">
+                  <a
+                    href={`/blog/${post.id.value}`}
+                    class="hover:underline transition-all text-brand"
+                  >
+                    {post.title.value}
+                  </a>
+                </h3>
+                <p class="text-brand font-bold text-sm m-0 p-0 mt-2">
+                  By {post.author.value}
+                </p>
+              </div>
+              <p class="text-gray-500 text-xs uppercase tracking-wider m-0 p-0 mt-1 whitespace-nowrap">
+                {post.date.value.toDateString()}
               </p>
-              <p class="text-gray-500 mb-4">{post.date.value.toDateString()}</p>
-              <p class="text-gray-300 leading-relaxed">
-                {post.description.value}
-              </p>
             </div>
+
+            <p class="text-gray-300 leading-relaxed text-left text-sm m-0 p-0">
+              {post.description.value}
+            </p>
           </article>
         ))
       }
