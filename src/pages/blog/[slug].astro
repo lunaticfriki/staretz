@@ -1,6 +1,6 @@
 ---
 import { getCollection, render } from "astro:content";
-import Layout from "../../layouts/Layout.astro";
+import Layout from "../../core/ui/layouts/Layout.astro";
 import { DependencyLocator } from "../../core/di/DependencyLocator";
 
 export async function getStaticPaths() {
@@ -36,13 +36,15 @@ const { Content } = await render(astroPost);
       <p class="text-brand font-bold text-xl mb-2">
         By {post.author.value}
       </p>
-      <p class="text-gray-500 text-lg uppercase tracking-widest">
+      <p
+        class="text-gray-500 dark:text-gray-400 text-lg uppercase tracking-widest"
+      >
         {post.date.value.toDateString()}
       </p>
     </header>
 
     <div
-      class="prose prose-invert prose-p:text-gray-300 prose-headings:text-[#ff00ff] prose-a:text-[#ff00ff] max-w-none text-xl leading-loose font-sans"
+      class="prose dark:prose-invert prose-p:text-gray-700 dark:prose-p:text-gray-300 prose-headings:text-[#ff00ff] prose-a:text-[#ff00ff] max-w-none text-xl leading-loose font-sans"
     >
       <Content />
     </div>

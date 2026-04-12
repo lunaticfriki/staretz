@@ -1,5 +1,5 @@
 ---
-import Layout from "../layouts/Layout.astro";
+import Layout from "../core/ui/layouts/Layout.astro";
 import { DependencyLocator } from "../core/di/DependencyLocator";
 
 const readService = DependencyLocator.getPostReadService();
@@ -39,12 +39,12 @@ const postsToRender = stateService.posts;
                   By {post.author.value}
                 </p>
               </div>
-              <p class="text-gray-500 text-xs uppercase tracking-wider m-0 p-0 mt-1 whitespace-nowrap">
+              <p class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider m-0 p-0 mt-1 whitespace-nowrap">
                 {post.date.value.toDateString()}
               </p>
             </div>
 
-            <p class="text-gray-300 leading-relaxed text-left text-sm m-0 p-0">
+            <p class="text-gray-700 dark:text-gray-300 leading-relaxed text-left text-sm m-0 p-0">
               {post.description.value}
             </p>
           </article>
