@@ -1,0 +1,48 @@
+---
+interface Props {
+  post: any;
+}
+
+const { post } = Astro.props;
+---
+
+<article class="flex flex-col w-1/4 p-4 mb-4">
+  {
+    post.heroImage && (
+      <a href={`/blog/${post.id.value}`}>
+        <img
+          src={post.heroImage.value}
+          alt={post.title.value}
+          class="w-full h-56 object-cover rounded-lg shadow-md mb-6 block"
+        />
+      </a>
+    )
+  }
+
+  <div class="flex flex-row justify-between items-start mb-4">
+    <div class="flex flex-col text-left mr-4">
+      <h3 class="text-2xl font-bold leading-none m-0 p-0">
+        <a
+          href={`/blog/${post.id.value}`}
+          class="hover:underline transition-all text-brand"
+        >
+          {post.title.value}
+        </a>
+      </h3>
+      <p class="text-brand font-bold text-sm m-0 p-0 mt-2">
+        By {post.author.value}
+      </p>
+    </div>
+    <p
+      class="text-gray-500 dark:text-gray-400 text-xs uppercase tracking-wider m-0 p-0 mt-1 whitespace-nowrap"
+    >
+      {post.date.value.toDateString()}
+    </p>
+  </div>
+
+  <p
+    class="text-gray-700 dark:text-gray-300 leading-relaxed text-left text-sm m-0 p-0"
+  >
+    {post.description.value}
+  </p>
+</article>
