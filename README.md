@@ -1,43 +1,38 @@
-# Astro Starter Kit: Minimal
+# Staretz Blog
 
-```sh
-pnpm create astro@latest -- --template minimal
-```
+> *Staretz és un projecte personal sobre qualsevol cosa que s'em creui pel davant. Esteu avisats.*
 
-> 🧑‍🚀 **Seasoned astronaut?** Delete this file. Have fun!
+Staretz is a sleek, minimalist personal blog built on top of modern web architectural practices. 
 
-## 🚀 Project Structure
+## Architecture
 
-Inside of your Astro project, you'll see the following folders and files:
+This blog leverages an architectural exercise to strictly adhere to **Domain-Driven Design (DDD)** and **Hexagonal Architecture** principles. The core application logic and presentation constraints are architecturally decoupled.
 
-```text
-/
-├── public/
-├── src/
-│   └── pages/
-│       └── index.astro
-└── package.json
-```
+### Tech Stack
+- **Framework**: [Astro](https://astro.build)
+- **Styling**: [Tailwind CSS v4](https://tailwindcss.com/)
+- **State Management**: Signals
+- **Language**: Strict TypeScript
+- **Typography**: Google's [Inconsolata](https://fontsource.org/fonts/inconsolata)
 
-Astro looks for `.astro` or `.md` files in the `src/pages/` directory. Each page is exposed as a route based on its file name.
+## Features
 
-There's nothing special about `src/components/`, but that's where we like to put any Astro/React/Vue/Svelte/Preact components.
+- **Hexagonal UI Boundaries**: Rather than conventional structure, components and layouts actively operate under the `src/core/ui` domain tier, segregating UI constructs correctly.
+- **Dynamic Theming Ecosystem**: Built-in script hydration automatically applies user system-preferences and handles local storage caching natively bypassing framework bloat.
+- **Image Variant Handling**: Actively adapts non-transparent JPEG graphic logos through responsive element swaps and inverted light filters. 
+- **Pixel-Art SVGs**: Features unique, hand-crafted 14x14 pixel-styled SVG vector paths tailored for the theme iteration controls.
+- **Minimalist Aesthetic**: Engineered around a sharp black-on-white/white-on-black layout complimented by brilliant magenta (`#df14df`) active highlights.
+- **Sticky Footer Dynamics**: A highly robust Flex layout providing absolute sticky-bottom capabilities preserving component symmetry on any display ratio.
 
-Any static assets, like images, can be placed in the `public/` directory.
+## Working With the Project
 
-## 🧞 Commands
+All commands run directly through `pnpm` inside the terminal.
 
-All commands are run from the root of the project, from a terminal:
+| Command             | Action                                           |
+| :------------------ | :----------------------------------------------- |
+| `pnpm install`      | Resolves and installs the package dependencies   |
+| `pnpm dev`          | Launches the active local dev-server             |
+| `pnpm build`        | Outputs the production build directly to `dist/` |
 
-| Command                   | Action                                           |
-| :------------------------ | :----------------------------------------------- |
-| `pnpm install`             | Installs dependencies                            |
-| `pnpm dev`             | Starts local dev server at `localhost:4321`      |
-| `pnpm build`           | Build your production site to `./dist/`          |
-| `pnpm preview`         | Preview your build locally, before deploying     |
-| `pnpm astro ...`       | Run CLI commands like `astro add`, `astro check` |
-| `pnpm astro -- --help` | Get help using the Astro CLI                     |
-
-## 👀 Want to learn more?
-
-Feel free to check [our documentation](https://docs.astro.build) or jump into our [Discord server](https://astro.build/chat).
+**Deployment Location:**
+The project tracks via `origin` at `git@github.com:lunaticfriki/staretz.git`.
