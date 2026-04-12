@@ -6,7 +6,9 @@ interface Props {
 const { post } = Astro.props;
 ---
 
-<article class="flex flex-col w-1/4 p-4 mb-4">
+<article
+  class="flex flex-col w-full sm:w-[calc(50%-1.5rem)] lg:w-[calc(33.333%-1.5rem)] xl:w-[calc(25%-1.5rem)] p-4 mb-0 sm:mb-4"
+>
   {
     post.heroImage && (
       <a href={`/blog/${post.id.value}`}>
@@ -30,7 +32,7 @@ const { post } = Astro.props;
         </a>
       </h3>
       <p class="text-brand font-bold text-sm m-0 p-0 mt-2">
-        By {post.author.value}
+        {post.author.value}
       </p>
     </div>
     <p
