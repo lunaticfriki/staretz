@@ -2,7 +2,7 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-  --color-brand: #df14df;
+  --color-brand: #9f0e9f;
 }
 
 @layer base {
