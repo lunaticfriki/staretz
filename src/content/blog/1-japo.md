@@ -2,7 +2,7 @@
 title: "És el Japó la meva segona cultura?"
 description: "Potser el Japó no és tan llunyà com ens pensem. Potser no són tan estranys, o nosaltres encara ho som més..."
 pubDate: 2026-04-12
-heroImage: "/images/IMG_20191203_162426.jpg"
+heroImage: "/images/1/IMG_20191203_162426.jpg"
 author: "Vania"
 ---
 
@@ -15,6 +15,10 @@ Parlant de tòpics, un dia una persona té una revelació. Ja sabeu, passa algun
 &nbsp;
 
 Em vaig inventar la teoria de les edats del manga a Catalunya. Òbviament una teoria *ad hoc* que em servia per explicar el meu cas. Jo formaria part de la segona fornada d’otakus catalans. Nascut el 1985. La primera la formarien els nascuts una dècada abans. L’explicació és ben senzilla. Durant els noranta el meu consum de continguts japonesos era totalment passiu. Mirava els dibuixos de la tele, punt. Tenia rellotges *Casio* (ara els col·lecciono), tenia videoconsoles, però principalment el meu contacte amb el Japó era la tele. TV3, però també altres cadenes. El que feien, que jo no podia decidir. Els macarrons de *Bola de Drac*, *Doraemon*, però també *Mikan* (que és com li diem al meu cotxe a casa perquè és taronja...), *Dome Shinjo*, *El petit xef*, i un llarg etcètera. Aquesta afició passiva era similar per molt nanos de l’època, on el compromís era bàsicament arribar a temps després d’escola per veure dibuixos, llevar-se d’hora els caps de setmana per veure dibuixos i desitjar estar malalt per quedar-se a casa... i veure dibuixos. Però un dia, un dia qualsevol, mes d'abril de 1998, anant a comprar a la papereria del meu poble la *Hobby Consolas*, o la *Nintendo Acción* o qualsevol revista de videojocs, no ho recordo exactament, vaig veure una cosa nova. Era una portada amb *Asuka* de *Neon Genesis Evangelion*. Encara no sabia què era *Evangelion*, però vaig identificar que allò era anime japonès. I la vaig comprar. 795 pessetes, una pasta descomunal per mi que tenia 12 (camí dels 13) anys. Venia amb un cd-rom. Era el primeríssim número de la revista *Dokan*. Potra descomunal, enganxar just el primer número d'un mite que ho canviaria tot. I és per això, per aquesta revista, que em vaig inventar la teoria de les edats del manga a Catalunya.
+
+&nbsp;
+
+![Dokan n.1, abril 1998](/public/images/1/dokan_1.jpg)
 
 &nbsp;
 
