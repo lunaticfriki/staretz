@@ -16,6 +16,8 @@ Only read source files if the docs do not provide enough context. When in doubt,
 
 Update the relevant docs if anything changed: a new layer rule, a new naming pattern, a new feature.
 
+**Tests must be updated in the same task.** Every feature addition or bug fix requires updating or adding the corresponding tests before the task is considered done. Leaving tests broken is not acceptable — if a change breaks existing tests, fix them as part of the same change.
+
 ## Project facts
 
 - Flutter 3.44 / Dart 3.12 — web target, runs in Brave via `CHROME_EXECUTABLE=/usr/bin/brave-browser flutter run -d chrome`

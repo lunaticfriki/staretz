@@ -37,7 +37,7 @@
 | Concern | Choice |
 |---------|--------|
 | Unit / arch tests | `flutter_test` + custom arch test helpers |
-| Mocking | `mockito` (with code generation via `build_runner`) |
+| Mocking | `mocktail` (no code generation required) |
 | Test data | Mother objects (no raw primitives in test setup) |
 | E2E | `integration_test` package |
 

@@ -1,5 +1,9 @@
 # Testing Strategy
 
+## Rule: tests are part of the task
+
+Every feature addition or bug fix must include updated or new tests in the same change. A task is not done until `flutter test` and `flutter test integration_test` pass. Broken tests are never left for later.
+
 ## Test types
 
 | Type | Location | Tool |
@@ -45,7 +49,8 @@ Mother files: `test/mothers/<feature>/<entity>.mother.dart`.
 Mock the repository port; test the service in isolation.
 
 ```dart
-@GenerateMocks([PostRepository])
+class MockPostRepository extends Mock implements PostRepository {}
+
 void main() {
   late MockPostRepository repository;
   late PostReadService svc;
@@ -57,17 +62,17 @@ void main() {
 
   test('returns all posts from repository', () async {
     final posts = [PostMother.valid()];
-    when(repository.findAll()).thenAnswer((_) async => posts);
+    when(() => repository.findAll()).thenAnswer((_) async => posts);
 
     final result = await svc.getAllPosts();
 
     expect(result, posts);
-    verify(repository.findAll()).called(1);
+    verify(() => repository.findAll()).called(1);
   });
 }
 ```
 
-Generate mocks: `flutter pub run build_runner build`.
+No code generation needed — `mocktail` works on any class without annotations.
 
 ---
 

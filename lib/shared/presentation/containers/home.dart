@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:staretz/shared/application/theme.state_service.dart';
+import 'package:staretz/shared/application/theme_state.dart';
 import 'package:staretz/shared/presentation/widgets/footer.dart';
 import 'package:staretz/shared/presentation/widgets/header.dart';
 import 'package:staretz/shared/presentation/widgets/home_content.dart';
@@ -22,15 +25,15 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _runIntro() async {
-    await Future.delayed(const Duration(milliseconds: 1500));
+    await Future.delayed(const Duration(milliseconds: 1000));
     setState(() => _opacity = 0.0);
-    await Future.delayed(const Duration(milliseconds: 70));
+    await Future.delayed(const Duration(milliseconds: 250));
     setState(() => _opacity = 1.0);
-    await Future.delayed(const Duration(milliseconds: 70));
+    await Future.delayed(const Duration(milliseconds: 250));
     setState(() => _opacity = 0.0);
-    await Future.delayed(const Duration(milliseconds: 70));
+    await Future.delayed(const Duration(milliseconds: 250));
     setState(() {
-      _animDuration = const Duration(milliseconds: 200);
+      _animDuration = const Duration(milliseconds: 600);
       _showMain = true;
       _opacity = 1.0;
     });
@@ -64,12 +67,17 @@ class _MainLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Column(
-      children: [
-        Header(),
-        Expanded(child: HomeContent()),
-        Footer(),
-      ],
+    return BlocBuilder<ThemeStateService, ThemeState>(
+      builder: (context, state) => Column(
+        children: [
+          Header(
+            currentTheme: state.theme,
+            onToggle: () => context.read<ThemeStateService>().toggle(),
+          ),
+          const Expanded(child: HomeContent()),
+          const Footer(),
+        ],
+      ),
     );
   }
 }
