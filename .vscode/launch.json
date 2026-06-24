@@ -5,7 +5,10 @@
       "name": "Flutter (Brave)",
       "request": "launch",
       "type": "dart",
-      "args": ["-d", "chrome"]
+      "args": ["-d", "chrome"],
+      "env": {
+        "CHROME_EXECUTABLE": "/home/vania/.local/bin/brave-flutter"
+      }
     }
   ]
 }
