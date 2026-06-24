@@ -14,12 +14,6 @@ stashed=false
 echo ""
 echo -e "${BOLD}${YELLOW}── Pre-push checks ──────────────────────────${NC}"
 
-stash_output=$(git stash --include-untracked 2>&1)
-if [[ "$stash_output" != "No local changes to save" ]]; then
-  stashed=true
-  echo -e "${YELLOW}  Stashed local changes${NC}"
-fi
-
 cleanup() {
   if $stashed; then
     echo -e "${YELLOW}  Restoring stashed changes...${NC}"
@@ -27,6 +21,12 @@ cleanup() {
   fi
 }
 trap cleanup EXIT
+
+if [[ -n "$(git status --porcelain)" ]]; then
+  git stash --include-untracked
+  stashed=true
+  echo -e "${YELLOW}  Stashed local changes${NC}"
+fi
 
 echo -e "  Running ${BOLD}flutter test${NC}..."
 echo ""
