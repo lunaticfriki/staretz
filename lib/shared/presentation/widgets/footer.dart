@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:staretz/shared/presentation/app_colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class Footer extends StatelessWidget {
@@ -21,11 +22,19 @@ class Footer extends StatelessWidget {
                 Uri.parse('https://github.com/lunaticfriki/staretz'),
                 webOnlyWindowName: '_blank',
               ),
-              child: Text(
-                'staretz, ${DateTime.now().year}',
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
+              child: RichText(
+                text: TextSpan(
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
+                  ),
+                  children: [
+                    const TextSpan(text: 'staretz, '),
+                    TextSpan(
+                      text: '${DateTime.now().year}',
+                      style: const TextStyle(color: AppColors.magenta),
+                    ),
+                  ],
                 ),
               ),
             ),
