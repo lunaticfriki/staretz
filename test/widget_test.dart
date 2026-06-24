@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -32,7 +33,7 @@ void main() {
     await tester.pump(const Duration(milliseconds: 250));
     await tester.pumpAndSettle();
 
-    expect(find.text('staretz'), findsWidgets);
+    expect(find.byType(Image), findsWidgets);
     expect(find.text('staretz, 2026'), findsOneWidget);
     expect(find.text('home page'), findsOneWidget);
   });

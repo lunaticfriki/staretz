@@ -20,7 +20,7 @@ Update the relevant docs if anything changed: a new layer rule, a new naming pat
 
 ## Project facts
 
-- Flutter 3.44 / Dart 3.12 — web target, runs in Brave via `CHROME_EXECUTABLE=/usr/bin/brave-browser flutter run -d chrome`
+- Flutter 3.44 / Dart 3.12 — web target, runs in Brave via `CHROME_EXECUTABLE=/opt/brave.com/brave/brave-browser flutter run -d chrome`
 - Local Flutter SDK: `~/development/flutter/bin/flutter`
 - Tests: `flutter test` (unit + arch), `flutter test integration_test` (e2e)
 - No comments in code unless the WHY is non-obvious

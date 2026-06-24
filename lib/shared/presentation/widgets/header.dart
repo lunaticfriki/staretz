@@ -10,15 +10,17 @@ class Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final logo = isDark
+        ? 'assets/images/logo-black.jpg'
+        : 'assets/images/logo-white.jpg';
+
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
       child: Row(
         children: [
-          const Text(
-            'staretz',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-          ),
+          Image.asset(logo, height: 32),
           const Spacer(),
           ThemeToggle(currentTheme: currentTheme, onToggle: onToggle),
         ],
