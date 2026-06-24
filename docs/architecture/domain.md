@@ -1,5 +1,16 @@
 # Domain Layer
 
+## Folder structure
+
+The domain layer is split into three subfolders:
+
+```
+domain/
+  entities/       # identity-bearing types (Post, User, …)
+  value_objects/  # structural-equality types (PostTitle, PostSlug, …)
+  ports/          # repository abstract classes (PostRepository, …)
+```
+
 ## Rules
 
 - No Flutter imports. No `get_it`. No Bloc. No infrastructure concerns.

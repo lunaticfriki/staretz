@@ -9,7 +9,7 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     await GetIt.instance.reset();
-    setupDi();
+    setupDi(postsData: const []);
   });
 
   testWidgets('splash shows staretz title', (tester) async {
@@ -34,7 +34,6 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.byType(Image), findsWidgets);
-    expect(find.text('staretz, 2026'), findsOneWidget);
-    expect(find.text('home page'), findsOneWidget);
+    expect(find.text('staretz, 2026', findRichText: true), findsOneWidget);
   });
 }

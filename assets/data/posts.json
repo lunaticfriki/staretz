@@ -1,0 +1,227 @@
+[
+  {
+    "id": "1",
+    "title": "Getting Started with Flutter",
+    "slug": "getting-started-with-flutter",
+    "imageUrl": "https://picsum.photos/seed/flutter/800/600",
+    "excerpt": "A beginner's guide to building cross-platform apps with Flutter and Dart.",
+    "body": "Flutter is Google's UI toolkit for building natively compiled applications for mobile, web, and desktop from a single codebase. In this post, we'll cover the basics of setting up your environment and building your first widget tree.\n\nFlutter uses a reactive framework where UI is rebuilt whenever state changes. The core building block is the Widget — everything in Flutter is a widget, from layout containers to text to interactive controls.\n\nTo get started, install the Flutter SDK and run flutter create my_app. You'll get a working counter app out of the box. From there, explore StatelessWidget for static UI and StatefulWidget for interactive components.",
+    "publishedAt": "2026-01-10"
+  },
+  {
+    "id": "2",
+    "title": "Clean Architecture in Dart",
+    "slug": "clean-architecture-in-dart",
+    "imageUrl": "https://picsum.photos/seed/architecture/800/600",
+    "excerpt": "How to structure Dart projects using hexagonal architecture and DDD principles.",
+    "body": "Clean architecture separates your code into layers with dependencies pointing inward. The domain layer contains your business logic and has no external dependencies. The application layer orchestrates use cases. Infrastructure adapts external systems to your domain ports. Presentation renders UI.\n\nIn Dart, this maps cleanly to packages and import constraints. By enforcing that domain classes never import Flutter or infrastructure packages, you keep your business logic portable and testable.\n\nValue objects wrap primitives and validate their own invariants. Entities have identity and lifecycle. Repositories are abstract interfaces in the domain, implemented in infrastructure.",
+    "publishedAt": "2026-01-18"
+  },
+  {
+    "id": "3",
+    "title": "State Management with Bloc",
+    "slug": "state-management-with-bloc",
+    "imageUrl": "https://picsum.photos/seed/bloc/800/600",
+    "excerpt": "Using flutter_bloc to manage application state predictably and testably.",
+    "body": "Bloc (Business Logic Component) separates presentation from business logic. A Cubit is the simpler form — it exposes methods that emit new states. The UI rebuilds via BlocBuilder whenever state changes.\n\nThe key benefit is testability: you can test a Cubit in isolation by verifying which states it emits in response to method calls. No widget tests needed to verify business logic.\n\nFor dependency injection, combine Bloc with get_it. Register your Cubits as factories so each widget tree gets a fresh instance, and register services as lazy singletons.",
+    "publishedAt": "2026-01-25"
+  },
+  {
+    "id": "4",
+    "title": "Dart Value Objects and Validation",
+    "slug": "dart-value-objects-and-validation",
+    "imageUrl": "https://picsum.photos/seed/valueobj/800/600",
+    "excerpt": "Wrapping primitives in value objects to enforce invariants at the type level.",
+    "body": "Primitive obsession is a common code smell where raw strings, ints, and booleans flow through your system without any semantic meaning. Value objects solve this by wrapping primitives with validation and domain meaning.\n\nA value object has no identity — two objects with the same value are equal. In Dart, implement == and hashCode to enforce this. Use a private constructor and a static factory that validates before constructing.\n\nThis catches bugs at the boundary: if you pass an empty string where a PostTitle is expected, the error surfaces immediately rather than propagating silently through your system.",
+    "publishedAt": "2026-02-02"
+  },
+  {
+    "id": "5",
+    "title": "Testing Flutter Apps with Mocktail",
+    "slug": "testing-flutter-apps-with-mocktail",
+    "imageUrl": "https://picsum.photos/seed/testing/800/600",
+    "excerpt": "Writing reliable unit and integration tests for Flutter applications.",
+    "body": "Mocktail is a null-safe mocking library for Dart that doesn't require code generation. To mock a class, extend Mock and implement the interface. Use when() to stub return values and verify() to assert calls.\n\nFor architecture tests, scan the file system and parse imports to enforce layer boundaries. This catches violations before they compound into design debt.\n\nIntegration tests run in a real Flutter app instance. They're slower but catch issues that unit tests miss, like widget layout bugs and navigation flows.",
+    "publishedAt": "2026-02-10"
+  },
+  {
+    "id": "6",
+    "title": "Web Performance in Flutter",
+    "slug": "web-performance-in-flutter",
+    "imageUrl": "https://picsum.photos/seed/webperf/800/600",
+    "excerpt": "Optimizing Flutter web apps for fast load times and smooth animations.",
+    "body": "Flutter web compiles to JavaScript (CanvasKit or HTML renderer). CanvasKit gives pixel-perfect rendering but increases initial bundle size. HTML renderer is lighter but has some rendering differences.\n\nFor performance, avoid rebuilding large widget trees unnecessarily. Use const constructors for widgets that don't change. Split large BlocBuilders so only the parts that need to update do.\n\nLazy loading assets and deferring non-critical initialization keeps the app feeling fast on first load.",
+    "publishedAt": "2026-02-18"
+  },
+  {
+    "id": "7",
+    "title": "Responsive Layouts in Flutter",
+    "slug": "responsive-layouts-in-flutter",
+    "imageUrl": "https://picsum.photos/seed/responsive/800/600",
+    "excerpt": "Building UIs that adapt to different screen sizes and orientations.",
+    "body": "Flutter doesn't have CSS media queries, but you can achieve the same with LayoutBuilder, MediaQuery, and adaptive widgets. LayoutBuilder gives you the parent's constraints so you can switch between layouts.\n\nFor a blog, a common pattern is to show a single column on mobile and switch to a grid on wider screens. Use a breakpoint threshold like 600px to decide.\n\nWrap and GridView.builder with maxCrossAxisExtent are great for content grids that reflow naturally as the window resizes.",
+    "publishedAt": "2026-02-26"
+  },
+  {
+    "id": "8",
+    "title": "Animations and Transitions",
+    "slug": "animations-and-transitions",
+    "imageUrl": "https://picsum.photos/seed/animation/800/600",
+    "excerpt": "Adding polish with Flutter's animation system and implicit animations.",
+    "body": "Flutter's animation system is built on Animation<T> and AnimationController. For most use cases, implicit animations like AnimatedOpacity, AnimatedContainer, and AnimatedCrossFade handle transitions automatically.\n\nFor custom animations, use AnimationController with a Tween. Feed the animation value into your build method and call setState or use an AnimatedBuilder.\n\nPage transitions can be customized by overriding PageRoute. For smooth navigation between pages, coordinate the outgoing and incoming animations with a shared Hero or a custom transition.",
+    "publishedAt": "2026-03-05"
+  },
+  {
+    "id": "9",
+    "title": "Asset Management and Fonts",
+    "slug": "asset-management-and-fonts",
+    "imageUrl": "https://picsum.photos/seed/assets/800/600",
+    "excerpt": "Organising images, fonts, and data files in Flutter projects.",
+    "body": "Flutter bundles assets at build time. Declare them in pubspec.yaml under the flutter > assets section. Directories can be declared with a trailing slash to include all files.\n\nCustom fonts are declared under flutter > fonts. You can specify weights and styles for the same family. Use GoogleFonts package if you want to pull fonts from the network.\n\nFor data files like JSON, load them with rootBundle.loadString() from flutter/services.dart. Parse the result with jsonDecode from dart:convert.",
+    "publishedAt": "2026-03-12"
+  },
+  {
+    "id": "10",
+    "title": "Navigation and Routing",
+    "slug": "navigation-and-routing",
+    "imageUrl": "https://picsum.photos/seed/routing/800/600",
+    "excerpt": "Managing routes and deep links in Flutter web applications.",
+    "body": "Flutter's Navigator manages a stack of routes. Push a new route with Navigator.of(context).push() and pop back with Navigator.pop(). For web, go_router provides URL-based navigation with deep linking support.\n\nMaterialPageRoute wraps a widget in a full-screen route with a platform-appropriate transition. Custom routes can override buildTransitions for tailored animations.\n\nFor web apps, consider URL structure early. go_router maps path parameters like /posts/:slug directly to widget parameters, making deep linking seamless.",
+    "publishedAt": "2026-03-20"
+  },
+  {
+    "id": "11",
+    "title": "Dependency Injection with get_it",
+    "slug": "dependency-injection-with-get-it",
+    "imageUrl": "https://picsum.photos/seed/getit/800/600",
+    "excerpt": "Wiring up services and repositories using a service locator pattern.",
+    "body": "get_it is a service locator for Dart. Register types with registerLazySingleton for shared instances or registerFactory for fresh instances per call. Resolve with GetIt.instance<T>().\n\nThe key is to register everything at startup in a single container setup function. This makes it easy to swap implementations for testing — just re-register with a mock.\n\nFor Cubits, always use registerFactory so each BlocProvider gets a fresh Cubit with clean state. Services and repositories can be singletons since they hold no UI state.",
+    "publishedAt": "2026-03-28"
+  },
+  {
+    "id": "12",
+    "title": "Dark Mode and Theming",
+    "slug": "dark-mode-and-theming",
+    "imageUrl": "https://picsum.photos/seed/darkmode/800/600",
+    "excerpt": "Implementing a theme system with light/dark mode and custom extensions.",
+    "body": "Flutter's MaterialApp accepts theme and darkTheme. When themeMode is ThemeMode.system, it follows the OS setting. You can override this with ThemeMode.light or ThemeMode.dark.\n\nThemeExtension lets you attach custom design tokens to the theme. Define your color palette and typography as extension properties, then access them via Theme.of(context).extension<YourExtension>().\n\nPersist the user's choice with shared_preferences. Load it at startup and emit the saved theme before showing any UI to avoid a flash.",
+    "publishedAt": "2026-04-05"
+  },
+  {
+    "id": "13",
+    "title": "Custom Painters and Canvas",
+    "slug": "custom-painters-and-canvas",
+    "imageUrl": "https://picsum.photos/seed/canvas/800/600",
+    "excerpt": "Drawing custom graphics with Flutter's Canvas and CustomPainter API.",
+    "body": "CustomPainter gives you direct access to the Canvas, where you can draw paths, shapes, text, and images. Override paint() to issue draw calls and shouldRepaint() to control when the canvas is invalidated.\n\nFor charts and visualisations, start with paths. A Path can describe any shape via lineTo, cubicTo, and arcTo. Fill or stroke with a Paint configured with color, strokeWidth, and style.\n\nAnimate custom painters by passing an Animation<double> and calling repaint on the animation. The Listenable-based repaint system is more efficient than rebuilding the whole widget tree.",
+    "publishedAt": "2026-04-12"
+  },
+  {
+    "id": "14",
+    "title": "Forms and Validation",
+    "slug": "forms-and-validation",
+    "imageUrl": "https://picsum.photos/seed/forms/800/600",
+    "excerpt": "Building robust forms with validation, error display, and submission handling.",
+    "body": "Flutter's Form widget wraps TextFormField widgets and manages their validation state. Attach a GlobalKey<FormState> to trigger validate() and save() programmatically.\n\nFor reactive forms, consider a Cubit that holds the form data and validation errors. Each field change emits a new state. This makes it easy to test form logic without widget tests.\n\nClient-side validation runs instantly. Server-side validation returns errors after submission. Design your UI to handle both — show field-level errors and a general submission error banner.",
+    "publishedAt": "2026-04-20"
+  },
+  {
+    "id": "15",
+    "title": "Working with HTTP and REST APIs",
+    "slug": "working-with-http-and-rest-apis",
+    "imageUrl": "https://picsum.photos/seed/http/800/600",
+    "excerpt": "Consuming REST APIs in Flutter with proper error handling and loading states.",
+    "body": "Use the http package for simple requests or dio for more control. Always handle errors: network failures, non-200 responses, and JSON parsing exceptions all need distinct handling.\n\nModel API responses as sealed classes with success and failure variants. This forces call sites to handle both cases at compile time, eliminating forgotten error states.\n\nFor the repository pattern, the infrastructure adapter handles HTTP and maps JSON to domain entities. The domain never knows the transport format — only the adapter does.",
+    "publishedAt": "2026-04-28"
+  },
+  {
+    "id": "16",
+    "title": "Local Storage and Persistence",
+    "slug": "local-storage-and-persistence",
+    "imageUrl": "https://picsum.photos/seed/storage/800/600",
+    "excerpt": "Persisting data locally with shared_preferences, Hive, and SQLite.",
+    "body": "shared_preferences stores key-value pairs suitable for settings and small data. It's synchronous to read after initialisation, making it ideal for startup configuration.\n\nFor structured data, Hive is a lightweight NoSQL database. Define TypeAdapters for your domain objects and store them directly. It's fast and works across all Flutter platforms.\n\nSQLite via sqflite or drift is best for relational data with complex queries. Drift provides type-safe query building with compile-time error detection.",
+    "publishedAt": "2026-05-06"
+  },
+  {
+    "id": "17",
+    "title": "Flutter DevTools and Debugging",
+    "slug": "flutter-devtools-and-debugging",
+    "imageUrl": "https://picsum.photos/seed/devtools/800/600",
+    "excerpt": "Using Flutter DevTools to profile performance and debug widget trees.",
+    "body": "Flutter DevTools is a suite of performance and debugging tools available in the browser. The Widget Inspector lets you select any widget and see its properties, constraints, and render box.\n\nThe Performance view records frame rendering times. Look for frames that take longer than 16ms (60fps budget). The flame chart shows exactly which build, layout, and paint operations are slow.\n\nThe Memory tab tracks allocations over time. Watch for objects that grow without being collected — this usually points to listeners or streams not being disposed.",
+    "publishedAt": "2026-05-14"
+  },
+  {
+    "id": "18",
+    "title": "Internationalisation and Localisation",
+    "slug": "internationalisation-and-localisation",
+    "imageUrl": "https://picsum.photos/seed/i18n/800/600",
+    "excerpt": "Supporting multiple languages and locales in Flutter applications.",
+    "body": "Flutter's intl package and the flutter_localizations package together provide full internationalisation support. Define ARB files with your string resources, generate Dart classes with flutter gen-l10n, and access them via AppLocalizations.of(context).\n\nDate and number formatting is locale-aware via the intl package. Always format dates and currencies through intl rather than string interpolation to get correct locale-specific output.\n\nFor right-to-left languages, Flutter handles text direction automatically. Check Directionality.of(context) if you need to mirror custom layouts.",
+    "publishedAt": "2026-05-22"
+  },
+  {
+    "id": "19",
+    "title": "Accessibility in Flutter",
+    "slug": "accessibility-in-flutter",
+    "imageUrl": "https://picsum.photos/seed/a11y/800/600",
+    "excerpt": "Making Flutter apps accessible to users with disabilities.",
+    "body": "Flutter has built-in semantics support. Interactive widgets like buttons and form fields automatically expose the right semantics to screen readers. For custom widgets, wrap with Semantics to describe the widget's role and label.\n\nTest accessibility with the Accessibility Scanner on Android or VoiceOver on iOS. In Flutter DevTools, the Accessibility tab shows the semantics tree.\n\nColour contrast matters: text should meet WCAG AA standards (4.5:1 for normal text). Avoid conveying information through colour alone — use icons or text as secondary indicators.",
+    "publishedAt": "2026-05-30"
+  },
+  {
+    "id": "20",
+    "title": "Platform Channels and Native Code",
+    "slug": "platform-channels-and-native-code",
+    "imageUrl": "https://picsum.photos/seed/platform/800/600",
+    "excerpt": "Bridging Flutter and native platform APIs with MethodChannel.",
+    "body": "Platform channels let Flutter code call native Kotlin/Swift/C++ APIs. Define a MethodChannel with a unique name, call invokeMethod from Dart, and handle it in the platform-specific code.\n\nFor bidirectional communication, EventChannel streams events from native to Dart. This is useful for sensor data, notifications, or any native event source.\n\nKeep platform channel code thin. The native side should only do what Dart can't — heavy logic belongs in Dart. Document the interface carefully since it crosses a type system boundary.",
+    "publishedAt": "2026-06-07"
+  },
+  {
+    "id": "21",
+    "title": "CI/CD for Flutter Projects",
+    "slug": "ci-cd-for-flutter-projects",
+    "imageUrl": "https://picsum.photos/seed/cicd/800/600",
+    "excerpt": "Automating builds, tests, and deployments with GitHub Actions.",
+    "body": "A good Flutter CI pipeline runs flutter analyze, flutter test, and then builds artifacts. GitHub Actions makes this straightforward with the subosito/flutter-action action.\n\nFor web, add flutter build web and deploy the build/web output to your hosting provider. Firebase Hosting and GitHub Pages both work well for static Flutter web apps.\n\nProtect the main branch with required checks. A pre-push hook that runs tests locally catches issues before they hit CI and reduces wasted build minutes.",
+    "publishedAt": "2026-06-10"
+  },
+  {
+    "id": "22",
+    "title": "Code Generation in Dart",
+    "slug": "code-generation-in-dart",
+    "imageUrl": "https://picsum.photos/seed/codegen/800/600",
+    "excerpt": "Using build_runner and source_gen to automate boilerplate.",
+    "body": "Code generation in Dart works through build_runner, which runs builders that read source files and produce generated .g.dart files. Common use cases are JSON serialisation, route generation, and mock creation.\n\njson_serializable generates fromJson and toJson methods from annotated classes. freezed generates immutable value types with copyWith, equality, and pattern matching. drift generates type-safe database queries.\n\nGenerated files should be committed to version control so that CI doesn't need a build step. Run dart run build_runner build --delete-conflicting-outputs to regenerate.",
+    "publishedAt": "2026-06-13"
+  },
+  {
+    "id": "23",
+    "title": "Error Handling Strategies",
+    "slug": "error-handling-strategies",
+    "imageUrl": "https://picsum.photos/seed/errors/800/600",
+    "excerpt": "Designing robust error handling with Either types and domain exceptions.",
+    "body": "Exceptions should be domain-specific and meaningful. Define a hierarchy rooted at a base domain exception. Infrastructure adapters catch technical exceptions and translate them to domain exceptions before they reach the application layer.\n\nFor expected failures, consider using a Result type or Either instead of exceptions. This forces callers to handle both success and failure paths at compile time.\n\nGlobal error handling in Flutter can be set up with FlutterError.onError and PlatformDispatcher.instance.onError. Use these to log unexpected errors to your monitoring service.",
+    "publishedAt": "2026-06-15"
+  },
+  {
+    "id": "24",
+    "title": "Package Development and Publishing",
+    "slug": "package-development-and-publishing",
+    "imageUrl": "https://picsum.photos/seed/packages/800/600",
+    "excerpt": "Creating reusable Dart packages and publishing them to pub.dev.",
+    "body": "A Dart package has a pubspec.yaml, a lib/ directory, and optionally example/ and test/ directories. The main export lives in lib/<package_name>.dart.\n\nDocument your public API with dartdoc comments. Run dart doc to generate HTML documentation. Good documentation is what separates a package others trust from one they avoid.\n\nBefore publishing, run dart pub publish --dry-run to catch issues. The pub.dev score considers documentation, test coverage, and null safety. Aim for a high score — it drives adoption.",
+    "publishedAt": "2026-06-18"
+  },
+  {
+    "id": "25",
+    "title": "The Future of Flutter",
+    "slug": "the-future-of-flutter",
+    "imageUrl": "https://picsum.photos/seed/future/800/600",
+    "excerpt": "Where Flutter is headed: Dart 4, Wasm, and the evolving ecosystem.",
+    "body": "Flutter continues to mature with each release. WebAssembly (Wasm) support is bringing near-native performance to Flutter web by compiling Dart directly to Wasm rather than JavaScript.\n\nDart's type system keeps improving. Records and patterns added in Dart 3 enable more expressive code. Sealed classes make exhaustive pattern matching possible, which pairs perfectly with state machines.\n\nThe ecosystem of packages grows every month. The challenge shifts from finding packages to evaluating them — look at pub points, maintenance activity, and issue responsiveness before committing to a dependency.",
+    "publishedAt": "2026-06-24"
+  }
+]

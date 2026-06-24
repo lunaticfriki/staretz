@@ -36,19 +36,40 @@ Each feature lives under `lib/<feature>/`:
 lib/
   blog/
     domain/
-      post.dart               # Post entity
-      post_title.dart         # PostTitle value object
-      post_repository.dart    # port (abstract class)
+      entities/
+        post.dart              # Post entity
+      value_objects/
+        post_id.dart
+        post_title.dart
+        post_slug.dart
+        post_image_url.dart
+        post_excerpt.dart
+        post_body.dart
+        post_published_at.dart
+      ports/
+        post_repository.dart   # port (abstract class)
     application/
-      post.read-service.dart
-      post.write-service.dart
-      post.state-service.dart
+      post.read_service.dart
+      post_state.dart
+      post.state_service.dart
     infrastructure/
-      post.repository.dart    # adapter implementing the port
-      posts/                  # markdown source files
+      json_post_repository.dart  # adapter implementing the port
     presentation/
-      post_list.container.dart
-      post_list.dart          # dumb widget
+      widgets/
+        post_preview_card.dart
+        post_preview_list.dart
+        blog_post_list.dart
+        post_detail_view.dart
+      containers/
+        home_preview.container.dart
+        blog_page.container.dart
+        post_detail.container.dart
+  shared/
+    pagination/
+      page_criteria.dart       # Criteria pattern: describes what page to load
+      paginated.dart           # Generic paginated result
+      widgets/
+        pagination_bar.dart
   di/
     container.dart
   main.dart

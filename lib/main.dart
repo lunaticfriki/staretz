@@ -1,4 +1,7 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:staretz/di/container.dart';
@@ -8,9 +11,11 @@ import 'package:staretz/shared/presentation/app_colors.dart';
 import 'package:staretz/shared/presentation/app_theme_extension.dart';
 import 'package:staretz/shared/presentation/containers/home.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  setupDi();
+  final raw = await rootBundle.loadString('../assets/data/posts.json');
+  final posts = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
+  setupDi(postsData: posts);
   runApp(const StaretzApp());
 }
 
