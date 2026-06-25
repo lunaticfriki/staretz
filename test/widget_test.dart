@@ -9,7 +9,7 @@ void main() {
   setUp(() async {
     SharedPreferences.setMockInitialValues({});
     await GetIt.instance.reset();
-    setupDi(postsData: const []);
+    setupDi();
   });
 
   testWidgets('splash shows staretz title', (tester) async {

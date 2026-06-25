@@ -53,7 +53,11 @@ lib/
       post_state.dart
       post.state_service.dart
     infrastructure/
-      json_post_repository.dart  # adapter implementing the port
+      markdown_post_repository.dart  # adapter implementing the port
+      posts/
+        manifest.json              # ordered list of slugs
+        getting-started-with-flutter.md
+        ...                        # one .md file per post
     presentation/
       widgets/
         post_preview_card.dart

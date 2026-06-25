@@ -11,12 +11,21 @@ import 'package:staretz/shared/presentation/app_colors.dart';
 import 'package:staretz/shared/presentation/app_theme_extension.dart';
 import 'package:staretz/shared/presentation/containers/home.dart';
 
+const _postsPath = 'lib/blog/infrastructure/posts';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  final raw = await rootBundle.loadString('../assets/data/posts.json');
-  final posts = (jsonDecode(raw) as List).cast<Map<String, dynamic>>();
-  setupDi(postsData: posts);
+  setupDi(rawPosts: await _loadRawPosts());
   runApp(const StaretzApp());
+}
+
+Future<Map<String, String>> _loadRawPosts() async {
+  final manifestRaw = await rootBundle.loadString('$_postsPath/manifest.json');
+  final slugs = (jsonDecode(manifestRaw) as List).cast<String>();
+  final contents = await Future.wait(
+    slugs.map((s) => rootBundle.loadString('$_postsPath/$s.md')),
+  );
+  return Map.fromIterables(slugs, contents);
 }
 
 class StaretzApp extends StatelessWidget {

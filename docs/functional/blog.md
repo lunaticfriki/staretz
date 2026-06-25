@@ -29,6 +29,25 @@ A post has:
 
 Posts are Markdown files in `lib/blog/infrastructure/posts/`. Each file uses YAML frontmatter for metadata; the body is plain Markdown.
 
+### Adding a post
+
+1. Create `lib/blog/infrastructure/posts/<slug>.md` with this structure:
+
+```
+---
+id: "<next-id>"
+title: "Post Title"
+slug: "post-slug"
+imageUrl: "https://..."
+excerpt: "Short summary."
+publishedAt: "YYYY-MM-DD"
+---
+
+Full Markdown body.
+```
+
+2. Add the slug to `lib/blog/infrastructure/posts/manifest.json` in the desired position.
+
 ## Future content management
 
 The `PostRepository` port decouples content delivery from the domain. Swapping the Markdown adapter for a CMS adapter (HTTP-based) requires only a new infrastructure implementation and a DI registration change — no domain or application code changes.

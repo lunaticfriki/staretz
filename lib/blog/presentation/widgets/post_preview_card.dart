@@ -15,39 +15,39 @@ class PostPreviewCard extends StatelessWidget {
         .titleSmall
         ?.copyWith(fontWeight: FontWeight.w600);
 
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(8),
+      clipBehavior: Clip.hardEdge,
+      child: InkWell(
         onTap: () => onTap(post.slug),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: Image.network(
-                  post.imageUrl.value,
-                  fit: BoxFit.cover,
-                  width: double.infinity,
-                  filterQuality: FilterQuality.medium,
-                  gaplessPlayback: true,
-                  errorBuilder: (_, _, _) => Container(
-                    color: Colors.grey.shade300,
-                    child: const Icon(Icons.image, size: 48, color: Colors.grey),
-                  ),
+        mouseCursor: SystemMouseCursors.click,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Image.network(
+                post.imageUrl.value,
+                fit: BoxFit.cover,
+                width: double.infinity,
+                filterQuality: FilterQuality.low,
+                gaplessPlayback: true,
+                errorBuilder: (_, _, _) => Container(
+                  color: Colors.grey.shade300,
+                  child: const Icon(Icons.image, size: 48, color: Colors.grey),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(12),
-                child: Text(
-                  post.title.value,
-                  style: titleStyle,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(12),
+              child: Text(
+                post.title.value,
+                style: titleStyle,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
