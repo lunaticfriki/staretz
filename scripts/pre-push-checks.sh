@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
 
+ROOT="$(git rev-parse --show-toplevel)"
 FLUTTER="${HOME}/development/flutter/bin/flutter"
+DART="${HOME}/development/flutter/bin/dart"
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
@@ -28,16 +30,34 @@ if [[ -n "$(git status --porcelain)" ]]; then
   echo -e "${YELLOW}  Stashed local changes${NC}"
 fi
 
-echo -e "  Running ${BOLD}flutter test${NC}..."
-echo ""
+failed=false
 
-if "$FLUTTER" test; then
-  echo ""
-  echo -e "${GREEN}${BOLD}✔ All tests passed — proceeding with push${NC}"
-  echo ""
-else
-  echo ""
+echo -e "  Running ${BOLD}dart test (domain)${NC}..."
+echo ""
+if ! (cd "$ROOT/packages/domain" && "$DART" test); then
+  failed=true
+fi
+
+echo ""
+echo -e "  Running ${BOLD}flutter test (front)${NC}..."
+echo ""
+if ! (cd "$ROOT/front" && "$FLUTTER" test); then
+  failed=true
+fi
+
+echo ""
+echo -e "  Running ${BOLD}dart test (back)${NC}..."
+echo ""
+if ! (cd "$ROOT/back" && "$DART" test); then
+  failed=true
+fi
+
+echo ""
+if $failed; then
   echo -e "${RED}${BOLD}✘ Tests failed — push aborted${NC}"
   echo ""
   exit 1
+else
+  echo -e "${GREEN}${BOLD}✔ All tests passed — proceeding with push${NC}"
+  echo ""
 fi
