@@ -43,6 +43,7 @@ dependencies:
     sdk: flutter
   staretz_domain:
     path: ../packages/domain
+  google_fonts: ^8.1.0
 
 dev_dependencies:
   flutter_test:

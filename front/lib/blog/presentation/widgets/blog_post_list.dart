@@ -26,19 +26,24 @@ class BlogPostList extends StatelessWidget {
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-          maxCrossAxisExtent: 300,
-          mainAxisSpacing: 24,
-          crossAxisSpacing: 24,
-          childAspectRatio: 0.85,
-        ),
-        itemCount: posts.length,
-        itemBuilder: (_, i) => PostPreviewCard(
-          post: posts[i],
-          onTap: onPostTap,
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 1100),
+          child: GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
+              maxCrossAxisExtent: 300,
+              mainAxisSpacing: 24,
+              crossAxisSpacing: 24,
+              childAspectRatio: 0.85,
+            ),
+            itemCount: posts.length,
+            itemBuilder: (_, i) => PostPreviewCard(
+              post: posts[i],
+              onTap: onPostTap,
+            ),
+          ),
         ),
       ),
     );

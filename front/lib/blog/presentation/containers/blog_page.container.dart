@@ -20,7 +20,7 @@ class BlogPageContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => GetIt.instance<PostStateService>()
-        ..loadPage(const PageCriteria(page: 1, pageSize: 20)),
+        ..loadPage(const PageCriteria(page: 1, pageSize: 10)),
       child: const _BlogLayout(),
     );
   }
@@ -41,30 +41,49 @@ class _BlogLayout extends StatelessWidget {
               : (postState.totalCount / postState.criteria.pageSize).ceil();
 
           return Scaffold(
-            body: SingleChildScrollView(
-              child: Column(
-                children: [
-                  Header(
-                    currentTheme: themeState.theme,
-                    onToggle: () =>
-                        context.read<ThemeStateService>().toggle(),
+            body: LayoutBuilder(
+              builder: (context, constraints) => SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints:
+                      BoxConstraints(minHeight: constraints.maxHeight),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Header(
+                            currentTheme: themeState.theme,
+                            onToggle: () =>
+                                context.read<ThemeStateService>().toggle(),
+                          ),
+                          BlogPostList(
+                            posts: postState.posts,
+                            isLoading:
+                                postState.status == PostStatus.loading,
+                            onPostTap: (PostSlug slug) =>
+                                _openDetail(context, slug),
+                          ),
+                        ],
+                      ),
+                      Column(
+                        children: [
+                          PaginationBar(
+                            currentPage: postState.criteria.page,
+                            totalPages: totalPages,
+                            hasPrevious: postState.criteria.page > 1,
+                            hasNext: postState.criteria.page < totalPages,
+                            onPrevious: () =>
+                                svc.loadPage(postState.criteria.previous()),
+                            onNext: () =>
+                                svc.loadPage(postState.criteria.next()),
+                          ),
+                          const Footer(),
+                        ],
+                      ),
+                    ],
                   ),
-                  BlogPostList(
-                    posts: postState.posts,
-                    isLoading: postState.status == PostStatus.loading,
-                    onPostTap: (PostSlug slug) => _openDetail(context, slug),
-                  ),
-                  PaginationBar(
-                    currentPage: postState.criteria.page,
-                    totalPages: totalPages,
-                    hasPrevious: postState.criteria.page > 1,
-                    hasNext: postState.criteria.page < totalPages,
-                    onPrevious: () =>
-                        svc.loadPage(postState.criteria.previous()),
-                    onNext: () => svc.loadPage(postState.criteria.next()),
-                  ),
-                  const Footer(),
-                ],
+                ),
               ),
             ),
           );

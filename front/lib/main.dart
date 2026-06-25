@@ -9,6 +9,7 @@ import 'package:staretz/di/container.dart';
 import 'package:staretz/router.dart';
 import 'package:staretz/shared/application/theme.state_service.dart';
 import 'package:staretz/shared/application/theme_state.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:staretz/shared/presentation/app_colors.dart';
 import 'package:staretz/shared/presentation/app_theme_extension.dart';
 
@@ -51,6 +52,7 @@ class StaretzApp extends StatelessWidget {
               brightness: Brightness.light,
               surface: AppColors.lightBackground,
             ),
+            textTheme: GoogleFonts.inconsolataTextTheme(),
           ),
           darkTheme: ThemeData(
             useMaterial3: true,
@@ -60,6 +62,9 @@ class StaretzApp extends StatelessWidget {
               seedColor: Colors.white,
               brightness: Brightness.dark,
               surface: AppColors.darkBackground,
+            ),
+            textTheme: GoogleFonts.inconsolataTextTheme(
+              ThemeData(brightness: Brightness.dark).textTheme,
             ),
           ),
           debugShowCheckedModeBanner: false,
