@@ -1,0 +1,18 @@
+name: staretz_back
+description: Staretz backend API — Dart Frog + PostgreSQL
+publish_to: none
+
+environment:
+  sdk: ^3.12.0
+
+dependencies:
+  dart_frog: ^1.2.6
+  postgres: ^3.5.3
+  staretz_domain:
+    path: ../packages/domain
+
+dev_dependencies:
+  test: ^1.24.0
+  mocktail: ^1.0.5
+  dart_frog_test: ^0.1.0
+  lints: ^5.0.0

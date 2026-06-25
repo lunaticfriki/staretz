@@ -4,47 +4,64 @@
 
 | Concern | Choice |
 |---------|--------|
-| Framework | Flutter 3.44 (web target) |
 | Language | Dart 3.12 |
-| Browser | Brave (Chromium-based) |
+| Front framework | Flutter 3.44 (web target) |
+| Back framework | Dart Frog 1.2 |
+| Dashboard framework | Flutter 3.44 (web target) |
+| Database | PostgreSQL |
+| Browser (dev) | Firefox (via `web-server` device — no CDP needed) |
 
-## State management
-
-| Concern | Choice |
-|---------|--------|
-| State / events | `flutter_bloc` — Cubits only (no full Blocs unless event complexity warrants it) |
-| Pattern | BlocBuilder / BlocConsumer in dumb widgets; Cubits owned by containers |
-
-## Dependency injection
+## Front
 
 | Concern | Choice |
 |---------|--------|
-| DI container | `get_it` |
-| Contracts | Abstract Dart classes (one per port) |
-| Registration | Single `di/container.dart` that merges feature module registrations |
+| State / events | `flutter_bloc` — Cubits only |
+| DI | `get_it` |
+| Routing | `go_router` |
+| Content | Markdown files in `front/lib/blog/infrastructure/posts/` |
+| Content parsing | `yaml` package (frontmatter) |
 
-## Content
+## Back
 
 | Concern | Choice |
 |---------|--------|
-| Post format | Markdown with YAML frontmatter |
-| Storage | Files in `lib/blog/infrastructure/posts/` |
-| Parsing | `markdown` pub package |
-| Future | Headless CMS (TBD) — infrastructure adapter swap, no domain change |
+| HTTP server | `dart_frog` |
+| Database client | `postgres` |
+| Config | `Platform.environment` (no dotenv library) |
+
+## Dashboard
+
+| Concern | Choice |
+|---------|--------|
+| State / events | `flutter_bloc` — Cubits only |
+| DI | `get_it` |
+| Routing | `go_router` |
+| Auth | `google_sign_in` |
+| API client | `http` |
+
+## Shared domain
+
+| Concern | Choice |
+|---------|--------|
+| Package name | `staretz_domain` |
+| Path | `packages/domain/` |
+| Flutter dependency | None — pure Dart |
 
 ## Testing
 
 | Concern | Choice |
 |---------|--------|
-| Unit / arch tests | `flutter_test` + custom arch test helpers |
-| Mocking | `mocktail` (no code generation required) |
+| Front / Dashboard unit & arch | `flutter_test` + custom arch test helpers |
+| Back unit & arch | `dart test` (`package:test`) |
+| Domain unit & arch | `dart test` (`package:test`) |
+| Mocking | `mocktail` (all packages) |
 | Test data | Mother objects (no raw primitives in test setup) |
-| E2E | `integration_test` package |
+| E2E | `integration_test` package (front only) |
 
 ## Tooling
 
 | Concern | Choice |
 |---------|--------|
-| Linting | `flutter_lints` |
-| Build | Vite-equivalent is Flutter's own build system |
-| Local SDK | `~/development/flutter` |
+| Linting | `flutter_lints` (front, dashboard), `lints` (back, domain) |
+| Local Flutter SDK | `~/development/flutter` |
+| Git hooks | Husky (pre-push runs tests) |

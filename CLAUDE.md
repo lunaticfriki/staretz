@@ -20,7 +20,21 @@ Update the relevant docs if anything changed: a new layer rule, a new naming pat
 
 ## Project facts
 
-- Flutter 3.44 / Dart 3.12 — web target, runs via `flutter run -d web-server --web-port 5000`, then open `http://localhost:5000` in Firefox (Firefox does not support CDP so `-d chrome` cannot be used)
+This is a Dart monorepo. Read `docs/architecture/monorepo.md` first for the full picture.
+
+| Package | Path | Language | Run command |
+|---------|------|----------|-------------|
+| `staretz_domain` | `packages/domain/` | Pure Dart | `dart test` |
+| `staretz` (front) | `front/` | Flutter web | `flutter run -d web-server --web-port 5000` |
+| `staretz_back` | `back/` | Dart Frog | `dart run dart_frog dev` |
+| `staretz_dashboard` | `dashboard/` | Flutter web | `flutter run -d web-server --web-port 5001` |
+
+- Flutter 3.44 / Dart 3.12
 - Local Flutter SDK: `~/development/flutter/bin/flutter`
-- Tests: `flutter test` (unit + arch), `flutter test integration_test` (e2e)
+- Browser: Firefox on `http://localhost:5000` (Firefox does not support CDP so `-d chrome` cannot be used)
+- Run all tests from root: `make test`
 - No comments in code unless the WHY is non-obvious
+
+## Shared domain rule
+
+Domain entities, value objects, and repository ports live ONLY in `packages/domain/`. Never duplicate them in `front/`, `back/`, or `dashboard/`. If a domain concept is needed across packages, add it to `packages/domain/` and import via `package:staretz_domain/...`.

@@ -1,8 +1,20 @@
 # Architecture Overview
 
+## Monorepo packages
+
+```
+staretz/
+  packages/domain/    staretz_domain   — shared domain (pure Dart)
+  front/              staretz           — Flutter web, public blog
+  back/               staretz_back      — Dart Frog REST API
+  dashboard/          staretz_dashboard — Flutter web, private CMS
+```
+
+See [monorepo.md](monorepo.md) for the full package dependency graph and per-package run/test commands.
+
 ## Hexagonal Architecture (Ports & Adapters)
 
-The application is divided into four layers. Dependencies point inward — outer layers depend on inner layers, never the reverse.
+Each package follows the same four-layer model. Dependencies point inward.
 
 ```
 ┌─────────────────────────────────────────────────┐
@@ -17,6 +29,8 @@ The application is divided into four layers. Dependencies point inward — outer
 └─────────────────────────────────────────────────┘
 ```
 
+> **back/** has no Presentation layer — routes replace it.
+
 ## Layer rules
 
 | From \ To | Domain | Application | Infrastructure | Presentation |
@@ -28,61 +42,30 @@ The application is divided into four layers. Dependencies point inward — outer
 
 Presentation never imports Infrastructure directly. It talks to Application services through Cubits.
 
-## Feature module structure
+## Shared domain (`packages/domain`)
 
-Each feature lives under `lib/<feature>/`:
+Domain code that is the same across all packages lives in `packages/domain` (`staretz_domain`). Each app imports it as a path dependency. The package is pure Dart — no Flutter, no server dependencies.
+
+Contents:
+- `blog/domain/` — Post entity, value objects, PostRepository port
+- `shared/domain/` — AppTheme, ThemeRepository port
+- `shared/pagination/` — PageCriteria, Paginated
+
+## Feature module structure (per package)
 
 ```
 lib/
   blog/
-    domain/
-      entities/
-        post.dart              # Post entity
-      value_objects/
-        post_id.dart
-        post_title.dart
-        post_slug.dart
-        post_image_url.dart
-        post_excerpt.dart
-        post_body.dart
-        post_published_at.dart
-      ports/
-        post_repository.dart   # port (abstract class)
+    domain/           # (front/dashboard: re-exported from staretz_domain)
     application/
-      post.read_service.dart
-      post_state.dart
-      post.state_service.dart
     infrastructure/
-      markdown_post_repository.dart  # adapter implementing the port
-      posts/
-        manifest.json              # ordered list of slugs
-        getting-started-with-flutter.md
-        ...                        # one .md file per post
-    presentation/
-      widgets/
-        post_preview_card.dart
-        post_preview_list.dart
-        blog_post_list.dart
-        post_detail_view.dart
-      containers/
-        home_preview.container.dart
-        blog_page.container.dart
-        post_detail.container.dart
+    presentation/     # (back: routes/ instead)
   shared/
-    pagination/
-      page_criteria.dart       # Criteria pattern: describes what page to load
-      paginated.dart           # Generic paginated result
-      widgets/
-        pagination_bar.dart
   di/
     container.dart
   main.dart
 ```
 
-## Shared kernel
-
-Cross-feature utilities (base value objects, error types, DI helpers) live in `lib/shared/`.
-
 ## Arch tests
 
-Architecture rules are enforced by tests in `test/arch/`. See [testing.md](testing.md).
+Architecture rules are enforced by tests in each package's `test/arch/`. See [testing.md](testing.md).
