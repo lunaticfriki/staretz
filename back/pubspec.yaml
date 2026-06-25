@@ -16,3 +16,4 @@ dev_dependencies:
   mocktail: ^1.0.5
   dart_frog_test: ^0.1.0
   lints: ^5.0.0
+  dart_frog_cli: ^1.2.14

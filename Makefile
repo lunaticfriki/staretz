@@ -32,7 +32,7 @@ run:
 	  --dart-define=API_BASE_URL=http://localhost:8080
 
 run-back:
-	cd back && $(DART) run dart_frog dev
+	cd back && $(DART) run dart_frog_cli:dart_frog dev
 
 build:
 	cd front && $(FLUTTER) build web

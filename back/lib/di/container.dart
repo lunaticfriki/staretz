@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:postgres/postgres.dart';
 import 'package:staretz_back/blog/application/post.read_service.dart';
 import 'package:staretz_back/blog/application/post.write_service.dart';
+import 'package:staretz_back/blog/infrastructure/in_memory_post_repository.dart';
 import 'package:staretz_back/blog/infrastructure/postgres_post_repository.dart';
+import 'package:staretz_domain/blog/domain/ports/post_repository.dart';
 
 class AppContainer {
   final PostReadService postReadService;
@@ -15,6 +17,17 @@ class AppContainer {
   });
 
   static Future<AppContainer> build() async {
+    final PostRepository repo = Platform.environment['USE_DB'] == '1'
+        ? await _buildPostgresRepo()
+        : InMemoryPostRepository();
+
+    return AppContainer._(
+      postReadService: PostReadService(repo),
+      postWriteService: PostWriteService(repo),
+    );
+  }
+
+  static Future<PostgresPostRepository> _buildPostgresRepo() async {
     final db = await Connection.open(
       Endpoint(
         host: Platform.environment['DB_HOST'] ?? 'localhost',
@@ -25,10 +38,6 @@ class AppContainer {
       ),
       settings: const ConnectionSettings(sslMode: SslMode.disable),
     );
-    final repo = PostgresPostRepository(db);
-    return AppContainer._(
-      postReadService: PostReadService(repo),
-      postWriteService: PostWriteService(repo),
-    );
+    return PostgresPostRepository(db);
   }
 }

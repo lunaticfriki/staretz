@@ -11,30 +11,42 @@ class PostStateService extends Cubit<PostState> {
 
   Future<void> loadPreview(int limit) async {
     emit(state.copyWith(status: PostStatus.loading));
-    final posts = await _read.getPreview(limit);
-    emit(state.copyWith(status: PostStatus.loaded, posts: posts));
+    try {
+      final posts = await _read.getPreview(limit);
+      emit(state.copyWith(status: PostStatus.loaded, posts: posts));
+    } catch (_) {
+      emit(state.copyWith(status: PostStatus.error));
+    }
   }
 
   Future<void> loadPage(PageCriteria criteria) async {
     emit(state.copyWith(status: PostStatus.loading, criteria: criteria));
-    final page = await _read.getPage(criteria);
-    emit(state.copyWith(
-      status: PostStatus.loaded,
-      posts: page.items,
-      totalCount: page.totalCount,
-      criteria: criteria,
-    ));
+    try {
+      final page = await _read.getPage(criteria);
+      emit(state.copyWith(
+        status: PostStatus.loaded,
+        posts: page.items,
+        totalCount: page.totalCount,
+        criteria: criteria,
+      ));
+    } catch (_) {
+      emit(state.copyWith(status: PostStatus.error));
+    }
   }
 
   Future<void> loadBySlug(PostSlug slug) async {
     emit(state.copyWith(status: PostStatus.loading));
-    final post = await _read.getBySlug(slug);
-    emit(PostState(
-      status: PostStatus.loaded,
-      posts: state.posts,
-      totalCount: state.totalCount,
-      selectedPost: post,
-      criteria: state.criteria,
-    ));
+    try {
+      final post = await _read.getBySlug(slug);
+      emit(PostState(
+        status: PostStatus.loaded,
+        posts: state.posts,
+        totalCount: state.totalCount,
+        selectedPost: post,
+        criteria: state.criteria,
+      ));
+    } catch (_) {
+      emit(state.copyWith(status: PostStatus.error));
+    }
   }
 }

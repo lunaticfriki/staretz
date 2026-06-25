@@ -22,6 +22,9 @@ class HomePreviewContainer extends StatelessWidget {
               posts: state.posts,
               onPostTap: (PostSlug slug) => _openDetail(context, slug),
             ),
+          PostStatus.error => const Center(
+              child: Text('could not connect to the backend.'),
+            ),
           _ => const SizedBox.shrink(),
         },
       ),

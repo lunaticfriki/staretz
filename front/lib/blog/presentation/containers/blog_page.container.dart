@@ -59,8 +59,8 @@ class _BlogLayout extends StatelessWidget {
                           ),
                           BlogPostList(
                             posts: postState.posts,
-                            isLoading:
-                                postState.status == PostStatus.loading,
+                            isLoading: postState.status == PostStatus.loading,
+                            isError: postState.status == PostStatus.error,
                             onPostTap: (PostSlug slug) =>
                                 _openDetail(context, slug),
                           ),

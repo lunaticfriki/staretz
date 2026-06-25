@@ -1,34 +1,20 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:get_it/get_it.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:staretz/di/container.dart';
 import 'package:staretz/router.dart';
 import 'package:staretz/shared/application/theme.state_service.dart';
 import 'package:staretz/shared/application/theme_state.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:staretz/shared/presentation/app_colors.dart';
 import 'package:staretz/shared/presentation/app_theme_extension.dart';
 
-const _postsPath = 'lib/blog/infrastructure/posts';
-
-void main() async {
+void main() {
   usePathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
-  setupDi(rawPosts: await _loadRawPosts());
+  setupDi();
   runApp(const StaretzApp());
-}
-
-Future<Map<String, String>> _loadRawPosts() async {
-  final manifestRaw = await rootBundle.loadString('$_postsPath/manifest.json');
-  final slugs = (jsonDecode(manifestRaw) as List).cast<String>();
-  final contents = await Future.wait(
-    slugs.map((s) => rootBundle.loadString('$_postsPath/$s.md')),
-  );
-  return Map.fromIterables(slugs, contents);
 }
 
 class StaretzApp extends StatelessWidget {
