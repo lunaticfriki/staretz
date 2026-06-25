@@ -7,21 +7,28 @@
 | Language | Dart 3.12 |
 | Front framework | Flutter 3.44 (web target) |
 | Back framework | Dart Frog 1.2 |
-| Dashboard framework | Flutter 3.44 (web target) |
 | Database | PostgreSQL |
 | Browser (dev) | Firefox (via `web-server` device — no CDP needed) |
 
-## Front
+## Front (`front/`)
+
+Serves two feature modules at port 5000:
+
+| Module | Routes | Description |
+|--------|--------|-------------|
+| `blog` | `/`, `/blog`, `/blog/:slug` | Public read-only blog |
+| `dashboard` | `/dashboard`, `/dashboard/new`, `/dashboard/:slug/edit` | CMS — create/edit/delete posts |
 
 | Concern | Choice |
 |---------|--------|
 | State / events | `flutter_bloc` — Cubits only |
 | DI | `get_it` |
 | Routing | `go_router` |
-| Content | Markdown files in `front/lib/blog/infrastructure/posts/` |
-| Content parsing | `yaml` package (frontmatter) |
+| Blog content | Markdown files in `front/lib/blog/infrastructure/posts/` |
+| Blog content parsing | `yaml` package (frontmatter) |
+| Dashboard API client | `http` package → `HttpPostRepository` |
 
-## Back
+## Back (`back/`)
 
 | Concern | Choice |
 |---------|--------|
@@ -29,29 +36,19 @@
 | Database client | `postgres` |
 | Config | `Platform.environment` (no dotenv library) |
 
-## Dashboard
-
-| Concern | Choice |
-|---------|--------|
-| State / events | `flutter_bloc` — Cubits only |
-| DI | `get_it` |
-| Routing | `go_router` |
-| Auth | `google_sign_in` |
-| API client | `http` |
-
-## Shared domain
+## Shared domain (`packages/domain/`)
 
 | Concern | Choice |
 |---------|--------|
 | Package name | `staretz_domain` |
-| Path | `packages/domain/` |
 | Flutter dependency | None — pure Dart |
+| Used by | `front/` and `back/` via path dependency |
 
 ## Testing
 
 | Concern | Choice |
 |---------|--------|
-| Front / Dashboard unit & arch | `flutter_test` + custom arch test helpers |
+| Front unit & arch | `flutter_test` + custom arch test helpers |
 | Back unit & arch | `dart test` (`package:test`) |
 | Domain unit & arch | `dart test` (`package:test`) |
 | Mocking | `mocktail` (all packages) |
@@ -62,6 +59,6 @@
 
 | Concern | Choice |
 |---------|--------|
-| Linting | `flutter_lints` (front, dashboard), `lints` (back, domain) |
+| Linting | `flutter_lints` (front), `lints` (back, domain) |
 | Local Flutter SDK | `~/development/flutter` |
 | Git hooks | Husky (pre-push runs tests) |

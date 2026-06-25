@@ -1,49 +1,77 @@
-# Dashboard Layer (Flutter web — private CMS)
+# Dashboard Module (`front/lib/dashboard/`)
 
 ## Purpose
 
-The dashboard is a private Flutter web app that lets authenticated users create, edit, and delete blog posts. It talks to the back-end API via `HttpPostRepository` and uses Google Sign-In for authentication.
+The dashboard is a CMS module inside the `front` Flutter app. It lets users create, edit, and delete blog posts. It is accessible at `/dashboard` and talks to the `back/` REST API via `HttpPostRepository`.
 
-## Feature structure
+The dashboard is currently **public** (no auth guard). Authentication will be added later as a `go_router` redirect — see [front.md](front.md) when that exists, or the router in `front/lib/router.dart`.
+
+## Module structure
 
 ```
-lib/
-  auth/
-    domain/          # AuthUser entity, AuthRepository port
-    application/     # AuthStateService (Cubit), AuthState
-    infrastructure/  # GoogleAuthRepository
-    presentation/    # LoginContainer, DashboardShellContainer, LoginButton
-  blog/
-    application/     # PostReadService, PostWriteService, PostEditStateService
-    infrastructure/  # HttpPostRepository
-    presentation/    # PostListContainer, PostEditorContainer, widgets
-  di/
-    container.dart
-  main.dart
-  router.dart
+lib/dashboard/
+  application/
+    post.write_service.dart       # delegates save/delete to PostRepository port
+    post_edit_state.dart          # PostEditState + PostEditStatus enum
+    post_edit.state_service.dart  # Cubit — owns list + edit states
+  infrastructure/
+    http_post_repository.dart     # implements PostRepository; calls back-end API
+  presentation/
+    containers/
+      post_list.container.dart    # /dashboard — list of posts with edit/delete
+      post_editor.container.dart  # /dashboard/new and /dashboard/:slug/edit
+    widgets/
+      post_list.dart              # dumb list widget
+      post_editor_form.dart       # dumb form widget
 ```
 
-## Auth flow
+## Dependency injection
 
-1. App starts → `AuthStateService.checkCurrentUser()` fires.
-2. If no current user → `GoRouter` redirects to `/login`.
-3. `LoginContainer` shows the "Sign in with Google" button.
-4. On success → `AuthStateService` emits `authenticated` → router redirects to `/posts`.
-5. `DashboardShellContainer` wraps all protected routes and listens for `unauthenticated` to redirect back to `/login`.
+`HttpPostRepository` is registered as a `LazySingleton` by its concrete type (separate from the blog's `PostRepository` → `MarkdownPostRepository`). `PostEditStateService` is also a `LazySingleton` so the list and editor share state across navigation.
 
-## Blog management
+```dart
+sl.registerLazySingleton<HttpPostRepository>(
+  () => HttpPostRepository(_apiBaseUrl),
+);
+sl.registerLazySingleton(
+  () => PostEditStateService(
+    PostReadService(sl<HttpPostRepository>()),
+    PostWriteService(sl<HttpPostRepository>()),
+  ),
+);
+```
 
-`PostEditStateService` owns the list + edit states. It calls `PostReadService` for reads and `PostWriteService` for mutations, which delegate to `HttpPostRepository`. The HTTP repository speaks to the `back/` API.
+`PostReadService` from the `blog` application layer is reused with the HTTP repository. `PostWriteService` lives in `dashboard/application/`.
 
-## Naming conventions
+## Routes
 
-Same rules as `front/` — see [naming.md](naming.md). Additional convention for the dashboard edit state:
+| Path | Widget | Description |
+|------|--------|-------------|
+| `/dashboard` | `PostListContainer` | Paginated list of posts; links to new/edit |
+| `/dashboard/new` | `PostEditorContainer` | Empty form; saves a new post |
+| `/dashboard/:slug/edit` | `PostEditorContainer` | Pre-filled form; updates existing post |
 
-| Artefact | Suffix | Example |
-|----------|--------|---------|
-| Edit state service | `<entity>_edit.state_service.dart` | `post_edit.state_service.dart` |
-| Edit state class | `<entity>_edit_state.dart` | `post_edit_state.dart` |
+## State flow
+
+`PostEditStateService` is a singleton Cubit. Navigating between the list and editor shares the same instance — `startEditing(post)` on the list survives the push to the editor.
+
+```
+List loads  →  loadPage()      →  PostEditStatus.loaded  →  shows posts
+New post    →  clearEditing()  →  push /dashboard/new    →  empty form
+Edit post   →  startEditing()  →  push /dashboard/:slug/edit  →  pre-filled form
+Save        →  savePost()      →  PostEditStatus.saved   →  go /dashboard
+Delete      →  deletePost()    →  reloads list
+Backend down → loadPage() catch  →  PostEditStatus.error  →  shows error message
+```
+
+## API base URL
+
+Set at compile time via `--dart-define=API_BASE_URL=http://localhost:8080`. Default is `http://localhost:8080`. `make run` passes this automatically.
 
 ## Testing
 
-Architecture tests in `test/arch/dashboard_arch_test.dart` enforce layer boundaries and naming conventions across both `auth` and `blog` features. Run with `flutter test` from `dashboard/`.
+Arch tests in `front/test/arch/dashboard_arch_test.dart` enforce:
+- Application does not import infrastructure or presentation
+- Presentation does not import infrastructure
+- State services end with `.state_service.dart`
+- Containers end with `.container.dart`

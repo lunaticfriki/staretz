@@ -25,16 +25,22 @@ This is a Dart monorepo. Read `docs/architecture/monorepo.md` first for the full
 | Package | Path | Language | Run command |
 |---------|------|----------|-------------|
 | `staretz_domain` | `packages/domain/` | Pure Dart | `dart test` |
-| `staretz` (front) | `front/` | Flutter web | `flutter run -d web-server --web-port 5000` |
+| `staretz` (front) | `front/` | Flutter web | `flutter run -d web-server --web-port 5000 --dart-define=API_BASE_URL=http://localhost:8080` |
 | `staretz_back` | `back/` | Dart Frog | `dart run dart_frog dev` |
-| `staretz_dashboard` | `dashboard/` | Flutter web | `flutter run -d web-server --web-port 5001` |
 
 - Flutter 3.44 / Dart 3.12
 - Local Flutter SDK: `~/development/flutter/bin/flutter`
 - Browser: Firefox on `http://localhost:5000` (Firefox does not support CDP so `-d chrome` cannot be used)
+- Dashboard CMS is at `http://localhost:5000/dashboard` (same Flutter app, different route)
 - Run all tests from root: `make test`
 - No comments in code unless the WHY is non-obvious
 
+## Front module structure
+
+`front/lib/` has two feature modules:
+- `blog/` — public read-only blog (Markdown assets, no backend required)
+- `dashboard/` — CMS at `/dashboard`; reads/writes via the back-end REST API
+
 ## Shared domain rule
 
-Domain entities, value objects, and repository ports live ONLY in `packages/domain/`. Never duplicate them in `front/`, `back/`, or `dashboard/`. If a domain concept is needed across packages, add it to `packages/domain/` and import via `package:staretz_domain/...`.
+Domain entities, value objects, and repository ports live ONLY in `packages/domain/`. Never duplicate them in `front/` or `back/`. If a domain concept is needed across packages, add it to `packages/domain/` and import via `package:staretz_domain/...`.
