@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:staretz/blog/presentation/containers/blog_page.container.dart';
 import 'package:staretz/blog/presentation/containers/home_preview.container.dart';
 import 'package:staretz/shared/application/theme.state_service.dart';
 import 'package:staretz/shared/application/theme_state.dart';
@@ -74,9 +73,6 @@ class _MainLayout extends StatelessWidget {
           Header(
             currentTheme: state.theme,
             onToggle: () => context.read<ThemeStateService>().toggle(),
-            onBlogTap: () => Navigator.of(context).push(
-              MaterialPageRoute(builder: (_) => const BlogPageContainer()),
-            ),
           ),
           const Expanded(child: HomePreviewContainer()),
           const Footer(),

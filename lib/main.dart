@@ -5,11 +5,11 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:staretz/di/container.dart';
+import 'package:staretz/router.dart';
 import 'package:staretz/shared/application/theme.state_service.dart';
 import 'package:staretz/shared/application/theme_state.dart';
 import 'package:staretz/shared/presentation/app_colors.dart';
 import 'package:staretz/shared/presentation/app_theme_extension.dart';
-import 'package:staretz/shared/presentation/containers/home.dart';
 
 const _postsPath = 'lib/blog/infrastructure/posts';
 
@@ -36,7 +36,8 @@ class StaretzApp extends StatelessWidget {
     return BlocProvider(
       create: (_) => GetIt.instance<ThemeStateService>()..load(),
       child: BlocBuilder<ThemeStateService, ThemeState>(
-        builder: (_, state) => MaterialApp(
+        builder: (_, state) => MaterialApp.router(
+          routerConfig: appRouter,
           title: 'staretz',
           themeMode: state.theme.flutterThemeMode,
           theme: ThemeData(
@@ -59,7 +60,6 @@ class StaretzApp extends StatelessWidget {
               surface: AppColors.darkBackground,
             ),
           ),
-          home: const HomePage(),
           debugShowCheckedModeBanner: false,
         ),
       ),

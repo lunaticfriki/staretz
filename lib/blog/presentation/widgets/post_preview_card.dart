@@ -8,12 +8,22 @@ class PostPreviewCard extends StatelessWidget {
 
   const PostPreviewCard({super.key, required this.post, required this.onTap});
 
+  static const _author = 'Vania';
+
+  static const _months = [
+    'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+    'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec',
+  ];
+
+  String _formatDate(DateTime d) => '${_months[d.month - 1]} ${d.day}, ${d.year}';
+
   @override
   Widget build(BuildContext context) {
-    final titleStyle = Theme.of(context)
-        .textTheme
-        .titleSmall
-        ?.copyWith(fontWeight: FontWeight.w600);
+    final theme = Theme.of(context);
+    final titleStyle = theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w600);
+    final metaStyle = theme.textTheme.labelSmall?.copyWith(
+      color: theme.colorScheme.onSurface.withValues(alpha: 0.6),
+    );
 
     return Material(
       color: Colors.transparent,
@@ -40,11 +50,23 @@ class PostPreviewCard extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.all(12),
-              child: Text(
-                post.title.value,
-                style: titleStyle,
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    post.title.value,
+                    style: titleStyle,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    '$_author · ${_formatDate(post.publishedAt.value)}',
+                    style: metaStyle,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
               ),
             ),
           ],

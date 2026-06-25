@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:staretz/shared/domain/app_theme.dart';
 import 'package:staretz/shared/presentation/app_colors.dart';
 import 'package:staretz/shared/presentation/widgets/theme_toggle.dart';
@@ -6,17 +7,12 @@ import 'package:staretz/shared/presentation/widgets/theme_toggle.dart';
 class Header extends StatelessWidget {
   final AppTheme currentTheme;
   final VoidCallback onToggle;
-  final VoidCallback? onBlogTap;
   final VoidCallback? onBack;
-
-  final VoidCallback? onHomeTap;
 
   const Header({
     super.key,
     required this.currentTheme,
     required this.onToggle,
-    this.onHomeTap,
-    this.onBlogTap,
     this.onBack,
   });
 
@@ -46,27 +42,24 @@ class Header extends StatelessWidget {
               ),
             ),
           MouseRegion(
-            cursor: onHomeTap != null
-                ? SystemMouseCursors.click
-                : MouseCursor.defer,
+            cursor: SystemMouseCursors.click,
             child: GestureDetector(
-              onTap: onHomeTap,
+              onTap: () => context.go('/'),
               child: Image.asset(logo, height: 32),
             ),
           ),
           const Spacer(),
-          if (onBlogTap != null)
-            MouseRegion(
-              cursor: SystemMouseCursors.click,
-              child: GestureDetector(
-                onTap: onBlogTap,
-                child: Text(
-                  'blog',
-                  style: TextStyle(fontSize: 14, color: mutedColor),
-                ),
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => context.go('/blog'),
+              child: Text(
+                'blog',
+                style: TextStyle(fontSize: 14, color: mutedColor),
               ),
             ),
-          if (onBlogTap != null) const SizedBox(width: 24),
+          ),
+          const SizedBox(width: 24),
           ThemeToggle(currentTheme: currentTheme, onToggle: onToggle),
         ],
       ),

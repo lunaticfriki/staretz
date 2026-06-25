@@ -1,10 +1,10 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:staretz/blog/application/post.state_service.dart';
 import 'package:staretz/blog/application/post_state.dart';
 import 'package:staretz/blog/domain/value_objects/post_slug.dart';
-import 'package:staretz/blog/presentation/containers/post_detail.container.dart';
 import 'package:staretz/blog/presentation/widgets/post_preview_list.dart';
 
 class HomePreviewContainer extends StatelessWidget {
@@ -29,8 +29,6 @@ class HomePreviewContainer extends StatelessWidget {
   }
 
   void _openDetail(BuildContext context, PostSlug slug) {
-    Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => PostDetailContainer(slug: slug)),
-    );
+    context.push('/blog/${slug.value}');
   }
 }

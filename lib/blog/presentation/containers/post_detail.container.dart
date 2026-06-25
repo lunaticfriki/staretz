@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
 import 'package:staretz/blog/application/post.state_service.dart';
 import 'package:staretz/blog/application/post_state.dart';
@@ -44,11 +45,9 @@ class PostDetailContainer extends StatelessWidget {
                         currentTheme: themeState.theme,
                         onToggle: () =>
                             context.read<ThemeStateService>().toggle(),
-                        onHomeTap: () => Navigator.popUntil(
-                          context,
-                          (route) => route.isFirst,
-                        ),
-                        onBack: () => Navigator.of(context).pop(),
+                        onBack: () => context.canPop()
+                            ? context.pop()
+                            : context.go('/blog'),
                       ),
                     ),
                   ),
