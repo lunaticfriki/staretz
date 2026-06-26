@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'package:get_it/get_it.dart';
+import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:staretz/di/container.dart';
 import 'package:staretz/router.dart';
@@ -11,6 +12,7 @@ import 'package:staretz/shared/presentation/app_colors.dart';
 import 'package:staretz/shared/presentation/app_theme_extension.dart';
 
 void main() {
+  GoRouter.optionURLReflectsImperativeAPIs = true;
   usePathUrlStrategy();
   WidgetsFlutterBinding.ensureInitialized();
   setupDi();
@@ -27,7 +29,7 @@ class StaretzApp extends StatelessWidget {
       child: BlocBuilder<ThemeStateService, ThemeState>(
         builder: (_, state) => MaterialApp.router(
           routerConfig: appRouter,
-          title: 'staretz',
+          title: 'Staretz',
           themeMode: state.theme.flutterThemeMode,
           theme: ThemeData(
             useMaterial3: true,
