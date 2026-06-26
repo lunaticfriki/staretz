@@ -38,12 +38,33 @@ class PostList extends StatelessWidget {
               ),
               IconButton(
                 icon: const Icon(Icons.delete),
-                onPressed: () => onDelete(post),
+                onPressed: () => _confirmDelete(context, post),
               ),
             ],
           ),
         );
       },
     );
+  }
+
+  Future<void> _confirmDelete(BuildContext context, Post post) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Delete post'),
+        content: Text('Delete "${post.title.value}"? This cannot be undone.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(false),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(true),
+            child: const Text('Delete'),
+          ),
+        ],
+      ),
+    );
+    if (confirmed == true) onDelete(post);
   }
 }

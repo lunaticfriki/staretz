@@ -51,6 +51,22 @@ class InMemoryPostRepository implements PostRepository {
   }
 
   @override
+  Future<void> update(PostSlug originalSlug, Post updatedPost) async {
+    final idx = _posts.indexWhere((p) => p.slug.value == originalSlug.value);
+    if (idx == -1) return;
+    final existing = _posts[idx];
+    _posts[idx] = Post.create(
+      id: existing.id,
+      title: updatedPost.title,
+      slug: updatedPost.slug,
+      imageUrl: updatedPost.imageUrl,
+      excerpt: updatedPost.excerpt,
+      body: updatedPost.body,
+      publishedAt: existing.publishedAt,
+    );
+  }
+
+  @override
   Future<void> delete(PostSlug slug) async {
     _posts.removeWhere((p) => p.slug.value == slug.value);
   }

@@ -13,7 +13,7 @@ class HomePreviewContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (_) => GetIt.instance<PostStateService>()..loadPreview(5),
+      create: (_) => GetIt.instance<PostStateService>()..loadPreview(6),
       child: BlocBuilder<PostStateService, PostState>(
         builder: (context, state) => switch (state.status) {
           PostStatus.loading =>

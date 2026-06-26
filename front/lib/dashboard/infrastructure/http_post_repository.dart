@@ -70,6 +70,16 @@ class HttpPostRepository implements PostRepository {
   }
 
   @override
+  Future<void> update(PostSlug originalSlug, Post post) async {
+    final uri = Uri.parse('$_baseUrl/posts/${originalSlug.value}');
+    await _client.put(
+      uri,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode(_postToJson(post)),
+    );
+  }
+
+  @override
   Future<void> delete(PostSlug slug) async {
     final uri = Uri.parse('$_baseUrl/posts/${slug.value}');
     await _client.delete(uri);

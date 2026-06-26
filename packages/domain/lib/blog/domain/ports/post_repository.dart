@@ -8,5 +8,6 @@ abstract class PostRepository {
   Future<Paginated<Post>> findPage(PageCriteria criteria);
   Future<Post?> findBySlug(PostSlug slug);
   Future<void> save(Post post);
+  Future<void> update(PostSlug originalSlug, Post updatedPost);
   Future<void> delete(PostSlug slug);
 }

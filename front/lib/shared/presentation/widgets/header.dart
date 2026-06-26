@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:staretz_domain/shared/domain/app_theme.dart';
 import 'package:staretz/shared/presentation/app_colors.dart';
+import 'package:staretz/shared/presentation/widgets/app_logo.dart';
 import 'package:staretz/shared/presentation/widgets/theme_toggle.dart';
 
 const _mobileBreakpoint = 640.0;
@@ -20,13 +21,10 @@ class Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final logo = isDark
-        ? 'assets/images/logo-black.jpg'
-        : 'assets/images/logo-white.jpg';
     final isMobile = MediaQuery.sizeOf(context).width < _mobileBreakpoint;
     final mutedColor =
         Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6);
+    final location = GoRouterState.of(context).uri.path;
 
     return Container(
       width: double.infinity,
@@ -48,10 +46,7 @@ class Header extends StatelessWidget {
             cursor: SystemMouseCursors.click,
             child: GestureDetector(
               onTap: () => context.go('/'),
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxHeight: 32, maxWidth: 140),
-                child: Image.asset(logo, fit: BoxFit.contain),
-              ),
+              child: const AppLogo(),
             ),
           ),
           const Spacer(),
@@ -59,14 +54,22 @@ class Header extends StatelessWidget {
             MouseRegion(
               cursor: SystemMouseCursors.click,
               child: GestureDetector(
-                onTap: () => _openMenu(context),
+                onTap: () => _openMenu(context, location),
                 child: Icon(Icons.menu, color: mutedColor),
               ),
             )
           else ...[
-            _NavLink(label: 'blog', onTap: () => context.go('/blog')),
+            _NavLink(
+              label: 'blog',
+              isActive: location.startsWith('/blog'),
+              onTap: () => context.go('/blog'),
+            ),
             const SizedBox(width: 24),
-            _NavLink(label: 'dashboard', onTap: () => context.go('/dashboard')),
+            _NavLink(
+              label: 'dashboard',
+              isActive: location.startsWith('/dashboard'),
+              onTap: () => context.go('/dashboard'),
+            ),
             const SizedBox(width: 24),
             ThemeToggle(currentTheme: currentTheme, onToggle: onToggle),
           ],
@@ -75,7 +78,7 @@ class Header extends StatelessWidget {
     );
   }
 
-  void _openMenu(BuildContext context) {
+  void _openMenu(BuildContext context, String location) {
     final router = GoRouter.of(context);
     showGeneralDialog<void>(
       context: context,
@@ -87,6 +90,7 @@ class Header extends StatelessWidget {
         router: router,
         currentTheme: currentTheme,
         onToggle: onToggle,
+        location: location,
       ),
       transitionBuilder: (ctx, anim, _, child) => FadeTransition(
         opacity: CurvedAnimation(parent: anim, curve: Curves.easeOut),
@@ -98,9 +102,14 @@ class Header extends StatelessWidget {
 
 class _NavLink extends StatelessWidget {
   final String label;
+  final bool isActive;
   final VoidCallback onTap;
 
-  const _NavLink({required this.label, required this.onTap});
+  const _NavLink({
+    required this.label,
+    required this.isActive,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +121,9 @@ class _NavLink extends StatelessWidget {
           label,
           style: TextStyle(
             fontSize: 14,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+            color: isActive
+                ? AppColors.magenta
+                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
           ),
         ),
       ),
@@ -124,11 +135,13 @@ class _MobileMenu extends StatelessWidget {
   final GoRouter router;
   final AppTheme currentTheme;
   final VoidCallback onToggle;
+  final String location;
 
   const _MobileMenu({
     required this.router,
     required this.currentTheme,
     required this.onToggle,
+    required this.location,
   });
 
   @override
@@ -161,6 +174,7 @@ class _MobileMenu extends StatelessWidget {
             const Spacer(),
             _MobileMenuItem(
               label: 'blog',
+              isActive: location.startsWith('/blog'),
               onTap: () {
                 Navigator.of(context).pop();
                 router.go('/blog');
@@ -169,6 +183,7 @@ class _MobileMenu extends StatelessWidget {
             const SizedBox(height: 32),
             _MobileMenuItem(
               label: 'dashboard',
+              isActive: location.startsWith('/dashboard'),
               onTap: () {
                 Navigator.of(context).pop();
                 router.go('/dashboard');
@@ -190,9 +205,14 @@ class _MobileMenu extends StatelessWidget {
 
 class _MobileMenuItem extends StatelessWidget {
   final String label;
+  final bool isActive;
   final VoidCallback onTap;
 
-  const _MobileMenuItem({required this.label, required this.onTap});
+  const _MobileMenuItem({
+    required this.label,
+    required this.isActive,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -205,10 +225,12 @@ class _MobileMenuItem extends StatelessWidget {
             label,
             style: TextStyle(
               fontSize: 32,
-              color: Theme.of(context)
-                  .colorScheme
-                  .onSurface
-                  .withValues(alpha: 0.6),
+              color: isActive
+                  ? AppColors.magenta
+                  : Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.6),
             ),
           ),
         ),

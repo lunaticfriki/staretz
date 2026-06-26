@@ -88,6 +88,25 @@ class PostgresPostRepository implements PostRepository {
   }
 
   @override
+  Future<void> update(PostSlug originalSlug, Post updatedPost) async {
+    await _db.execute(
+      Sql.named(
+        'UPDATE posts SET title=@title, slug=@slug, image_url=@imageUrl, '
+        'excerpt=@excerpt, body=@body '
+        'WHERE slug=@originalSlug',
+      ),
+      parameters: {
+        'originalSlug': originalSlug.value,
+        'title': updatedPost.title.value,
+        'slug': updatedPost.slug.value,
+        'imageUrl': updatedPost.imageUrl.value,
+        'excerpt': updatedPost.excerpt.value,
+        'body': updatedPost.body.value,
+      },
+    );
+  }
+
+  @override
   Future<void> delete(PostSlug slug) async {
     await _db.execute(
       Sql.named('DELETE FROM posts WHERE slug = @slug'),

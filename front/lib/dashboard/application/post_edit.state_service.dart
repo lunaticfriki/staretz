@@ -36,7 +36,12 @@ class PostEditStateService extends Cubit<PostEditState> {
   Future<void> savePost(Post post) async {
     emit(state.copyWith(status: PostEditStatus.saving));
     try {
-      await _write.save(post);
+      final originalSlug = state.editing?.slug;
+      if (originalSlug != null) {
+        await _write.update(originalSlug, post);
+      } else {
+        await _write.save(post);
+      }
       emit(state.copyWith(status: PostEditStatus.saved));
       await loadPage(state.criteria);
     } catch (_) {

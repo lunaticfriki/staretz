@@ -9,5 +9,8 @@ class PostWriteService {
 
   Future<void> save(Post post) => _repository.save(post);
 
+  Future<void> update(PostSlug originalSlug, Post post) =>
+      _repository.update(originalSlug, post);
+
   Future<void> delete(PostSlug slug) => _repository.delete(slug);
 }

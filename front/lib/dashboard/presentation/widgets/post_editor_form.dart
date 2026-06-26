@@ -70,7 +70,7 @@ class _PostEditorFormState extends State<PostEditorForm> {
           _field(_excerpt, 'Excerpt', required: true),
           _field(_body, 'Body', required: true, maxLines: 10),
           const SizedBox(height: 24),
-          ElevatedButton(onPressed: _submit, child: const Text('Save')),
+          OutlinedButton(onPressed: _submit, child: const Text('Save')),
         ],
       ),
     );

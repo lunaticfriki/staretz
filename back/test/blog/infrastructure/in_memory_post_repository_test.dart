@@ -1,5 +1,12 @@
 import 'package:staretz_back/blog/infrastructure/in_memory_post_repository.dart';
+import 'package:staretz_domain/blog/domain/entities/post.dart';
+import 'package:staretz_domain/blog/domain/value_objects/post_body.dart';
+import 'package:staretz_domain/blog/domain/value_objects/post_excerpt.dart';
+import 'package:staretz_domain/blog/domain/value_objects/post_id.dart';
+import 'package:staretz_domain/blog/domain/value_objects/post_image_url.dart';
+import 'package:staretz_domain/blog/domain/value_objects/post_published_at.dart';
 import 'package:staretz_domain/blog/domain/value_objects/post_slug.dart';
+import 'package:staretz_domain/blog/domain/value_objects/post_title.dart';
 import 'package:staretz_domain/shared/pagination/page_criteria.dart';
 import 'package:test/test.dart';
 import '../../mothers/blog/post.mother.dart';
@@ -84,6 +91,40 @@ void main() {
 
       final found = await repo.findBySlug(post.slug);
       expect(found, isNull);
+    });
+
+    test('update changes fields but preserves id and publishedAt', () async {
+      final original = PostMother.valid();
+      await repo.save(original);
+
+      final edits = Post.create(
+        id: PostId.create('ignored'),
+        title: PostTitle.create('New Title'),
+        slug: PostSlug.create('new-slug'),
+        imageUrl: PostImageUrl.create('https://example.com/new.jpg'),
+        excerpt: PostExcerpt.create('New excerpt.'),
+        body: PostBody.create('New body.'),
+        publishedAt: PostPublishedAt.create(DateTime(2099, 1, 1)),
+      );
+
+      await repo.update(original.slug, edits);
+
+      final found = await repo.findBySlug(PostSlug.create('new-slug'));
+      expect(found, isNotNull);
+      expect(found!.id, original.id);
+      expect(found.publishedAt, original.publishedAt);
+      expect(found.title.value, 'New Title');
+    });
+
+    test('update on unknown slug does nothing', () async {
+      final before =
+          await repo.findPage(const PageCriteria(page: 1, pageSize: 100));
+
+      await repo.update(PostSlug.create('ghost'), PostMother.valid());
+
+      final after =
+          await repo.findPage(const PageCriteria(page: 1, pageSize: 100));
+      expect(after.totalCount, before.totalCount);
     });
 
     test('delete on unknown slug does nothing', () async {

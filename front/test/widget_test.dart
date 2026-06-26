@@ -21,6 +21,8 @@ class _FakePostRepository implements PostRepository {
   @override
   Future<void> save(Post post) async {}
   @override
+  Future<void> update(PostSlug originalSlug, Post updatedPost) async {}
+  @override
   Future<void> delete(PostSlug slug) async {}
 }
 

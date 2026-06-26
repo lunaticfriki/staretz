@@ -11,6 +11,17 @@ import 'package:staretz/shared/application/theme_state.dart';
 import 'package:staretz/shared/presentation/app_colors.dart';
 import 'package:staretz/shared/presentation/app_theme_extension.dart';
 
+const _outlinedButtonTheme = OutlinedButtonThemeData(
+  style: ButtonStyle(
+    foregroundColor: WidgetStatePropertyAll(AppColors.magenta),
+    shape: WidgetStatePropertyAll(
+      RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(4)),
+      ),
+    ),
+  ),
+);
+
 void main() {
   GoRouter.optionURLReflectsImperativeAPIs = true;
   usePathUrlStrategy();
@@ -41,6 +52,7 @@ class StaretzApp extends StatelessWidget {
               surface: AppColors.lightBackground,
             ),
             textTheme: GoogleFonts.inconsolataTextTheme(),
+            outlinedButtonTheme: _outlinedButtonTheme,
           ),
           darkTheme: ThemeData(
             useMaterial3: true,
@@ -54,6 +66,7 @@ class StaretzApp extends StatelessWidget {
             textTheme: GoogleFonts.inconsolataTextTheme(
               ThemeData(brightness: Brightness.dark).textTheme,
             ),
+            outlinedButtonTheme: _outlinedButtonTheme,
           ),
           debugShowCheckedModeBanner: false,
         ),

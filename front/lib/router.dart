@@ -1,6 +1,7 @@
 import 'package:go_router/go_router.dart';
 import 'package:staretz_domain/blog/domain/value_objects/post_slug.dart';
 import 'package:staretz/blog/presentation/containers/blog_page.container.dart';
+import 'package:staretz/dashboard/presentation/containers/dashboard_shell.container.dart';
 import 'package:staretz/dashboard/presentation/containers/post_editor.container.dart';
 import 'package:staretz/dashboard/presentation/containers/post_list.container.dart';
 import 'package:staretz/blog/presentation/containers/post_detail.container.dart';
@@ -24,17 +25,25 @@ final appRouter = GoRouter(
         ),
       ],
     ),
-    GoRoute(
-      path: '/dashboard',
-      builder: (_, _) => const PostListContainer(),
+    ShellRoute(
+      builder: (context, state, child) => DashboardShellContainer(
+        location: state.uri.path,
+        child: child,
+      ),
       routes: [
         GoRoute(
-          path: 'new',
-          builder: (_, _) => const PostEditorContainer(),
-        ),
-        GoRoute(
-          path: ':slug/edit',
-          builder: (_, _) => const PostEditorContainer(),
+          path: '/dashboard',
+          builder: (_, _) => const PostListContainer(),
+          routes: [
+            GoRoute(
+              path: 'new',
+              builder: (_, _) => const PostEditorContainer(),
+            ),
+            GoRoute(
+              path: ':slug/edit',
+              builder: (_, _) => const PostEditorContainer(),
+            ),
+          ],
         ),
       ],
     ),

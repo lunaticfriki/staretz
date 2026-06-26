@@ -56,8 +56,43 @@ class _Splash extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Center(
-      child: Text('staretz', style: TextStyle(fontSize: 48)),
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final asset = isDark
+        ? 'assets/images/logo-face-black.jpg'
+        : 'assets/images/logo-face-white.jpg';
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 650, maxHeight: 650),
+        child: Image.asset(asset, fit: BoxFit.contain),
+      ),
+    );
+  }
+}
+
+class _FaceBackground extends StatelessWidget {
+  const _FaceBackground();
+
+  @override
+  Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final asset = isDark
+        ? 'assets/images/logo-face-black.jpg'
+        : 'assets/images/logo-face-white.jpg';
+    final overlayColor = Theme.of(
+      context,
+    ).scaffoldBackgroundColor.withValues(alpha: 0.75);
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Center(
+          child: FractionallySizedBox(
+            widthFactor: 0.4,
+            child: Image.asset(asset, fit: BoxFit.contain),
+          ),
+        ),
+        ColoredBox(color: overlayColor),
+      ],
     );
   }
 }
@@ -69,13 +104,15 @@ class _MainLayout extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder<ThemeStateService, ThemeState>(
       builder: (context, state) => LayoutBuilder(
-        builder: (context, constraints) => SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
+        builder: (context, constraints) => Stack(
+          fit: StackFit.expand,
+          children: [
+            const _FaceBackground(),
+            SingleChildScrollView(
+              child: ConstrainedBox(
+                constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Header(
@@ -84,12 +121,12 @@ class _MainLayout extends StatelessWidget {
                           context.read<ThemeStateService>().toggle(),
                     ),
                     const HomePreviewContainer(),
+                    const Footer(),
                   ],
                 ),
-                const Footer(),
-              ],
+              ),
             ),
-          ),
+          ],
         ),
       ),
     );

@@ -64,6 +64,10 @@ class MarkdownPostRepository implements PostRepository {
       throw UnsupportedError('MarkdownPostRepository is read-only');
 
   @override
+  Future<void> update(PostSlug originalSlug, Post updatedPost) =>
+      throw UnsupportedError('MarkdownPostRepository is read-only');
+
+  @override
   Future<void> delete(PostSlug slug) =>
       throw UnsupportedError('MarkdownPostRepository is read-only');
 }
