@@ -12,6 +12,7 @@ import 'package:staretz_domain/blog/domain/value_objects/post_published_at.dart'
 import 'package:staretz_domain/blog/domain/value_objects/post_slug.dart';
 import 'package:staretz_domain/blog/domain/value_objects/post_title.dart';
 import 'package:staretz_domain/shared/pagination/page_criteria.dart';
+import 'package:uuid/uuid.dart';
 
 Future<Response> onRequest(RequestContext context) async {
   return switch (context.request.method) {
@@ -44,15 +45,13 @@ Future<Response> _create(RequestContext context) async {
   final body = await context.request.json() as Map<String, dynamic>;
 
   final post = Post.create(
-    id: PostId.create(body['id'] as String),
+    id: PostId.create(const Uuid().v4()),
     title: PostTitle.create(body['title'] as String),
     slug: PostSlug.create(body['slug'] as String),
     imageUrl: PostImageUrl.create(body['imageUrl'] as String),
     excerpt: PostExcerpt.create(body['excerpt'] as String),
     body: PostBody.create(body['body'] as String),
-    publishedAt: PostPublishedAt.create(
-      DateTime.parse(body['publishedAt'] as String),
-    ),
+    publishedAt: PostPublishedAt.create(DateTime.now().toUtc()),
   );
 
   await svc.save(post);

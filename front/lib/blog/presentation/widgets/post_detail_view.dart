@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:staretz_domain/blog/domain/entities/post.dart';
 import 'package:staretz/shared/presentation/app_colors.dart';
+import 'package:staretz/shared/presentation/widgets/external_image.dart';
 import 'package:staretz/shared/presentation/widgets/footer.dart';
+import 'package:staretz_domain/blog/domain/entities/post.dart';
 
 class PostDetailView extends StatelessWidget {
   final Post post;
@@ -36,24 +37,7 @@ class _Hero extends StatelessWidget {
         child: Stack(
           fit: StackFit.expand,
           children: [
-            Image.network(
-              post.imageUrl.value,
-              fit: BoxFit.cover,
-              filterQuality: FilterQuality.medium,
-              gaplessPlayback: true,
-              frameBuilder: (context, child, frame, _) => AnimatedOpacity(
-                opacity: frame == null ? 0 : 1,
-                duration: const Duration(milliseconds: 300),
-                child: frame == null
-                    ? ColoredBox(
-                        color: Colors.black12,
-                        child: child,
-                      )
-                    : child,
-              ),
-              errorBuilder: (_, _, _) =>
-                  const ColoredBox(color: Colors.black26),
-            ),
+            ExternalImage(src: post.imageUrl.value),
             DecoratedBox(
               decoration: BoxDecoration(
                 gradient: LinearGradient(

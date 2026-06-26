@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:staretz/shared/presentation/widgets/external_image.dart';
 import 'package:staretz_domain/blog/domain/entities/post.dart';
 import 'package:staretz_domain/blog/domain/value_objects/post_slug.dart';
 
@@ -22,18 +23,7 @@ class PostPreviewCard extends StatelessWidget {
   String _formatDate(DateTime d) => '${_months[d.month - 1]} ${d.day}, ${d.year}';
 
   Widget _buildImage() {
-    return Image.network(
-      post.imageUrl.value,
-      fit: BoxFit.cover,
-      width: double.infinity,
-      height: double.infinity,
-      filterQuality: FilterQuality.low,
-      gaplessPlayback: true,
-      errorBuilder: (_, _, _) => Container(
-        color: Colors.grey.shade300,
-        child: const Icon(Icons.image, size: 48, color: Colors.grey),
-      ),
-    );
+    return ExternalImage(src: post.imageUrl.value);
   }
 
   Widget _buildInfo(TextStyle? titleStyle, TextStyle? metaStyle, {int maxTitleLines = 2, EdgeInsets padding = const EdgeInsets.all(12)}) {

@@ -44,6 +44,7 @@ dependencies:
   staretz_domain:
     path: ../packages/domain
   google_fonts: ^8.1.0
+  web: ^1.0.0
 
 dev_dependencies:
   flutter_test:

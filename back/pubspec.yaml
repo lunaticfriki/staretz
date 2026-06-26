@@ -8,6 +8,7 @@ environment:
 dependencies:
   dart_frog: ^1.2.6
   postgres: ^3.5.3
+  uuid: ^4.5.1
   staretz_domain:
     path: ../packages/domain
 
