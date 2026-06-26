@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:staretz/shared/presentation/app_colors.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -40,17 +41,23 @@ class Footer extends StatelessWidget {
             ),
           ),
           const Spacer(),
-          isLight
-              ? ColorFiltered(
-                  colorFilter: const ColorFilter.matrix([
-                    -1, 0, 0, 0, 255,
-                    0, -1, 0, 0, 255,
-                    0, 0, -1, 0, 255,
-                    0, 0, 0, 1, 0,
-                  ]),
-                  child: logo,
-                )
-              : logo,
+          MouseRegion(
+            cursor: SystemMouseCursors.click,
+            child: GestureDetector(
+              onTap: () => context.go('/'),
+              child: isLight
+                  ? ColorFiltered(
+                      colorFilter: const ColorFilter.matrix([
+                        -1, 0, 0, 0, 255,
+                        0, -1, 0, 0, 255,
+                        0, 0, -1, 0, 255,
+                        0, 0, 0, 1, 0,
+                      ]),
+                      child: logo,
+                    )
+                  : logo,
+            ),
+          ),
         ],
       ),
     );

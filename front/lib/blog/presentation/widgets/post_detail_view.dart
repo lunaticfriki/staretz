@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:staretz_domain/blog/domain/entities/post.dart';
 import 'package:staretz/shared/presentation/app_colors.dart';
+import 'package:staretz/shared/presentation/widgets/footer.dart';
 
 class PostDetailView extends StatelessWidget {
   final Post post;
@@ -15,6 +16,7 @@ class PostDetailView extends StatelessWidget {
         children: [
           _Hero(post: post),
           _Body(post: post),
+          const Footer(),
         ],
       ),
     );
