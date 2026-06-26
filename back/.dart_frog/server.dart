@@ -9,6 +9,8 @@ import 'package:dart_frog/dart_frog.dart';
 import '../routes/index.dart' as index;
 import '../routes/posts/index.dart' as posts_index;
 import '../routes/posts/[slug].dart' as posts_$slug;
+import '../routes/docs/openapi.dart' as docs_openapi;
+import '../routes/docs/index.dart' as docs_index;
 
 import '../routes/_middleware.dart' as middleware;
 
@@ -27,7 +29,8 @@ Handler buildRootHandler() {
   final pipeline = const Pipeline().addMiddleware(middleware.middleware);
   final router = Router()
     ..mount('/', (context) => buildHandler()(context))
-    ..mount('/posts', (context) => buildPostsHandler()(context));
+    ..mount('/posts', (context) => buildPostsHandler()(context))
+    ..mount('/docs', (context) => buildDocsHandler()(context));
   return pipeline.addHandler(router);
 }
 
@@ -42,6 +45,13 @@ Handler buildPostsHandler() {
   final pipeline = const Pipeline();
   final router = Router()
     ..all('/<slug>', (context,slug,) => posts_$slug.onRequest(context,slug,))..all('/', (context) => posts_index.onRequest(context,));
+  return pipeline.addHandler(router);
+}
+
+Handler buildDocsHandler() {
+  final pipeline = const Pipeline();
+  final router = Router()
+    ..all('/openapi', (context) => docs_openapi.onRequest(context,))..all('/', (context) => docs_index.onRequest(context,));
   return pipeline.addHandler(router);
 }
 

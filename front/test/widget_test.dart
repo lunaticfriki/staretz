@@ -33,10 +33,10 @@ void main() {
     setupDi(postRepository: _FakePostRepository());
   });
 
-  testWidgets('splash shows staretz title', (tester) async {
+  testWidgets('splash shows face logo image', (tester) async {
     await tester.pumpWidget(const StaretzApp());
 
-    expect(find.text('staretz'), findsWidgets);
+    expect(find.byType(Image), findsWidgets);
 
     await tester.pump(const Duration(milliseconds: 1000));
     await tester.pump(const Duration(milliseconds: 250));
