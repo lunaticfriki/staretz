@@ -22,16 +22,11 @@ class PostPreviewList extends StatelessWidget {
         constraints: const BoxConstraints(maxWidth: 1200),
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 32),
-          child: GridView.builder(
+          child: ListView.separated(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-              maxCrossAxisExtent: 300,
-              mainAxisSpacing: 24,
-              crossAxisSpacing: 24,
-              childAspectRatio: 0.85,
-            ),
             itemCount: posts.length,
+            separatorBuilder: (_, _) => const SizedBox(height: 16),
             itemBuilder: (_, i) => PostPreviewCard(
               post: posts[i],
               onTap: onPostTap,

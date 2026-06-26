@@ -48,7 +48,10 @@ class Header extends StatelessWidget {
             cursor: SystemMouseCursors.click,
             child: GestureDetector(
               onTap: () => context.go('/'),
-              child: Image.asset(logo, height: 32),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxHeight: 32, maxWidth: 140),
+                child: Image.asset(logo, fit: BoxFit.contain),
+              ),
             ),
           ),
           const Spacer(),
@@ -80,7 +83,7 @@ class Header extends StatelessWidget {
       barrierLabel: 'close menu',
       barrierColor: Colors.transparent,
       transitionDuration: const Duration(milliseconds: 200),
-      pageBuilder: (ctx, _, __) => _MobileMenu(
+      pageBuilder: (ctx, _, _) => _MobileMenu(
         router: router,
         currentTheme: currentTheme,
         onToggle: onToggle,

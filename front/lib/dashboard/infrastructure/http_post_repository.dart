@@ -24,6 +24,7 @@ class HttpPostRepository implements PostRepository {
   Future<List<Post>> findPreview(int limit) async {
     final uri = Uri.parse('$_baseUrl/posts?page=1&pageSize=$limit');
     final response = await _client.get(uri);
+    _assertOk(response);
     final data = jsonDecode(response.body) as Map<String, dynamic>;
     return (data['items'] as List)
         .cast<Map<String, dynamic>>()
@@ -37,6 +38,7 @@ class HttpPostRepository implements PostRepository {
       '$_baseUrl/posts?page=${criteria.page}&pageSize=${criteria.pageSize}',
     );
     final response = await _client.get(uri);
+    _assertOk(response);
     final data = jsonDecode(response.body) as Map<String, dynamic>;
     return Paginated(
       items: (data['items'] as List)
@@ -53,6 +55,7 @@ class HttpPostRepository implements PostRepository {
     final uri = Uri.parse('$_baseUrl/posts/${slug.value}');
     final response = await _client.get(uri);
     if (response.statusCode == 404) return null;
+    _assertOk(response);
     return _jsonToPost(jsonDecode(response.body) as Map<String, dynamic>);
   }
 
@@ -70,6 +73,12 @@ class HttpPostRepository implements PostRepository {
   Future<void> delete(PostSlug slug) async {
     final uri = Uri.parse('$_baseUrl/posts/${slug.value}');
     await _client.delete(uri);
+  }
+
+  void _assertOk(http.Response response) {
+    if (response.statusCode < 200 || response.statusCode >= 300) {
+      throw Exception('HTTP ${response.statusCode}');
+    }
   }
 
   Post _jsonToPost(Map<String, dynamic> json) => Post.create(

@@ -20,7 +20,7 @@ class BlogPageContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => GetIt.instance<PostStateService>()
-        ..loadPage(const PageCriteria(page: 1, pageSize: 10)),
+        ..loadPage(const PageCriteria(page: 1, pageSize: 5)),
       child: const _BlogLayout(),
     );
   }

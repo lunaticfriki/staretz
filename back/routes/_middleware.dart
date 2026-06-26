@@ -19,13 +19,17 @@ Handler middleware(Handler handler) {
 
     container ??= await AppContainer.build();
 
-    final response = await handler
-        .use(provider<PostReadService>((_) => container!.postReadService))
-        .use(provider<PostWriteService>((_) => container!.postWriteService))
-        .call(context);
+    try {
+      final response = await handler
+          .use(provider<PostReadService>((_) => container!.postReadService))
+          .use(provider<PostWriteService>((_) => container!.postWriteService))
+          .call(context);
 
-    return response.copyWith(
-      headers: {...response.headers, ..._corsHeaders},
-    );
+      return response.copyWith(
+        headers: {...response.headers, ..._corsHeaders},
+      );
+    } catch (_) {
+      return Response(statusCode: 500, headers: _corsHeaders);
+    }
   };
 }
