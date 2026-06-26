@@ -23,7 +23,7 @@ void main() {
 
     test('findPreview clamps to total when limit exceeds count', () async {
       final result = await repo.findPreview(999);
-      expect(result.length, 5);
+      expect(result.length, 20);
     });
 
     test('findPage returns correct slice and totalCount', () async {
@@ -31,14 +31,14 @@ void main() {
       final page = await repo.findPage(criteria);
 
       expect(page.items.length, 3);
-      expect(page.totalCount, 5);
+      expect(page.totalCount, 20);
     });
 
     test('findPage page 2 returns remaining items', () async {
-      const criteria = PageCriteria(page: 2, pageSize: 3);
+      const criteria = PageCriteria(page: 2, pageSize: 17);
       final page = await repo.findPage(criteria);
 
-      expect(page.items.length, 2);
+      expect(page.items.length, 3);
     });
 
     test('findBySlug returns matching post', () async {
