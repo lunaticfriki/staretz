@@ -68,15 +68,29 @@ class _MainLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocBuilder<ThemeStateService, ThemeState>(
-      builder: (context, state) => Column(
-        children: [
-          Header(
-            currentTheme: state.theme,
-            onToggle: () => context.read<ThemeStateService>().toggle(),
+      builder: (context, state) => LayoutBuilder(
+        builder: (context, constraints) => SingleChildScrollView(
+          child: ConstrainedBox(
+            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Header(
+                      currentTheme: state.theme,
+                      onToggle: () =>
+                          context.read<ThemeStateService>().toggle(),
+                    ),
+                    const HomePreviewContainer(),
+                  ],
+                ),
+                const Footer(),
+              ],
+            ),
           ),
-          const Expanded(child: HomePreviewContainer()),
-          const Footer(),
-        ],
+        ),
       ),
     );
   }
