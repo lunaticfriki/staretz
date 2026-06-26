@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:staretz/shared/presentation/app_colors.dart';
 import 'package:staretz_domain/blog/domain/entities/post.dart';
 
 class PostList extends StatelessWidget {
@@ -51,15 +52,24 @@ class PostList extends StatelessWidget {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         title: const Text('Delete post'),
         content: Text('Delete "${post.title.value}"? This cannot be undone.'),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(ctx).pop(false),
+            style: TextButton.styleFrom(
+              foregroundColor: Theme.of(ctx).colorScheme.onSurface.withValues(alpha: 0.6),
+            ),
             child: const Text('Cancel'),
           ),
-          TextButton(
+          OutlinedButton(
             onPressed: () => Navigator.of(ctx).pop(true),
+            style: OutlinedButton.styleFrom(
+              foregroundColor: AppColors.magenta,
+              side: const BorderSide(color: AppColors.magenta),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+            ),
             child: const Text('Delete'),
           ),
         ],
