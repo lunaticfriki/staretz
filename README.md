@@ -14,7 +14,8 @@ domain-driven, hexagonal architecture with CQRS and vertical slicing.
 - **InversifyJS** for dependency injection
 - **marked** to render post content from Markdown
 - **Vitest** + **ts-mockito** + **@testing-library/preact** + **jsdom** for
-  testing
+  unit/integration testing
+- **Playwright** + **Cucumber** (Gherkin/BDD) for end-to-end testing
 - **Husky** + **commitlint** for the git workflow
 
 ## Getting started
@@ -29,14 +30,16 @@ posts), an About page, and one page per post at `/blog/:slug`.
 
 ## Scripts
 
-| Command           | What it does                                                                        |
-| ----------------- | ----------------------------------------------------------------------------------- |
-| `pnpm dev`        | Start the Vite dev server                                                           |
-| `pnpm build`      | Type-check (`tsc -b`) and produce a production build                                |
-| `pnpm preview`    | Serve the production build locally                                                  |
-| `pnpm test`       | Run the full test suite once                                                        |
-| `pnpm test:watch` | Run tests in watch mode                                                             |
-| `pnpm dev:tmux`   | Open a tmux session split into server / tests / empty panes (`scripts/dev-tmux.sh`) |
+| Command                | What it does                                                                        |
+| ---------------------- | ------------------------------------------------------------------------------------ |
+| `pnpm dev`              | Start the Vite dev server                                                           |
+| `pnpm build`            | Type-check (`tsc -b`) and produce a production build                               |
+| `pnpm preview`          | Serve the production build locally                                                 |
+| `pnpm test`             | Run the unit/integration test suite once                                           |
+| `pnpm test:watch`       | Run the unit/integration suite in watch mode                                       |
+| `pnpm test:e2e`         | Build, serve, and run the Cucumber/Playwright end-to-end suite against it          |
+| `pnpm typecheck:e2e`    | Type-check the `e2e/` folder on its own (also run automatically by `test:e2e`)      |
+| `pnpm dev:tmux`         | Open a tmux session split into server / tests / empty panes (`scripts/dev-tmux.sh`) |
 
 ## Architecture
 
@@ -118,6 +121,35 @@ Covers domain invariants (no mocks needed), application services (mocked
 ports via `ts-mockito`), a real integration test against the actual seed
 data (no mocks at all), and a full DOM-rendered test of routing/navigation
 via `@testing-library/preact` + `jsdom`.
+
+## End-to-end testing
+
+```bash
+pnpm test:e2e
+```
+
+Scenarios are written in Gherkin and executed by `@cucumber/cucumber`,
+driving a real Chromium browser via Playwright:
+
+```
+e2e/
+  features/           — .feature files (Given/When/Then scenarios)
+  step-definitions/    — Given/When/Then implementations, using Playwright's page
+  support/
+    world.ts           — the Cucumber World, carrying the Playwright Page
+    hooks.ts           — launches/closes the browser and a fresh context per scenario
+```
+
+`pnpm test:e2e` (`scripts/e2e.sh`) type-checks `e2e/`, builds the app,
+serves the production build on `localhost:4173`, waits for it to respond,
+runs every `.feature` file against it, and tears the server down
+afterward regardless of outcome. It's a real, separate browser +
+production build — not a mock, and not the dev server.
+
+To add a scenario: write it in a `.feature` file, then implement any new
+Given/When/Then step in `e2e/step-definitions/` (reuse the existing
+navigation/assertion steps where the wording already fits — `cucumber-js`
+will report "undefined" steps if a Gherkin line doesn't match anything).
 
 ## Git workflow
 
