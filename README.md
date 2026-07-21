@@ -1,6 +1,6 @@
 # Staretz
 
-A small blog about software architecture, built with Preact, TypeScript, and
+A small blog built with Preact, TypeScript, and
 Tailwind CSS — and used as the reference implementation for a
 domain-driven, hexagonal architecture with CQRS and vertical slicing.
 
@@ -29,14 +29,14 @@ posts), an About page, and one page per post at `/blog/:slug`.
 
 ## Scripts
 
-| Command | What it does |
-|---|---|
-| `pnpm dev` | Start the Vite dev server |
-| `pnpm build` | Type-check (`tsc -b`) and produce a production build |
-| `pnpm preview` | Serve the production build locally |
-| `pnpm test` | Run the full test suite once |
-| `pnpm test:watch` | Run tests in watch mode |
-| `pnpm dev:tmux` | Open a tmux session split into server / tests / empty panes (`scripts/dev-tmux.sh`) |
+| Command           | What it does                                                                        |
+| ----------------- | ----------------------------------------------------------------------------------- |
+| `pnpm dev`        | Start the Vite dev server                                                           |
+| `pnpm build`      | Type-check (`tsc -b`) and produce a production build                                |
+| `pnpm preview`    | Serve the production build locally                                                  |
+| `pnpm test`       | Run the full test suite once                                                        |
+| `pnpm test:watch` | Run tests in watch mode                                                             |
+| `pnpm dev:tmux`   | Open a tmux session split into server / tests / empty panes (`scripts/dev-tmux.sh`) |
 
 ## Architecture
 
