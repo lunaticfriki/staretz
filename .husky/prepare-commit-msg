@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+
+if [ -c /dev/tty ]; then
+  exec < /dev/tty
+fi
+
+node scripts/commit.mjs "$1" "$2" "$3"

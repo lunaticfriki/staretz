@@ -10,7 +10,6 @@
     "test": "vitest run",
     "test:watch": "vitest --watch",
     "dev:tmux": "bash scripts/dev-tmux.sh",
-    "commit": "node scripts/commit.mjs",
     "prepare": "husky"
   },
   "dependencies": {

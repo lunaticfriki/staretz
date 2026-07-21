@@ -1,4 +1,4 @@
-import { execSync } from 'node:child_process'
+import { writeFileSync } from 'node:fs'
 import { createInterface } from 'node:readline/promises'
 
 const TYPES = [
@@ -15,19 +15,21 @@ const TYPES = [
   ['revert', 'reverts a previous commit'],
 ]
 
-function hasStagedChanges() {
-  try {
-    execSync('git diff --cached --quiet')
-    return false
-  } catch {
-    return true
-  }
-}
+const SKIP_SOURCES = new Set(['message', 'merge', 'squash', 'commit'])
 
 async function main() {
-  if (!hasStagedChanges()) {
-    console.error('No staged changes. Stage files with "git add" before committing.')
-    process.exit(1)
+  const [, , messageFile, source] = process.argv
+
+  if (!messageFile) {
+    process.exit(0)
+  }
+
+  if (source && SKIP_SOURCES.has(source)) {
+    process.exit(0)
+  }
+
+  if (!process.stdin.isTTY) {
+    process.exit(0)
   }
 
   const rl = createInterface({ input: process.stdin, output: process.stdout })
@@ -41,7 +43,7 @@ async function main() {
   const selected = TYPES[Number.parseInt(typeAnswer, 10) - 1]
 
   if (!selected) {
-    console.error('Invalid selection.')
+    console.error('Invalid selection. Commit aborted.')
     rl.close()
     process.exit(1)
   }
@@ -52,14 +54,14 @@ async function main() {
   rl.close()
 
   if (!description.trim()) {
-    console.error('Description cannot be empty.')
+    console.error('Description cannot be empty. Commit aborted.')
     process.exit(1)
   }
 
   const [type] = selected
   const header = scope.trim() ? `${type}(${scope.trim()}): ${description.trim()}` : `${type}: ${description.trim()}`
 
-  execSync(`git commit -m ${JSON.stringify(header)}`, { stdio: 'inherit' })
+  writeFileSync(messageFile, `${header}\n`)
 }
 
 main()
