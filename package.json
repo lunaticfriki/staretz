@@ -1,0 +1,31 @@
+{
+  "name": "staretz",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "test:watch": "vitest --watch",
+    "dev:tmux": "bash scripts/dev-tmux.sh",
+    "commit": "node scripts/commit.mjs",
+    "prepare": "husky"
+  },
+  "dependencies": {
+    "@tailwindcss/vite": "^4.3.3",
+    "preact": "^10.29.3",
+    "tailwindcss": "^4.3.3"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^21.2.1",
+    "@commitlint/config-conventional": "^21.2.0",
+    "@preact/preset-vite": "^2.10.5",
+    "@types/node": "^24.13.2",
+    "husky": "^9.1.7",
+    "typescript": "~6.0.2",
+    "vite": "^8.1.1",
+    "vitest": "^4.1.10"
+  }
+}
