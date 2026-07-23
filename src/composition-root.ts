@@ -15,6 +15,9 @@ import {
   NotificationStateServiceImpl,
   type NotificationStateService,
 } from './shared/notifications/application/Notification.stateService'
+import { ThemeStateServiceImpl, type ThemeStateService } from './shared/theme/application/Theme.stateService'
+import type { ThemeRepository } from './shared/theme/domain/repositories/Theme.repository'
+import { BrowserThemeRepository } from './shared/theme/infrastructure/BrowserTheme.repository'
 import { TYPES } from './shared/di/types'
 
 const container = new Container()
@@ -63,6 +66,16 @@ container
         context.get<ErrorManager>(TYPES.ErrorManager),
       ),
   )
+  .inSingletonScope()
+
+container
+  .bind<ThemeRepository>(TYPES.ThemeRepository)
+  .toDynamicValue(() => new BrowserThemeRepository())
+  .inSingletonScope()
+
+container
+  .bind<ThemeStateService>(TYPES.ThemeStateService)
+  .toDynamicValue((context) => new ThemeStateServiceImpl(context.get<ThemeRepository>(TYPES.ThemeRepository)))
   .inSingletonScope()
 
 export { container }

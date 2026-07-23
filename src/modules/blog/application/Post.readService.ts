@@ -1,3 +1,4 @@
+import type { PostCollection } from '../domain/collections/Post.collection'
 import { Post } from '../domain/entities/Post.entity'
 import { GetPostBySlugQuery } from './query/GetPostBySlug.query'
 import { GetPostBySlugQueryHandler } from './query/GetPostBySlug.queryHandler'
@@ -5,7 +6,7 @@ import { ListLatestPostsQuery } from './query/ListLatestPosts.query'
 import { ListLatestPostsQueryHandler } from './query/ListLatestPosts.queryHandler'
 
 export abstract class PostReadService {
-  abstract listLatest(query: ListLatestPostsQuery): Promise<Post[]>
+  abstract listLatest(query: ListLatestPostsQuery): Promise<PostCollection>
   abstract getBySlug(query: GetPostBySlugQuery): Promise<Post>
 }
 
@@ -17,7 +18,7 @@ export class PostReadServiceImpl extends PostReadService {
     super()
   }
 
-  listLatest(query: ListLatestPostsQuery): Promise<Post[]> {
+  listLatest(query: ListLatestPostsQuery): Promise<PostCollection> {
     return this.listLatestHandler.handle(query)
   }
 

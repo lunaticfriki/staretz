@@ -1,2 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;500;600;700&display=swap');
 @import 'tailwindcss';
 @plugin '@tailwindcss/typography';
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  font-family:
+    'Inconsolata', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    'Liberation Mono', 'Courier New', monospace;
+}
+
+body {
+  margin: 0;
+  font-family: inherit;
+}

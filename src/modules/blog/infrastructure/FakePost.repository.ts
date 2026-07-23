@@ -1,3 +1,4 @@
+import { PostCollection } from '../domain/collections/Post.collection'
 import { Post } from '../domain/entities/Post.entity'
 import { PostRepository } from '../domain/repositories/Post.repository'
 import { Slug } from '../domain/value-objects/Slug.valueObject'
@@ -12,8 +13,8 @@ const postFiles = import.meta.glob('/src/data/posts/*.md', {
 export class FakePostRepository extends PostRepository {
   private readonly posts: Post[] = Object.values(postFiles).map((raw) => PostMapper.toDomain(raw))
 
-  async findAll(): Promise<Post[]> {
-    return this.posts
+  async findAll(): Promise<PostCollection> {
+    return PostCollection.create(this.posts)
   }
 
   async findBySlug(slug: Slug): Promise<Post | null> {

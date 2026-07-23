@@ -5,7 +5,7 @@ import { FakePostRepository } from '../FakePost.repository'
 describe('FakePostRepository', () => {
   it('loads all 20 seed posts as valid domain entities', async () => {
     const repository = new FakePostRepository()
-    const posts = await repository.findAll()
+    const posts = (await repository.findAll()).toArray()
 
     expect(posts).toHaveLength(20)
   })
@@ -28,7 +28,7 @@ describe('FakePostRepository', () => {
 
   it('every seed post has distinct, chronologically valid publishedAt dates', async () => {
     const repository = new FakePostRepository()
-    const posts = await repository.findAll()
+    const posts = (await repository.findAll()).toArray()
     const timestamps = posts.map((post) => post.publishedAt.toDate().getTime())
 
     expect(new Set(timestamps).size).toBe(posts.length)

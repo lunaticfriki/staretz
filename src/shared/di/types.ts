@@ -5,4 +5,6 @@ export const TYPES = {
   NotificationService: Symbol.for('NotificationService'),
   NotificationStateService: Symbol.for('NotificationStateService'),
   ErrorManager: Symbol.for('ErrorManager'),
+  ThemeRepository: Symbol.for('ThemeRepository'),
+  ThemeStateService: Symbol.for('ThemeStateService'),
 }

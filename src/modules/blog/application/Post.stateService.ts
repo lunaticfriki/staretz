@@ -1,5 +1,6 @@
 import { signal, type Signal } from '@preact/signals-core'
 import type { ErrorManager } from '../../../shared/errors/application/ErrorManager.service'
+import type { PostCollection } from '../domain/collections/Post.collection'
 import { Post } from '../domain/entities/Post.entity'
 import { GetPostBySlugQuery } from './query/GetPostBySlug.query'
 import { ListLatestPostsQuery } from './query/ListLatestPosts.query'
@@ -7,7 +8,7 @@ import type { PostReadService } from './Post.readService'
 
 export type LatestPostsState =
   | { status: 'loading' }
-  | { status: 'loaded'; posts: Post[] }
+  | { status: 'loaded'; posts: PostCollection }
   | { status: 'error'; message: string }
 
 export type PostBySlugState =

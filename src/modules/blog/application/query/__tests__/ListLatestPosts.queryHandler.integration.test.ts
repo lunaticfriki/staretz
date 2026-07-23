@@ -7,7 +7,7 @@ describe('ListLatestPostsQueryHandler (integration, real seed data)', () => {
   it('returns exactly 5 posts ordered from most to least recent', async () => {
     const handler = new ListLatestPostsQueryHandler(new FakePostRepository())
 
-    const result = await handler.handle(new ListLatestPostsQuery(5))
+    const result = (await handler.handle(new ListLatestPostsQuery(5))).toArray()
 
     expect(result).toHaveLength(5)
     const dates = result.map((post) => post.publishedAt.toDate().getTime())

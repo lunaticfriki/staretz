@@ -11,6 +11,7 @@
     "test:watch": "vitest --watch",
     "test:e2e": "bash scripts/e2e.sh",
     "typecheck:e2e": "tsc -p tsconfig.e2e.json",
+    "arch-test": "depcruise src",
     "dev:tmux": "bash scripts/dev-tmux.sh",
     "prepare": "husky"
   },
@@ -34,6 +35,7 @@
     "@tailwindcss/typography": "^0.5.20",
     "@testing-library/preact": "^3.2.4",
     "@types/node": "^24.13.2",
+    "dependency-cruiser": "^18.1.0",
     "husky": "^9.1.7",
     "jsdom": "^29.1.1",
     "ts-mockito": "^2.6.1",

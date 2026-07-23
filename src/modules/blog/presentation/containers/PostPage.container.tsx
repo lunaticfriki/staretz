@@ -11,13 +11,11 @@ interface PostPageContainerProps extends RouteProps {
 export function PostPageContainer({ slug = '' }: PostPageContainerProps) {
   const state = usePostBySlugState(slug)
 
-  if (state.status === 'loading') {
-    return <PostViewSkeleton />
-  }
-
-  if (state.status === 'not-found') {
-    return <PostNotFound />
-  }
-
-  return <PostView post={state.post} />
+  return (
+    <div class="mx-auto max-w-3xl">
+      {state.status === 'loading' && <PostViewSkeleton />}
+      {state.status === 'not-found' && <PostNotFound />}
+      {state.status === 'loaded' && <PostView post={state.post} />}
+    </div>
+  )
 }

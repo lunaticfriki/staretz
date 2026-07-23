@@ -10,7 +10,7 @@ export function HomeContainer(_props: RouteProps) {
 
   if (state.status === 'loading') {
     return (
-      <div class="space-y-4">
+      <div class="mx-auto grid max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {Array.from({ length: RECENT_POSTS_LIMIT }).map((_, index) => (
           <PostPreviewSkeleton key={index} />
         ))}
@@ -23,8 +23,8 @@ export function HomeContainer(_props: RouteProps) {
   }
 
   return (
-    <div class="space-y-4">
-      {state.posts.map((post) => (
+    <div class="mx-auto grid max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      {state.posts.toArray().map((post) => (
         <PostPreview key={post.slug.toString()} post={post} />
       ))}
     </div>
