@@ -13,7 +13,8 @@
     "typecheck:e2e": "tsc -p tsconfig.e2e.json",
     "arch-test": "depcruise src",
     "dev:tmux": "bash scripts/dev-tmux.sh",
-    "prepare": "husky"
+    "prepare": "husky",
+    "deploy": "pnpm build && firebase deploy --only hosting"
   },
   "dependencies": {
     "@preact/signals": "^2.9.4",
@@ -37,6 +38,7 @@
     "@testing-library/preact": "^3.2.4",
     "@types/node": "^24.13.2",
     "dependency-cruiser": "^18.1.0",
+    "firebase-tools": "^15.24.0",
     "husky": "^9.1.7",
     "jsdom": "^29.1.1",
     "ts-mockito": "^2.6.1",

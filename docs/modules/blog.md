@@ -206,6 +206,16 @@ read, because the Firestore document id is **not** the slug (documents
 get Firestore-assigned random ids; `slug` is its own field like every
 other field). `findBySlug()` takes the first match.
 
+Every Firestore import in this file, `firebaseApp.ts`, and
+`FirestorePost.mapper.ts` comes from **`firebase/firestore/lite`**, not
+the full `firebase/firestore` — this app only ever does one-time reads
+(`getDoc`/`getDocs`), never `onSnapshot` real-time listeners or offline
+persistence, and the lite build drops all of that machinery. It cut the
+production bundle from ~650KB to ~289KB minified. If a future feature
+genuinely needs live updates or offline support, that's the trigger to
+switch back to the full `firebase/firestore` import — not a default to
+reach for pre-emptively.
+
 **`FakePostRepository`** is a second `PostRepository` adapter — the
 original one, kept in the codebase as the in-memory alternative: despite
 the "Fake" name (a holdover from when it was test-only),

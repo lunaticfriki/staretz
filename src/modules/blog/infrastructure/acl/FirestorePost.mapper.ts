@@ -1,4 +1,4 @@
-import { Timestamp, type DocumentData } from 'firebase/firestore'
+import { Timestamp, type DocumentData } from 'firebase/firestore/lite'
 import { Post } from '../../domain/entities/Post.entity'
 import { Category } from '../../domain/value-objects/Category.valueObject'
 import { PostAuthor } from '../../domain/value-objects/PostAuthor.valueObject'

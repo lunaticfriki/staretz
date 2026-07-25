@@ -1,4 +1,4 @@
-import { collection, getDocs, limit, query, where } from 'firebase/firestore'
+import { collection, getDocs, limit, query, where } from 'firebase/firestore/lite'
 import { PostCollection } from '../domain/collections/Post.collection'
 import { Post } from '../domain/entities/Post.entity'
 import { PostRepository } from '../domain/repositories/Post.repository'

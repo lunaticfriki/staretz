@@ -20,6 +20,11 @@ dist-ssr
 # e2e
 e2e/reports
 
+# firebase
+.firebase
+firebase-debug.log
+firestore-debug.log
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
