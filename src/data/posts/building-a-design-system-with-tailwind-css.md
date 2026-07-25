@@ -4,6 +4,7 @@ slug: building-a-design-system-with-tailwind-css
 excerpt: Utility classes scale better than component-scoped CSS once a few conventions are in place.
 author: Jane Doe
 publishedAt: 2026-05-04
+category: Frontend
 ---
 ## Why this matters
 

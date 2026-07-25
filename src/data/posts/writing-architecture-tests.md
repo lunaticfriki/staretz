@@ -4,6 +4,7 @@ slug: writing-architecture-tests
 excerpt: Enforcing the dependency rule in CI instead of hoping code review catches every violation.
 author: Jane Doe
 publishedAt: 2026-06-15
+category: Testing
 ---
 ## Why this matters
 

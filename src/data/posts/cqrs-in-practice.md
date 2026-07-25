@@ -4,6 +4,7 @@ slug: cqrs-in-practice
 excerpt: Splitting reads from writes is simple to say and easy to get subtly wrong. Here is what actually works.
 author: Jane Doe
 publishedAt: 2026-02-02
+category: Domain-Driven Design
 ---
 ## Why this matters
 

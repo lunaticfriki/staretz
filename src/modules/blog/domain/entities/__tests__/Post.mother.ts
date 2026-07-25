@@ -1,4 +1,5 @@
 import { Post } from '../Post.entity'
+import { Category } from '../../value-objects/Category.valueObject'
 import { PostAuthor } from '../../value-objects/PostAuthor.valueObject'
 import { PostContent } from '../../value-objects/PostContent.valueObject'
 import { PostExcerpt } from '../../value-objects/PostExcerpt.valueObject'
@@ -15,6 +16,7 @@ export class PostMother {
       content: PostContent.create('Sample post body content.'),
       author: PostAuthor.create('Jane Doe'),
       publishedAt: PublishedAt.create(new Date('2026-01-01T00:00:00Z')),
+      category: Category.create('Architecture'),
     })
   }
 
@@ -30,6 +32,7 @@ export class PostMother {
       content: PostContent.create('Sample post body content.'),
       author: PostAuthor.create('Jane Doe'),
       publishedAt: PublishedAt.create(new Date('2026-01-01T00:00:00Z')),
+      category: Category.create('Architecture'),
     })
   }
 
@@ -41,6 +44,19 @@ export class PostMother {
       content: PostContent.create('Sample post body content.'),
       author: PostAuthor.create('Jane Doe'),
       publishedAt: PublishedAt.create(date),
+      category: Category.create('Architecture'),
+    })
+  }
+
+  static category(category: string): Post {
+    return Post.create({
+      slug: Slug.create('sample-post'),
+      title: PostTitle.create('Sample Post'),
+      excerpt: PostExcerpt.create('A sample excerpt used for tests.'),
+      content: PostContent.create('Sample post body content.'),
+      author: PostAuthor.create('Jane Doe'),
+      publishedAt: PublishedAt.create(new Date('2026-01-01T00:00:00Z')),
+      category: Category.create(category),
     })
   }
 }

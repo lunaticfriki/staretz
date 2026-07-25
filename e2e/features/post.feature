@@ -10,4 +10,4 @@ Feature: Post page
 
   Scenario: Visiting a post that does not exist
     Given I am on the post page for "does-not-exist"
-    Then I should see the heading "Post not found"
+    Then I should see the heading "Article no trobat"

@@ -4,6 +4,7 @@ slug: understanding-domain-driven-design
 excerpt: What DDD actually buys you beyond the buzzwords, and where it stops being worth the ceremony.
 author: Jane Doe
 publishedAt: 2026-01-05
+category: Domain-Driven Design
 ---
 ## Why this matters
 

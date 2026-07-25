@@ -2,7 +2,7 @@ export function Footer() {
   const year = new Date().getFullYear()
 
   return (
-    <footer class="sticky bottom-0 bg-background">
+    <footer class=" bg-background">
       <div class="flex items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
         <a
           href="http://www.github.com/lunaticfriki/staretz"

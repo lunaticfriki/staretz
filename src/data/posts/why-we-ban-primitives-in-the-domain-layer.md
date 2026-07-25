@@ -4,6 +4,7 @@ slug: why-we-ban-primitives-in-the-domain-layer
 excerpt: Primitive obsession is the quiet source of most invariant bugs. A rule that sounds strict until you feel the payoff.
 author: Marco Reyes
 publishedAt: 2026-03-02
+category: Domain-Driven Design
 ---
 ## Why this matters
 

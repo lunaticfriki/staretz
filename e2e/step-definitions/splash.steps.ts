@@ -3,13 +3,13 @@ import { expect } from '@playwright/test'
 import type { PlaywrightWorld } from '../support/world'
 
 Then('I should see the splash screen', async function (this: PlaywrightWorld) {
-  await expect(this.page.getByRole('status', { name: 'Loading Staretz' })).toBeVisible()
+  await expect(this.page.getByRole('status', { name: 'Carregant Staretz' })).toBeVisible()
 })
 
 When('I wait for the splash screen to finish', async function (this: PlaywrightWorld) {
-  await this.page.getByRole('status', { name: 'Loading Staretz' }).waitFor({ state: 'detached' })
+  await this.page.getByRole('status', { name: 'Carregant Staretz' }).waitFor({ state: 'detached' })
 })
 
 Then('I should not see the splash screen', async function (this: PlaywrightWorld) {
-  await expect(this.page.getByRole('status', { name: 'Loading Staretz' })).toHaveCount(0)
+  await expect(this.page.getByRole('status', { name: 'Carregant Staretz' })).toHaveCount(0)
 })

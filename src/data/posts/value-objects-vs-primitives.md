@@ -4,6 +4,7 @@ slug: value-objects-vs-primitives
 excerpt: A raw string is not a type. Why wrapping meaningful concepts pays for itself almost immediately.
 author: Priya Nair
 publishedAt: 2026-02-16
+category: Domain-Driven Design
 ---
 ## Why this matters
 

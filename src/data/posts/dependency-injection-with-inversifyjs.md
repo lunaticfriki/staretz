@@ -4,6 +4,7 @@ slug: dependency-injection-with-inversifyjs
 excerpt: A composition root, symbol tokens, and why we skip decorator metadata under Vite.
 author: Jane Doe
 publishedAt: 2026-05-25
+category: Tooling
 ---
 ## Why this matters
 

@@ -37,7 +37,7 @@ so no `.stateService.ts` — it's a pure orchestrator delegating to
 `NotificationStateService` for the reactive part.
 
 The one real caller today is
-`PostStateServiceImpl.loadLatest()`
+`PostStateServiceImpl.loadPosts()`
 ([blog.md](blog.md#application)) — a genuine failure loading the post
 list reports through here in addition to setting local `error` state.
 `loadBySlug`'s "not found" outcome deliberately does *not* call this — see

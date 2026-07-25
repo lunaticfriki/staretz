@@ -12,10 +12,10 @@ export function PostPageContainer({ slug = '' }: PostPageContainerProps) {
   const state = usePostBySlugState(slug)
 
   return (
-    <div class="mx-auto max-w-3xl">
+    <>
       {state.status === 'loading' && <PostViewSkeleton />}
       {state.status === 'not-found' && <PostNotFound />}
       {state.status === 'loaded' && <PostView post={state.post} />}
-    </div>
+    </>
   )
 }

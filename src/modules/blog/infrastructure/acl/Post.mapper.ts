@@ -1,4 +1,5 @@
 import { Post } from '../../domain/entities/Post.entity'
+import { Category } from '../../domain/value-objects/Category.valueObject'
 import { PostAuthor } from '../../domain/value-objects/PostAuthor.valueObject'
 import { PostContent } from '../../domain/value-objects/PostContent.valueObject'
 import { PostExcerpt } from '../../domain/value-objects/PostExcerpt.valueObject'
@@ -18,6 +19,7 @@ export class PostMapper {
       content: PostContent.create(body),
       author: PostAuthor.create(frontmatter.author),
       publishedAt: PublishedAt.create(frontmatter.publishedAt),
+      category: Category.create(frontmatter.category),
     })
   }
 }

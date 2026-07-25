@@ -4,6 +4,7 @@ slug: automating-commit-messages-with-husky
 excerpt: Wiring a type-selection prompt into prepare-commit-msg so it fires no matter how you commit.
 author: Priya Nair
 publishedAt: 2026-06-08
+category: Tooling
 ---
 ## Why this matters
 

@@ -1,14 +1,16 @@
 import { signal, type Signal } from '@preact/signals-core'
 import type { ErrorManager } from '../../../shared/errors/application/ErrorManager.service'
-import type { PostCollection } from '../domain/collections/Post.collection'
+import type { Page } from '../../../shared/pagination/domain/value-objects/Page.valueObject'
+import { Category } from '../domain/value-objects/Category.valueObject'
 import { Post } from '../domain/entities/Post.entity'
 import { GetPostBySlugQuery } from './query/GetPostBySlug.query'
-import { ListLatestPostsQuery } from './query/ListLatestPosts.query'
+import { ListCategoriesQuery } from './query/ListCategories.query'
+import { ListPostsQuery } from './query/ListPosts.query'
 import type { PostReadService } from './Post.readService'
 
-export type LatestPostsState =
+export type PostsPageState =
   | { status: 'loading' }
-  | { status: 'loaded'; posts: PostCollection }
+  | { status: 'loaded'; page: Page<Post> }
   | { status: 'error'; message: string }
 
 export type PostBySlugState =
@@ -16,16 +18,24 @@ export type PostBySlugState =
   | { status: 'loaded'; post: Post }
   | { status: 'not-found' }
 
+export type CategoriesState =
+  | { status: 'loading' }
+  | { status: 'loaded'; categories: Category[] }
+  | { status: 'error'; message: string }
+
 export abstract class PostStateService {
-  abstract readonly latestPosts: Signal<LatestPostsState>
+  abstract readonly postsPage: Signal<PostsPageState>
   abstract readonly postBySlug: Signal<PostBySlugState>
-  abstract loadLatest(query: ListLatestPostsQuery): Promise<void>
+  abstract readonly categories: Signal<CategoriesState>
+  abstract loadPosts(query: ListPostsQuery): Promise<void>
   abstract loadBySlug(query: GetPostBySlugQuery): Promise<void>
+  abstract loadCategories(query: ListCategoriesQuery): Promise<void>
 }
 
 export class PostStateServiceImpl extends PostStateService {
-  readonly latestPosts = signal<LatestPostsState>({ status: 'loading' })
+  readonly postsPage = signal<PostsPageState>({ status: 'loading' })
   readonly postBySlug = signal<PostBySlugState>({ status: 'loading' })
+  readonly categories = signal<CategoriesState>({ status: 'loading' })
 
   constructor(
     private readonly readService: PostReadService,
@@ -34,14 +44,14 @@ export class PostStateServiceImpl extends PostStateService {
     super()
   }
 
-  async loadLatest(query: ListLatestPostsQuery): Promise<void> {
-    this.latestPosts.value = { status: 'loading' }
+  async loadPosts(query: ListPostsQuery): Promise<void> {
+    this.postsPage.value = { status: 'loading' }
 
     try {
-      const posts = await this.readService.listLatest(query)
-      this.latestPosts.value = { status: 'loaded', posts }
+      const page = await this.readService.listPosts(query)
+      this.postsPage.value = { status: 'loaded', page }
     } catch (error) {
-      this.latestPosts.value = { status: 'error', message: (error as Error).message }
+      this.postsPage.value = { status: 'error', message: (error as Error).message }
       this.errorManager.handle(error as Error)
     }
   }
@@ -54,6 +64,18 @@ export class PostStateServiceImpl extends PostStateService {
       this.postBySlug.value = { status: 'loaded', post }
     } catch {
       this.postBySlug.value = { status: 'not-found' }
+    }
+  }
+
+  async loadCategories(query: ListCategoriesQuery): Promise<void> {
+    this.categories.value = { status: 'loading' }
+
+    try {
+      const categories = await this.readService.listCategories(query)
+      this.categories.value = { status: 'loaded', categories }
+    } catch (error) {
+      this.categories.value = { status: 'error', message: (error as Error).message }
+      this.errorManager.handle(error as Error)
     }
   }
 }

@@ -1,3 +1,4 @@
+import { Category } from '../value-objects/Category.valueObject'
 import { PostAuthor } from '../value-objects/PostAuthor.valueObject'
 import { PostContent } from '../value-objects/PostContent.valueObject'
 import { PostExcerpt } from '../value-objects/PostExcerpt.valueObject'
@@ -12,6 +13,7 @@ interface CreatePostParams {
   content: PostContent
   author: PostAuthor
   publishedAt: PublishedAt
+  category: Category
 }
 
 export class Post {
@@ -22,6 +24,7 @@ export class Post {
     public readonly content: PostContent,
     public readonly author: PostAuthor,
     public readonly publishedAt: PublishedAt,
+    public readonly category: Category,
   ) {}
 
   static create(params: CreatePostParams): Post {
@@ -32,6 +35,7 @@ export class Post {
       params.content,
       params.author,
       params.publishedAt,
+      params.category,
     )
   }
 
@@ -43,6 +47,7 @@ export class Post {
       PostContent.empty(),
       PostAuthor.empty(),
       PublishedAt.empty(),
+      Category.empty(),
     )
   }
 }

@@ -4,6 +4,7 @@ slug: conventional-commits-and-git-hooks
 excerpt: Making the commit message format impossible to get wrong, without slowing anyone down.
 author: Marco Reyes
 publishedAt: 2026-06-01
+category: Tooling
 ---
 ## Why this matters
 

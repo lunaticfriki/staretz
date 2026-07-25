@@ -4,6 +4,7 @@ slug: preact-vs-react-a-practical-comparison
 excerpt: Ten kilobytes, one API shape, and a handful of tradeoffs worth knowing before you switch.
 author: Priya Nair
 publishedAt: 2026-04-27
+category: Frontend
 ---
 ## Why this matters
 

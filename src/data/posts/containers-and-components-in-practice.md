@@ -4,6 +4,7 @@ slug: containers-and-components-in-practice
 excerpt: Keeping state-aware containers and pure presentational components from blurring together.
 author: Priya Nair
 publishedAt: 2026-06-29
+category: Architecture
 ---
 ## Why this matters
 

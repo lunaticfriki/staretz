@@ -4,6 +4,7 @@ slug: skeleton-screens-and-perceived-performance
 excerpt: Why a loading placeholder that mirrors the real layout matters more than a spinner.
 author: Marco Reyes
 publishedAt: 2026-06-22
+category: Frontend
 ---
 ## Why this matters
 

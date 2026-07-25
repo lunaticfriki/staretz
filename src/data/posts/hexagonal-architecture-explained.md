@@ -4,6 +4,7 @@ slug: hexagonal-architecture-explained
 excerpt: Ports, adapters, and the one dependency rule that keeps a codebase honest as it grows.
 author: Marco Reyes
 publishedAt: 2026-01-19
+category: Architecture
 ---
 ## Why this matters
 

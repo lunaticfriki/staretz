@@ -4,6 +4,7 @@ slug: testing-application-services-with-mocks
 excerpt: Where mocking belongs in a layered architecture, and why the domain should never need one.
 author: Jane Doe
 publishedAt: 2026-03-30
+category: Testing
 ---
 ## Why this matters
 

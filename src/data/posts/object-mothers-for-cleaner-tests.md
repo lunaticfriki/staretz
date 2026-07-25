@@ -4,6 +4,7 @@ slug: object-mothers-for-cleaner-tests
 excerpt: Replacing scattered test literals with named, composable factories that read like documentation.
 author: Priya Nair
 publishedAt: 2026-03-16
+category: Testing
 ---
 ## Why this matters
 

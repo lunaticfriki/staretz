@@ -1,17 +1,19 @@
+import { useState } from 'preact/hooks'
 import type { RouteProps } from '../../../../shared/presentation/RouteProps'
-import { PostPreview } from '../components/PostPreview.component'
+import { PostGrid } from '../components/PostGrid.component'
 import { PostPreviewSkeleton } from '../components/PostPreview.skeleton'
-import { useRecentPostsState } from '../useRecentPostsState.hook'
+import { usePostsPageState } from '../usePostsPageState.hook'
 
-const RECENT_POSTS_LIMIT = 5
+const POSTS_PER_PAGE = 5
 
 export function HomeContainer(_props: RouteProps) {
-  const state = useRecentPostsState(RECENT_POSTS_LIMIT)
+  const [page, setPage] = useState(1)
+  const state = usePostsPageState(page, POSTS_PER_PAGE)
 
   if (state.status === 'loading') {
     return (
       <div class="mx-auto grid max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: RECENT_POSTS_LIMIT }).map((_, index) => (
+        {Array.from({ length: POSTS_PER_PAGE }).map((_, index) => (
           <PostPreviewSkeleton key={index} />
         ))}
       </div>
@@ -23,10 +25,13 @@ export function HomeContainer(_props: RouteProps) {
   }
 
   return (
-    <div class="mx-auto grid max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {state.posts.toArray().map((post) => (
-        <PostPreview key={post.slug.toString()} post={post} />
-      ))}
-    </div>
+    <PostGrid
+      totalItems={state.page.totalItems}
+      items={state.page.items}
+      page={state.page.page}
+      totalPages={state.page.totalPages}
+      onPageChange={setPage}
+      emptyMessage="No s'han trobat articles."
+    />
   )
 }

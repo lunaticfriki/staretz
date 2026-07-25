@@ -27,7 +27,7 @@ export function SplashScreen() {
   return (
     <div
       role="status"
-      aria-label="Loading Staretz"
+      aria-label="Carregant Staretz"
       class={`fixed inset-0 z-100 flex items-center justify-center bg-background transition-opacity duration-2500 ${
         fading ? 'opacity-0' : 'opacity-100'
       }`}

@@ -4,6 +4,7 @@ slug: cubit-and-bloc-in-flutter
 excerpt: The Flutter equivalent of a presentation-layer state service, and when to reach for each.
 author: Priya Nair
 publishedAt: 2026-05-18
+category: Frontend
 ---
 ## Why this matters
 

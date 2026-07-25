@@ -4,6 +4,7 @@ slug: vertical-slicing-your-codebase
 excerpt: Organizing by feature instead of by layer changes how a team actually finds and deletes code.
 author: Marco Reyes
 publishedAt: 2026-04-13
+category: Architecture
 ---
 ## Why this matters
 

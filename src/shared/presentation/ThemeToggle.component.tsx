@@ -10,7 +10,7 @@ export function ThemeToggle() {
     <button
       type="button"
       onClick={toggle}
-      aria-label={isDark ? 'Switch to light theme' : 'Switch to dark theme'}
+      aria-label={isDark ? 'Canvia al tema clar' : 'Canvia al tema fosc'}
       class="text-lg text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-200"
     >
       {isDark ? <PixelSunIcon /> : <PixelMoonIcon />}

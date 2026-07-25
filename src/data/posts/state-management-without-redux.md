@@ -4,6 +4,7 @@ slug: state-management-without-redux
 excerpt: Most apps need a state service, not a global store with a dozen middleware layers.
 author: Marco Reyes
 publishedAt: 2026-05-11
+category: Frontend
 ---
 ## Why this matters
 

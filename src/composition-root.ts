@@ -3,7 +3,8 @@ import { Container } from 'inversify'
 import { PostReadServiceImpl, type PostReadService } from './modules/blog/application/Post.readService'
 import { PostStateServiceImpl, type PostStateService } from './modules/blog/application/Post.stateService'
 import { GetPostBySlugQueryHandler } from './modules/blog/application/query/GetPostBySlug.queryHandler'
-import { ListLatestPostsQueryHandler } from './modules/blog/application/query/ListLatestPosts.queryHandler'
+import { ListCategoriesQueryHandler } from './modules/blog/application/query/ListCategories.queryHandler'
+import { ListPostsQueryHandler } from './modules/blog/application/query/ListPosts.queryHandler'
 import type { PostRepository } from './modules/blog/domain/repositories/Post.repository'
 import { FakePostRepository } from './modules/blog/infrastructure/FakePost.repository'
 import { ErrorManagerImpl, type ErrorManager } from './shared/errors/application/ErrorManager.service'
@@ -32,8 +33,9 @@ container
   .toDynamicValue(
     (context) =>
       new PostReadServiceImpl(
-        new ListLatestPostsQueryHandler(context.get<PostRepository>(TYPES.PostRepository)),
+        new ListPostsQueryHandler(context.get<PostRepository>(TYPES.PostRepository)),
         new GetPostBySlugQueryHandler(context.get<PostRepository>(TYPES.PostRepository)),
+        new ListCategoriesQueryHandler(context.get<PostRepository>(TYPES.PostRepository)),
       ),
   )
   .inSingletonScope()

@@ -2,6 +2,7 @@ import '@preact/signals'
 
 import { Router } from 'preact-router'
 import { AboutPage } from './modules/about/presentation/AboutPage.component'
+import { CategoryPageContainer } from './modules/blog/presentation/containers/CategoryPage.container'
 import { HomeContainer } from './modules/blog/presentation/containers/Home.container'
 import { PostPageContainer } from './modules/blog/presentation/containers/PostPage.container'
 import { Layout } from './shared/presentation/Layout.component'
@@ -17,6 +18,7 @@ export function App() {
           <HomeContainer path="/" />
           <AboutPage path="/about" />
           <PostPageContainer path="/blog/:slug" />
+          <CategoryPageContainer path="/category/:term" />
           <NotFoundPage default />
         </Router>
       </Layout>

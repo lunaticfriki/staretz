@@ -19,6 +19,10 @@ root [README's non-negotiables](../README.md#non-negotiables-summary)).
   notifications, `shared/notifications/`.
 - [shared-errors.md](shared-errors.md) — `DomainError`/`DomainWarning` and
   `ErrorManager`, `shared/errors/`.
+- [shared-pagination.md](shared-pagination.md) — the criteria/result
+  pagination primitive, `shared/pagination/`.
+- [shared-search.md](shared-search.md) — the `SearchCriteria` filtering
+  primitive, `shared/search/`.
 
 Every module/shared-concern doc follows the same shape: what it's for,
 its routes (if any), its domain model, its application layer, its

@@ -4,6 +4,7 @@ slug: shipping-fast-without-breaking-architecture
 excerpt: Deadlines and clean layering are not actually opposites once the patterns are automatic.
 author: Marco Reyes
 publishedAt: 2026-07-13
+category: Architecture
 ---
 ## Why this matters
 

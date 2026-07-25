@@ -13,3 +13,9 @@ Feature: Home page
     When I click on the post titled "Shipping Fast Without Breaking Architecture"
     Then I should be on the post page for "shipping-fast-without-breaking-architecture"
     And I should see the heading "Shipping Fast Without Breaking Architecture"
+
+  Scenario: Paginating to the next page of posts
+    Given I am on the home page
+    When I go to page "2" of the posts
+    Then I should see 5 post previews
+    And the first post should be "Automating Commit Messages with Husky"

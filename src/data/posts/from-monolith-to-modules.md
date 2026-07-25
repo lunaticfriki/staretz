@@ -4,6 +4,7 @@ slug: from-monolith-to-modules
 excerpt: The incremental path from one giant folder to bounded, independently testable modules.
 author: Jane Doe
 publishedAt: 2026-07-06
+category: Architecture
 ---
 ## Why this matters
 
