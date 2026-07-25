@@ -1,6 +1,7 @@
-import { addDoc, collection, getDocs, limit, query, where } from 'firebase/firestore/lite'
+import { addDoc, collection, deleteDoc, getDocs, limit, query, updateDoc, where } from 'firebase/firestore/lite'
 import { PostCollection } from '../domain/collections/Post.collection'
 import { Post } from '../domain/entities/Post.entity'
+import { PostNotFoundError } from '../domain/errors/PostNotFound.error'
 import { PostRepository } from '../domain/repositories/Post.repository'
 import { Slug } from '../domain/value-objects/Slug.valueObject'
 import { FirestorePostMapper } from './acl/FirestorePost.mapper'
@@ -25,5 +26,26 @@ export class FirebasePostRepository extends PostRepository {
 
   async save(post: Post): Promise<void> {
     await addDoc(collection(firestore, POSTS_COLLECTION), FirestorePostMapper.toPersistence(post))
+  }
+
+  async update(post: Post): Promise<void> {
+    const document = await this.findDocumentBySlug(post.slug)
+    await updateDoc(document.ref, FirestorePostMapper.toPersistence(post))
+  }
+
+  async delete(slug: Slug): Promise<void> {
+    const document = await this.findDocumentBySlug(slug)
+    await deleteDoc(document.ref)
+  }
+
+  private async findDocumentBySlug(slug: Slug) {
+    const snapshot = await getDocs(
+      query(collection(firestore, POSTS_COLLECTION), where('slug', '==', slug.toString()), limit(1)),
+    )
+    const document = snapshot.docs[0]
+    if (!document) {
+      throw new PostNotFoundError(slug.toString())
+    }
+    return document
   }
 }

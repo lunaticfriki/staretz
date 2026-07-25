@@ -6,14 +6,14 @@ import type { PostsPageState, PostStateService } from '../application/Post.state
 import { ListPostsQuery } from '../application/query/ListPosts.query'
 import { TYPES } from '../../../shared/di/types'
 
-export function usePostsPageState(page: number, perPage: number, search = ''): PostsPageState {
+export function usePostsPageState(page: number, perPage: number, search = '', refreshToken = 0): PostsPageState {
   const postStateService = container.get<PostStateService>(TYPES.PostStateService)
 
   useEffect(() => {
     postStateService.loadPosts(
       new ListPostsQuery(PaginationCriteria.create(page, perPage), SearchCriteria.create(search)),
     )
-  }, [page, perPage, search])
+  }, [page, perPage, search, refreshToken])
 
   return postStateService.postsPage.value
 }

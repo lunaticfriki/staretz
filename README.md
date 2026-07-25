@@ -94,9 +94,9 @@ src/
       presentation/    — a fully static page, no other layers needed
     dashboard/
       domain/          — PostImageUploader port, MissingPostImageError
-      application/     — PublishPost command/handler + state service
+      application/     — PublishPost/EditPost command/handlers + PostManagement state service
       infrastructure/  — FirebasePostImageUploader (bound), FakePostImageUploader
-      presentation/    — private post-authoring screen, guarded by shared/policies
+      presentation/    — private post management area (list/create/edit/delete), guarded by shared/policies
   shared/
     auth/              — email/password login (Firebase Auth), AuthStateService
     policies/           — PolicyService.can(name, context) authorization

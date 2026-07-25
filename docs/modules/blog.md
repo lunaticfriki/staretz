@@ -111,19 +111,24 @@ the actual filtering algorithm lives here, in the domain, not as a
 
 **`PostRepository`** (port, `abstract class`) declares
 `findAll(): Promise<PostCollection>`,
-`findBySlug(slug: Slug): Promise<Post | null>`, and
-`save(post: Post): Promise<void>` — domain knows nothing about markdown
-files, Firestore, or `import.meta.glob`. Filtering and category listing
-are both derived from `findAll()` in the application layer (see below),
-not separate repository methods — there's no persistence concern that
-would justify pushing them down into the port. `save()` is the one
-write method the port has; there's no `update()`/`delete()` yet because
-nothing in the app needs them — see
-[dashboard.md](dashboard.md) for the one place `save()` is actually
-called from. Uploading the image file that becomes `PostImage.create(...)`'s
-argument is a separate technical capability (`PostImageUploader`) that
-now lives in `dashboard`'s own domain, not here — see
-[dashboard.md](dashboard.md#domain) for why.
+`findBySlug(slug: Slug): Promise<Post | null>`,
+`save(post: Post): Promise<void>`, `update(post: Post): Promise<void>`,
+and `delete(slug: Slug): Promise<void>` — domain knows nothing about
+markdown files, Firestore, or `import.meta.glob`. Filtering and
+category listing are both derived from `findAll()` in the application
+layer (see below), not separate repository methods — there's no
+persistence concern that would justify pushing them down into the
+port. `update()`/`delete()` both identify the target post by `slug`
+(a `Post`'s slug is immutable once created — see
+[dashboard.md](dashboard.md#presentation) for where that's enforced in
+the UI); `update()` takes a full `Post` rather than a partial patch,
+matching `save()`'s shape and this module's "read models are optional,
+reconstruct the whole entity" pattern — see
+[dashboard.md](dashboard.md) for the one place all three write methods
+are actually called from. Uploading the image file that becomes
+`PostImage.create(...)`'s argument is a separate technical capability
+(`PostImageUploader`) that lives in `dashboard`'s own domain, not here
+— see [dashboard.md](dashboard.md#domain) for why.
 
 **`PostNotFoundError`** (`extends DomainError`) is thrown by the query
 handler below when a slug doesn't resolve — see
@@ -147,16 +152,22 @@ src/modules/blog/application/
   command/
     CreatePost.command.ts
     CreatePost.commandHandler.ts
+    UpdatePost.command.ts
+    UpdatePost.commandHandler.ts
+    DeletePost.command.ts
+    DeletePost.commandHandler.ts
     __tests__/
       CreatePost.commandHandler.test.ts
+      UpdatePost.commandHandler.test.ts
+      DeletePost.commandHandler.test.ts
   Post.readService.ts
   Post.writeService.ts
   Post.stateService.ts
 ```
 
-Three query handlers and one command handler — the blog was read-only
-until the [dashboard](dashboard.md) module needed a way to publish new
-posts.
+Three query handlers and three command handlers — the blog was
+read-only until the [dashboard](dashboard.md) module needed a way to
+publish, edit, and delete posts.
 
 - **`ListPostsQueryHandler`**: takes a `ListPostsQuery { pagination:
   PaginationCriteria, search: SearchCriteria }`, does `findAll()` then
@@ -187,6 +198,23 @@ posts.
   `createPost()`, the image has already been uploaded and reduced to a
   plain URL string — see [dashboard.md](dashboard.md#application) for
   that orchestration.
+- **`UpdatePostCommandHandler`**: the same shape as
+  `CreatePostCommandHandler` — same primitives-in, same value-object
+  factories, same full-entity reconstruction — but calls `posts.update(post)`
+  instead of `posts.save(post)`. There's no separate "patch" command;
+  editing one field still means rebuilding and revalidating the whole
+  `Post`, so a change to any field goes through the same domain
+  validation every other write path does. Called from `dashboard`'s
+  `EditPostCommandHandler`, which resolves the image URL (new upload or
+  keep the current one) before this handler ever runs — see
+  [dashboard.md](dashboard.md#application).
+- **`DeletePostCommandHandler`**: takes a `DeletePostCommand { slug:
+  string }`, `Slug.create(command.slug)` then `posts.delete(slug)` — no
+  entity reconstruction needed, deleting doesn't touch `Post`'s fields.
+  Called directly from `dashboard`'s `PostManagementStateService`
+  (there's no dashboard-side command/handler wrapping it — see
+  [dashboard.md](dashboard.md#application) for why delete doesn't need
+  one).
 - **`PostReadService`**: zero library dependencies, wraps all three
   query handlers behind `listPosts()`/`getBySlug()`/`listCategories()`.
   Because `Post`/`CategoryCollection` are read-only, every method
@@ -196,10 +224,9 @@ posts.
 - **`PostWriteService`**: the read/write split
   [03-application-layer-cqrs.md](../03-application-layer-cqrs.md#read-and-write-services-are-separated)
   describes — a distinct dependency surface from `PostReadService`, zero
-  library dependencies, currently one method,
-  `createPost(command): Promise<void>`, wrapping
-  `CreatePostCommandHandler`. Nothing reads through it; nothing writes
-  through `PostReadService`.
+  library dependencies, three methods (`createPost`/`updatePost`/
+  `deletePost`), each wrapping its matching command handler. Nothing
+  reads through it; nothing writes through `PostReadService`.
 - **`PostStateService`**: the only file here depending on
   `@preact/signals-core`. Three signals: `postsPage` (`PostsPageState` —
   `loading | loaded (Page<Post>) | error`), `postBySlug`
@@ -244,7 +271,25 @@ is `getDocs(collection(firestore, 'posts'))`; `findBySlug()` is a
 Firestore document id is **not** the slug (documents get
 Firestore-assigned random ids; `slug` is its own field like every other
 field); `save()` is `addDoc(collection(firestore, 'posts'),
-FirestorePostMapper.toPersistence(post))`.
+FirestorePostMapper.toPersistence(post))`. `update()`/`delete()` both
+share a private `findDocumentBySlug()` helper that runs the same
+by-slug query as `findBySlug()` but throws `PostNotFoundError` instead
+of returning `null` when nothing matches (mirroring
+`GetPostBySlugQueryHandler`'s contract, not `findBySlug()`'s) — then
+`update()` calls `updateDoc(document.ref, FirestorePostMapper.toPersistence(post))`
+and `delete()` calls `deleteDoc(document.ref)`, both against the
+matched `QueryDocumentSnapshot`'s own `.ref`, since there's no other
+way to address a document whose id isn't the slug.
+
+Firestore's security rules (`firestore.rules` at the repo root) gate
+all three writes identically: `allow create, update, delete: if
+request.auth != null` — reads stay public (`allow read: if true`).
+Deployed via `firebase deploy --only firestore:rules`; nothing in this
+app's code depends on the rules file directly; it's the server-side
+enforcement of what `RequirePolicy`/`PolicyService`
+([shared-policies.md](shared-policies.md)) already gate client-side —
+belt and suspenders, since client-side checks alone are never real
+security.
 
 Every Firestore import in this file, `firestore.ts`, and
 `FirestorePost.mapper.ts` comes from **`firebase/firestore/lite`**, not
@@ -271,7 +316,12 @@ is the "one implementation per port, swappable" case from
 [04-infrastructure-layer.md](../04-infrastructure-layer.md#one-implementation-per-port-swappable):
 neither `PostReadService` nor anything above it changes when the binding
 switches. Swapping back is the one-line change in `composition-root.ts`:
-`new FirebasePostRepository()` → `new FakePostRepository()`.
+`new FirebasePostRepository()` → `new FakePostRepository()`. Its
+`update()`/`delete()` operate on the same in-memory `Post[]` `save()`
+already pushes into — `findIndex()` by `slug.equals()`, then splice-
+replace or splice-remove; both throw `PostNotFoundError` for an unknown
+slug, matching `FirebasePostRepository`'s contract exactly (see
+[Tests](#tests) below).
 
 **`markdownFrontmatter.util.ts`** splits a raw `.md` file into
 `{ frontmatter, body }` by regex-matching the leading `---`-delimited
@@ -312,8 +362,9 @@ string, so the mapper degrades gracefully if a document ever stores a
 string instead).
 
 Because the slug isn't the document id, `FirebasePostRepository.findBySlug()`
-is a query (`where('slug', '==', slug)`, `limit(1)`), not a direct
-document read — see [Infrastructure](#infrastructure) above.
+(and `update()`/`delete()`'s shared `findDocumentBySlug()` helper) run a
+query (`where('slug', '==', slug)`, `limit(1)`), not a direct document
+read — see [Infrastructure](#infrastructure) above.
 
 Expected Firestore document shape, collection `posts` (document id is
 whatever Firestore assigns — irrelevant to the domain):
@@ -471,8 +522,10 @@ way `usePostBySlugState` already takes `slug` from routing.
 Bound in [`composition-root.ts`](../../src/composition-root.ts), in
 dependency order: `PostRepository` → `PostReadService` (composes all
 three query handlers) / `PostWriteService` (composes
-`CreatePostCommandHandler`) → `PostStateService` (needs
-`PostReadService` + `ErrorManager`). Symbols in
+`CreatePostCommandHandler`, `UpdatePostCommandHandler`, and
+`DeletePostCommandHandler`, all three sharing the one
+`PostRepository`) → `PostStateService` (needs `PostReadService` +
+`ErrorManager`). Symbols in
 [`shared/di/types.ts`](../../src/shared/di/types.ts): `PostRepository`,
 `PostReadService`, `PostWriteService`, `PostStateService`. No new
 symbols were needed for categories/search —
@@ -497,15 +550,25 @@ application/
                               ListPosts.queryHandler.integration.test.ts (real FakePostRepository)
                               ListCategories.queryHandler.test.ts (mocked repository)
   command/__tests__/         CreatePost.commandHandler.test.ts (mocked repository)
+                              UpdatePost.commandHandler.test.ts (mocked repository)
+                              DeletePost.commandHandler.test.ts (mocked repository)
 infrastructure/
-  __tests__/                 FakePost.repository.test.ts (includes save())
+  __tests__/                 FakePost.repository.test.ts (includes save()/update()/delete())
   acl/__tests__/              Post.mapper.test.ts, FirestorePost.mapper.test.ts (includes toPersistence())
 ```
 
-`CreatePost.commandHandler.test.ts` mocks `PostRepository` and asserts
-both that a valid command builds and saves the right `Post` (captured
-via `ts-mockito`'s `capture()`) and that invalid fields still throw the
-normal value-object error before `save()` is ever reached.
+`CreatePost.commandHandler.test.ts`/`UpdatePost.commandHandler.test.ts`
+mock `PostRepository` and assert both that a valid command builds and
+saves/updates the right `Post` (captured via `ts-mockito`'s
+`capture()`) and that invalid fields still throw the normal
+value-object error before `save()`/`update()` is ever reached.
+`DeletePost.commandHandler.test.ts` asserts the resolved `Slug` reaches
+`repository.delete()` and that an invalid slug throws before it does.
+`FakePost.repository.test.ts`'s `update()`/`delete()` cases cover both
+the happy path (post replaced/removed, `findAll()`'s length reflects
+it) and the `PostNotFoundError` thrown for an unknown slug — the same
+contract `FirebasePostRepository` is documented (not tested, see below)
+to uphold.
 
 `Post.mapper.test.ts` and `FirestorePost.mapper.test.ts` are pure unit
 tests — hand-built markdown/`DocumentData` fixtures (the latter with a
@@ -517,10 +580,12 @@ value-object validation (`InvalidCategoryError`, etc.), and — for
 `postImagePlaceholderUrl` when absent" paths, on both mappers.
 `FirebasePostRepository` itself has no test: it's a thin sequence of
 Firestore SDK calls with no branching logic of its own beyond the
-`findBySlug()` query, and testing it for real would need the Firebase
-Local Emulator Suite, which isn't wired into this repo — add that if the
-SDK-call sequencing itself ever needs coverage beyond what the ACL test
-and manual verification against the real project already give it.
+by-slug queries (`findBySlug()`, and `update()`/`delete()`'s shared
+`findDocumentBySlug()`), and testing it for real would need the
+Firebase Local Emulator Suite, which isn't wired into this repo — add
+that if the SDK-call sequencing itself ever needs coverage beyond what
+the ACL test and manual verification against the real project already
+give it.
 
 The integration test is the one place production-looking code
 intentionally imports an infrastructure class from an application-layer

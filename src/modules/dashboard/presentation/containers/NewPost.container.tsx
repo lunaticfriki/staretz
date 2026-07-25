@@ -1,12 +1,13 @@
 import type { RouteProps } from '../../../../shared/presentation/RouteProps'
 import { useAuthState } from '../../../../shared/presentation/useAuthState.hook'
 import { PublishPostCommand } from '../../application/command/PublishPost.command'
-import { usePublishPostState } from '../usePublishPostState.hook'
+import { usePostManagementState } from '../usePostManagementState.hook'
+import { DashboardNav } from '../components/DashboardNav.component'
 import { PostForm, type PostFormValues } from '../components/PostForm.component'
 
-export function DashboardContainer(_props: RouteProps) {
+export function NewPostContainer(_props: RouteProps) {
   const { logout } = useAuthState()
-  const { publish, publishPost } = usePublishPostState()
+  const { publish, publishPost } = usePostManagementState()
 
   function handleSubmit(values: PostFormValues) {
     publishPost(
@@ -24,18 +25,12 @@ export function DashboardContainer(_props: RouteProps) {
   }
 
   return (
-    <section class="mx-auto max-w-2xl">
-      <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold text-purple-700 dark:text-purple-400">Nou article</h1>
-        <button
-          type="button"
-          onClick={logout}
-          class="text-sm text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-200"
-        >
-          Tanca sessió
-        </button>
+    <section class="w-full">
+      <DashboardNav onLogout={logout} />
+      <h1 class="mt-6 text-2xl font-bold text-purple-700 dark:text-purple-400">Nou article</h1>
+      <div class="max-w-5xl">
+        <PostForm onSubmit={handleSubmit} submitting={publish.status === 'submitting'} />
       </div>
-      <PostForm onSubmit={handleSubmit} submitting={publish.status === 'submitting'} />
     </section>
   )
 }

@@ -1,6 +1,8 @@
 import 'reflect-metadata'
 import { Container } from 'inversify'
 import { CreatePostCommandHandler } from './modules/blog/application/command/CreatePost.commandHandler'
+import { DeletePostCommandHandler } from './modules/blog/application/command/DeletePost.commandHandler'
+import { UpdatePostCommandHandler } from './modules/blog/application/command/UpdatePost.commandHandler'
 import { PostReadServiceImpl, type PostReadService } from './modules/blog/application/Post.readService'
 import { PostStateServiceImpl, type PostStateService } from './modules/blog/application/Post.stateService'
 import { PostWriteServiceImpl, type PostWriteService } from './modules/blog/application/Post.writeService'
@@ -9,11 +11,12 @@ import { ListCategoriesQueryHandler } from './modules/blog/application/query/Lis
 import { ListPostsQueryHandler } from './modules/blog/application/query/ListPosts.queryHandler'
 import type { PostRepository } from './modules/blog/domain/repositories/Post.repository'
 import { FirebasePostRepository } from './modules/blog/infrastructure/FirebasePost.repository'
+import { EditPostCommandHandler } from './modules/dashboard/application/command/EditPost.commandHandler'
 import { PublishPostCommandHandler } from './modules/dashboard/application/command/PublishPost.commandHandler'
 import {
-  PublishPostStateServiceImpl,
-  type PublishPostStateService,
-} from './modules/dashboard/application/PublishPost.stateService'
+  PostManagementStateServiceImpl,
+  type PostManagementStateService,
+} from './modules/dashboard/application/PostManagement.stateService'
 import { DASHBOARD_ACCESS_POLICY } from './modules/dashboard/dashboardPolicy'
 import type { PostImageUploader } from './modules/dashboard/domain/repositories/PostImageUploader.repository'
 import { FirebasePostImageUploader } from './modules/dashboard/infrastructure/FirebasePostImageUploader.repository'
@@ -60,7 +63,11 @@ container
   .bind<PostWriteService>(TYPES.PostWriteService)
   .toDynamicValue(
     (context) =>
-      new PostWriteServiceImpl(new CreatePostCommandHandler(context.get<PostRepository>(TYPES.PostRepository))),
+      new PostWriteServiceImpl(
+        new CreatePostCommandHandler(context.get<PostRepository>(TYPES.PostRepository)),
+        new UpdatePostCommandHandler(context.get<PostRepository>(TYPES.PostRepository)),
+        new DeletePostCommandHandler(context.get<PostRepository>(TYPES.PostRepository)),
+      ),
   )
   .inSingletonScope()
 
@@ -130,14 +137,19 @@ container
   .inSingletonScope()
 
 container
-  .bind<PublishPostStateService>(TYPES.PublishPostStateService)
+  .bind<PostManagementStateService>(TYPES.PostManagementStateService)
   .toDynamicValue(
     (context) =>
-      new PublishPostStateServiceImpl(
+      new PostManagementStateServiceImpl(
         new PublishPostCommandHandler(
           context.get<PostImageUploader>(TYPES.PostImageUploader),
           context.get<PostWriteService>(TYPES.PostWriteService),
         ),
+        new EditPostCommandHandler(
+          context.get<PostImageUploader>(TYPES.PostImageUploader),
+          context.get<PostWriteService>(TYPES.PostWriteService),
+        ),
+        context.get<PostWriteService>(TYPES.PostWriteService),
         context.get<NotificationStateService>(TYPES.NotificationStateService),
         context.get<ErrorManager>(TYPES.ErrorManager),
       ),

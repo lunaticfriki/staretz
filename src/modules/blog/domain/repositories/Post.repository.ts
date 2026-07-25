@@ -6,4 +6,6 @@ export abstract class PostRepository {
   abstract findAll(): Promise<PostCollection>
   abstract findBySlug(slug: Slug): Promise<Post | null>
   abstract save(post: Post): Promise<void>
+  abstract update(post: Post): Promise<void>
+  abstract delete(slug: Slug): Promise<void>
 }

@@ -15,6 +15,11 @@ export interface PostFormValues {
 interface PostFormProps {
   onSubmit: (values: PostFormValues) => void
   submitting: boolean
+  initialValues?: Omit<PostFormValues, 'imageFile'>
+  currentImage?: string
+  slugEditable?: boolean
+  submitLabel?: string
+  submittingLabel?: string
 }
 
 function slugify(value: string): string {
@@ -28,16 +33,26 @@ function slugify(value: string): string {
 const fieldClass =
   'rounded border border-gray-300 bg-transparent px-3 py-2 text-sm focus:border-purple-500 focus:outline-none dark:border-gray-700'
 
-export function PostForm({ onSubmit, submitting }: PostFormProps) {
+export function PostForm({
+  onSubmit,
+  submitting,
+  initialValues,
+  currentImage,
+  slugEditable = true,
+  submitLabel = 'Publica',
+  submittingLabel = 'Publicant...',
+}: PostFormProps) {
   const categoriesState = useCategoriesState()
-  const [title, setTitle] = useState('')
-  const [slug, setSlug] = useState('')
-  const [slugTouched, setSlugTouched] = useState(false)
-  const [excerpt, setExcerpt] = useState('')
-  const [content, setContent] = useState('')
-  const [author, setAuthor] = useState('')
-  const [category, setCategory] = useState('')
-  const [publishedAt, setPublishedAt] = useState(() => new Date().toISOString().slice(0, 10))
+  const [title, setTitle] = useState(initialValues?.title ?? '')
+  const [slug, setSlug] = useState(initialValues?.slug ?? '')
+  const [slugTouched, setSlugTouched] = useState(Boolean(initialValues))
+  const [excerpt, setExcerpt] = useState(initialValues?.excerpt ?? '')
+  const [content, setContent] = useState(initialValues?.content ?? '')
+  const [author, setAuthor] = useState(initialValues?.author ?? '')
+  const [category, setCategory] = useState(initialValues?.category ?? '')
+  const [publishedAt, setPublishedAt] = useState(
+    () => initialValues?.publishedAt ?? new Date().toISOString().slice(0, 10),
+  )
   const [imageFile, setImageFile] = useState<File | null>(null)
 
   function handleTitleInput(value: string) {
@@ -69,12 +84,13 @@ export function PostForm({ onSubmit, submitting }: PostFormProps) {
         <input
           type="text"
           required
+          disabled={!slugEditable}
           value={slug}
           onInput={(event) => {
             setSlugTouched(true)
             setSlug((event.target as HTMLInputElement).value)
           }}
-          class={`${fieldClass} font-mono`}
+          class={`${fieldClass} font-mono disabled:cursor-not-allowed disabled:opacity-60`}
         />
       </label>
       <label class="flex flex-col gap-1 text-sm">
@@ -139,10 +155,18 @@ export function PostForm({ onSubmit, submitting }: PostFormProps) {
       </label>
       <label class="flex flex-col gap-1 text-sm">
         Imatge
+        {currentImage && (
+          <div class="mb-1 flex items-center gap-3">
+            <img src={currentImage} alt="" class="h-16 w-24 rounded object-cover" />
+            <span class="text-xs text-gray-500 dark:text-gray-400">
+              Imatge actual — deixa-ho en blanc per mantenir-la
+            </span>
+          </div>
+        )}
         <input
           type="file"
           accept="image/*"
-          required
+          required={!currentImage}
           onInput={(event) => setImageFile((event.target as HTMLInputElement).files?.[0] ?? null)}
           class="text-sm"
         />
@@ -152,7 +176,7 @@ export function PostForm({ onSubmit, submitting }: PostFormProps) {
         disabled={submitting}
         class="rounded bg-purple-700 px-4 py-2 text-sm font-semibold text-white hover:bg-purple-800 disabled:opacity-50 dark:bg-purple-400 dark:text-black"
       >
-        {submitting ? 'Publicant...' : 'Publica'}
+        {submitting ? submittingLabel : submitLabel}
       </button>
     </form>
   )

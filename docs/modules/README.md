@@ -27,12 +27,12 @@ root [README's non-negotiables](../README.md#non-negotiables-summary)).
   `shared/auth/`.
 - [shared-policies.md](shared-policies.md) — the `PolicyService.can()`
   authorization primitive, `shared/policies/`.
-- [dashboard.md](dashboard.md) — the private post-authoring screen.
-  Full four-layer module: its own `PostImageUploader` domain port and
-  `PublishPost` command/handler orchestrate the upload-then-create flow,
-  calling into `blog`'s application layer (never its domain/
-  infrastructure) and `shared/auth`/`shared/policies` for who's allowed
-  to see it.
+- [dashboard.md](dashboard.md) — the private post-management area:
+  list, create, edit, delete. Full four-layer module: its own
+  `PostImageUploader` domain port and `PublishPost`/`EditPost`
+  command/handlers orchestrate the upload-then-write flows, calling
+  into `blog`'s application layer (never its domain/infrastructure)
+  and `shared/auth`/`shared/policies` for who's allowed to see it.
 
 Every module/shared-concern doc follows the same shape: what it's for,
 its routes (if any), its domain model, its application layer, its
