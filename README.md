@@ -93,6 +93,9 @@ src/
     about/
       presentation/    — a fully static page, no other layers needed
     dashboard/
+      domain/          — PostImageUploader port, MissingPostImageError
+      application/     — PublishPost command/handler + state service
+      infrastructure/  — FirebasePostImageUploader (bound), FakePostImageUploader
       presentation/    — private post-authoring screen, guarded by shared/policies
   shared/
     auth/              — email/password login (Firebase Auth), AuthStateService

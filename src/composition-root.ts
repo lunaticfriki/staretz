@@ -7,11 +7,16 @@ import { PostWriteServiceImpl, type PostWriteService } from './modules/blog/appl
 import { GetPostBySlugQueryHandler } from './modules/blog/application/query/GetPostBySlug.queryHandler'
 import { ListCategoriesQueryHandler } from './modules/blog/application/query/ListCategories.queryHandler'
 import { ListPostsQueryHandler } from './modules/blog/application/query/ListPosts.queryHandler'
-import type { PostImageUploader } from './modules/blog/domain/repositories/PostImageUploader.repository'
 import type { PostRepository } from './modules/blog/domain/repositories/Post.repository'
-import { FirebasePostImageUploader } from './modules/blog/infrastructure/FirebasePostImageUploader.repository'
 import { FirebasePostRepository } from './modules/blog/infrastructure/FirebasePost.repository'
+import { PublishPostCommandHandler } from './modules/dashboard/application/command/PublishPost.commandHandler'
+import {
+  PublishPostStateServiceImpl,
+  type PublishPostStateService,
+} from './modules/dashboard/application/PublishPost.stateService'
 import { DASHBOARD_ACCESS_POLICY } from './modules/dashboard/dashboardPolicy'
+import type { PostImageUploader } from './modules/dashboard/domain/repositories/PostImageUploader.repository'
+import { FirebasePostImageUploader } from './modules/dashboard/infrastructure/FirebasePostImageUploader.repository'
 import { AuthStateServiceImpl, type AuthStateService } from './shared/auth/application/Auth.stateService'
 import type { AuthRepository } from './shared/auth/domain/repositories/Auth.repository'
 import { FirebaseAuthRepository } from './shared/auth/infrastructure/FirebaseAuth.repository'
@@ -122,6 +127,21 @@ container
     ])
     return new PolicyServiceImpl(policies)
   })
+  .inSingletonScope()
+
+container
+  .bind<PublishPostStateService>(TYPES.PublishPostStateService)
+  .toDynamicValue(
+    (context) =>
+      new PublishPostStateServiceImpl(
+        new PublishPostCommandHandler(
+          context.get<PostImageUploader>(TYPES.PostImageUploader),
+          context.get<PostWriteService>(TYPES.PostWriteService),
+        ),
+        context.get<NotificationStateService>(TYPES.NotificationStateService),
+        context.get<ErrorManager>(TYPES.ErrorManager),
+      ),
+  )
   .inSingletonScope()
 
 export { container }

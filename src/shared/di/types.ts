@@ -12,4 +12,5 @@ export const TYPES = {
   AuthRepository: Symbol.for('AuthRepository'),
   AuthStateService: Symbol.for('AuthStateService'),
   PolicyService: Symbol.for('PolicyService'),
+  PublishPostStateService: Symbol.for('PublishPostStateService'),
 }

@@ -1,51 +1,26 @@
-import { useState } from 'preact/hooks'
-import { container } from '../../../../composition-root'
 import type { RouteProps } from '../../../../shared/presentation/RouteProps'
 import { useAuthState } from '../../../../shared/presentation/useAuthState.hook'
-import type { NotificationStateService } from '../../../../shared/notifications/application/Notification.stateService'
-import { TYPES } from '../../../../shared/di/types'
-import { CreatePostCommand } from '../../../blog/application/command/CreatePost.command'
-import type { PostWriteService } from '../../../blog/application/Post.writeService'
-import type { PostImageUploader } from '../../../blog/domain/repositories/PostImageUploader.repository'
+import { PublishPostCommand } from '../../application/command/PublishPost.command'
+import { usePublishPostState } from '../usePublishPostState.hook'
 import { PostForm, type PostFormValues } from '../components/PostForm.component'
 
 export function DashboardContainer(_props: RouteProps) {
   const { logout } = useAuthState()
-  const [submitting, setSubmitting] = useState(false)
+  const { publish, publishPost } = usePublishPostState()
 
-  async function handleSubmit(values: PostFormValues) {
-    const notifications = container.get<NotificationStateService>(TYPES.NotificationStateService)
-    setSubmitting(true)
-
-    try {
-      if (!values.imageFile) {
-        throw new Error("Selecciona una imatge per a l'article.")
-      }
-
-      const uploader = container.get<PostImageUploader>(TYPES.PostImageUploader)
-      const writeService = container.get<PostWriteService>(TYPES.PostWriteService)
-
-      const image = await uploader.upload(values.imageFile)
-
-      await writeService.createPost(
-        new CreatePostCommand(
-          values.slug,
-          values.title,
-          values.excerpt,
-          values.content,
-          values.author,
-          values.category,
-          values.publishedAt,
-          image.toString(),
-        ),
-      )
-
-      notifications.notify('success', 'Article publicat correctament.')
-    } catch (error) {
-      notifications.notify('error', (error as Error).message)
-    } finally {
-      setSubmitting(false)
-    }
+  function handleSubmit(values: PostFormValues) {
+    publishPost(
+      new PublishPostCommand(
+        values.slug,
+        values.title,
+        values.excerpt,
+        values.content,
+        values.author,
+        values.category,
+        values.publishedAt,
+        values.imageFile,
+      ),
+    )
   }
 
   return (
@@ -60,7 +35,7 @@ export function DashboardContainer(_props: RouteProps) {
           Tanca sessió
         </button>
       </div>
-      <PostForm onSubmit={handleSubmit} submitting={submitting} />
+      <PostForm onSubmit={handleSubmit} submitting={publish.status === 'submitting'} />
     </section>
   )
 }
