@@ -37,6 +37,7 @@ src/modules/blog/domain/
     PostImage.valueObject.ts
   repositories/
     Post.repository.ts
+    PostImageUploader.repository.ts
   errors/
     PostNotFound.error.ts
 ```
@@ -110,12 +111,32 @@ the actual filtering algorithm lives here, in the domain, not as a
 `toArray()` shape as `PostCollection`.
 
 **`PostRepository`** (port, `abstract class`) declares
-`findAll(): Promise<PostCollection>` and
-`findBySlug(slug: Slug): Promise<Post | null>` — domain knows nothing
-about markdown files or `import.meta.glob`. Filtering and category
-listing are both derived from `findAll()` in the application layer
-(see below), not separate repository methods — there's no persistence
-concern that would justify pushing them down into the port.
+`findAll(): Promise<PostCollection>`,
+`findBySlug(slug: Slug): Promise<Post | null>`, and
+`save(post: Post): Promise<void>` — domain knows nothing about markdown
+files, Firestore, or `import.meta.glob`. Filtering and category listing
+are both derived from `findAll()` in the application layer (see below),
+not separate repository methods — there's no persistence concern that
+would justify pushing them down into the port. `save()` is the one
+write method the port has; there's no `update()`/`delete()` yet because
+nothing in the app needs them — see
+[dashboard.md](dashboard.md) for the one place `save()` is actually
+called from.
+
+**`PostImageUploader`** (port, `abstract class`) is a second, narrower
+port: `upload(file: File): Promise<PostImage>`. It doesn't extend or
+relate to `PostRepository` — persisting a `Post` and uploading an image
+file are separate technical capabilities (one talks to Firestore, the
+other to Cloud Storage), each with their own adapter pair, so they get
+separate ports rather than one growing a `File` parameter it doesn't
+otherwise need. `File` (the browser API type) appearing in a domain
+port is the one place this module's domain layer touches a
+presentation-adjacent type — acceptable here because "upload this blob
+and hand back a URL" is a generic technical operation with no business
+meaning to model around, the same spirit as
+[04-infrastructure-layer.md](../04-infrastructure-layer.md#what-belongs-here)'s
+"wrappers around third-party SDKs, so the rest of the app depends on
+our own port, not the SDK's API surface."
 
 **`PostNotFoundError`** (`extends DomainError`) is thrown by the query
 handler below when a slug doesn't resolve — see
@@ -136,13 +157,19 @@ src/modules/blog/application/
     ListCategories.queryHandler.ts
     GetPostBySlug.query.ts
     GetPostBySlug.queryHandler.ts
+  command/
+    CreatePost.command.ts
+    CreatePost.commandHandler.ts
+    __tests__/
+      CreatePost.commandHandler.test.ts
   Post.readService.ts
+  Post.writeService.ts
   Post.stateService.ts
 ```
 
-Three query handlers, no commands — the blog is read-only from the app's
-perspective (posts come from markdown files checked into the repo, not
-authored through the UI).
+Three query handlers and one command handler — the blog was read-only
+until the [dashboard](dashboard.md) module needed a way to publish new
+posts.
 
 - **`ListPostsQueryHandler`**: takes a `ListPostsQuery { pagination:
   PaginationCriteria, search: SearchCriteria }`, does `findAll()` then
@@ -160,12 +187,31 @@ authored through the UI).
   does `findAll()` then `.categories()`.
 - **`GetPostBySlugQueryHandler`**: `Slug.create(query.slug)` then
   `findBySlug`; throws `PostNotFoundError` if `null`.
+- **`CreatePostCommandHandler`**: takes a `CreatePostCommand` of raw
+  primitives (`slug`, `title`, `excerpt`, `content`, `author`,
+  `category`, `publishedAt`, `image` — all `string`), builds a `Post`
+  through the exact same value-object factories every ACL mapper uses
+  (`Slug.create(command.slug)`, `PostImage.create(command.image)`,
+  etc.), then `posts.save(post)`. Domain validation is enforced here
+  the same way it is anywhere else a `Post` gets constructed — an
+  invalid category or empty title throws before `save()` is ever
+  called, so `PostImageUploader`'s successful upload (see below) never
+  gets silently wasted on a post that fails to save; the dashboard
+  container just lets that exception propagate to its `catch` and
+  surfaces it as a notification.
 - **`PostReadService`**: zero library dependencies, wraps all three
-  handlers behind `listPosts()`/`getBySlug()`/`listCategories()`.
+  query handlers behind `listPosts()`/`getBySlug()`/`listCategories()`.
   Because `Post`/`CategoryCollection` are read-only, every method
   returns the domain type directly (`Page<Post>`/`Post`/
   `CategoryCollection`) — no `Post.readModel.ts` DTO — see
   [05-presentation-layer.md](../05-presentation-layer.md#read-models-are-optional--presentation-may-render-a-domain-entity-directly).
+- **`PostWriteService`**: the read/write split
+  [03-application-layer-cqrs.md](../03-application-layer-cqrs.md#read-and-write-services-are-separated)
+  describes — a distinct dependency surface from `PostReadService`, zero
+  library dependencies, currently one method,
+  `createPost(command): Promise<void>`, wrapping
+  `CreatePostCommandHandler`. Nothing reads through it; nothing writes
+  through `PostReadService`.
 - **`PostStateService`**: the only file here depending on
   `@preact/signals-core`. Three signals: `postsPage` (`PostsPageState` —
   `loading | loaded (Page<Post>) | error`), `postBySlug`
@@ -182,7 +228,10 @@ authored through the UI).
 src/modules/blog/infrastructure/
   FakePost.repository.ts
   FirebasePost.repository.ts
-  firebaseApp.ts
+  FakePostImageUploader.repository.ts
+  FirebasePostImageUploader.repository.ts
+  firestore.ts
+  storage.ts
   acl/
     Post.mapper.ts
     markdownFrontmatter.util.ts
@@ -194,27 +243,45 @@ src/modules/blog/infrastructure/
 ```
 
 **`FirebasePostRepository`** is the `PostRepository` adapter currently
-bound in `composition-root.ts` — production reads from Cloud Firestore.
-`firebaseApp.ts` calls `initializeApp()`/`getFirestore()` once from
+bound in `composition-root.ts` — production reads from and writes to
+Cloud Firestore. `firestore.ts` calls `getFirestore(firebaseApp)` once
+and exports the `firestore` instance, where `firebaseApp` comes from
+`src/shared/firebase/firebaseApp.ts` — the Firebase App bootstrap
+itself lives in `shared/` (not here) because `shared/auth` needs the
+same app instance too; see
+[shared-auth.md](shared-auth.md#infrastructure) for why it moved.
 `VITE_FIREBASE_*` env vars (see `.env.example` at the repo root; never
-hardcoded, never committed — `.env*` is gitignored) and exports the
-`firestore` instance. The repository reads/queries the **`posts`**
-collection: `findAll()` is `getDocs(collection(firestore, 'posts'))`;
-`findBySlug()` is a *query* — `getDocs(query(collection(firestore,
-'posts'), where('slug', '==', slug), limit(1)))` — not a direct document
-read, because the Firestore document id is **not** the slug (documents
-get Firestore-assigned random ids; `slug` is its own field like every
-other field). `findBySlug()` takes the first match.
+hardcoded, never committed — `.env*` is gitignored) configure it. The
+repository reads/queries/writes the **`posts`** collection: `findAll()`
+is `getDocs(collection(firestore, 'posts'))`; `findBySlug()` is a
+*query* — `getDocs(query(collection(firestore, 'posts'), where('slug',
+'==', slug), limit(1)))` — not a direct document read, because the
+Firestore document id is **not** the slug (documents get
+Firestore-assigned random ids; `slug` is its own field like every other
+field); `save()` is `addDoc(collection(firestore, 'posts'),
+FirestorePostMapper.toPersistence(post))`.
 
-Every Firestore import in this file, `firebaseApp.ts`, and
+Every Firestore import in this file, `firestore.ts`, and
 `FirestorePost.mapper.ts` comes from **`firebase/firestore/lite`**, not
-the full `firebase/firestore` — this app only ever does one-time reads
-(`getDoc`/`getDocs`), never `onSnapshot` real-time listeners or offline
-persistence, and the lite build drops all of that machinery. It cut the
-production bundle from ~650KB to ~289KB minified. If a future feature
-genuinely needs live updates or offline support, that's the trigger to
-switch back to the full `firebase/firestore` import — not a default to
-reach for pre-emptively.
+the full `firebase/firestore` — this app only ever does one-time reads/
+writes (`getDoc`/`getDocs`/`addDoc`), never `onSnapshot` real-time
+listeners or offline persistence, and the lite build drops all of that
+machinery. It cut the production bundle from ~650KB to ~289KB minified.
+If a future feature genuinely needs live updates or offline support,
+that's the trigger to switch back to the full `firebase/firestore`
+import — not a default to reach for pre-emptively.
+
+**`FirebasePostImageUploader`** is the `PostImageUploader` adapter
+bound alongside it: `upload(file)` writes to Cloud Storage at
+`posts/<timestamp>-<filename>` via `uploadBytes()`, then resolves the
+public URL via `getDownloadURL()`, wrapping it in `PostImage`. Uses
+`storage.ts` (same pattern as `firestore.ts` — `getStorage(firebaseApp)`
+from the shared app instance) and the *full* `firebase/storage` import
+(no lite variant exists for Storage). **`FakePostImageUploader`** is
+its in-memory-development counterpart: `URL.createObjectURL(file)`
+returns a local blob URL good for the current browser session only —
+no real upload, no network call, pairs with `FakePostRepository` for
+offline development.
 
 **`FakePostRepository`** is a second `PostRepository` adapter — the
 original one, kept in the codebase as the in-memory alternative: despite
@@ -426,17 +493,22 @@ way `usePostBySlugState` already takes `slug` from routing.
 
 Bound in [`composition-root.ts`](../../src/composition-root.ts), in
 dependency order: `PostRepository` → `PostReadService` (composes all
-three query handlers) → `PostStateService` (needs `PostReadService` +
-`ErrorManager`). Symbols in
-[`shared/di/types.ts`](../../src/shared/di/types.ts):
-`PostRepository`, `PostReadService`, `PostStateService`. No new symbols
-were needed for categories/search — `ListCategoriesQueryHandler` is
-constructed inline in `composition-root.ts` exactly like the other two
-handlers, all sharing the one `PostRepository` binding — currently
+three query handlers) / `PostWriteService` (composes
+`CreatePostCommandHandler`) → `PostStateService` (needs
+`PostReadService` + `ErrorManager`). `PostImageUploader` is bound
+independently — it doesn't depend on `PostRepository` or vice versa.
+Symbols in [`shared/di/types.ts`](../../src/shared/di/types.ts):
+`PostRepository`, `PostReadService`, `PostWriteService`,
+`PostImageUploader`, `PostStateService`. No new symbols were needed for
+categories/search — `ListCategoriesQueryHandler` is constructed inline
+in `composition-root.ts` exactly like the other query handlers, all
+sharing the one `PostRepository` binding — currently
 `new FirebasePostRepository()`. `FakePostRepository` exists as a
 fully-built in-memory alternative (see [Infrastructure](#infrastructure)
 above); switching back is a one-line change to that single binding,
-nothing else in this section moves.
+nothing else in this section moves. Same swappability for
+`PostImageUploader`: `new FirebasePostImageUploader()` ↔
+`new FakePostImageUploader()`.
 
 ## Tests
 
@@ -448,10 +520,16 @@ application/
   query/__tests__/           ListPosts.queryHandler.test.ts (mocked repository)
                               ListPosts.queryHandler.integration.test.ts (real FakePostRepository)
                               ListCategories.queryHandler.test.ts (mocked repository)
+  command/__tests__/         CreatePost.commandHandler.test.ts (mocked repository)
 infrastructure/
-  __tests__/                 FakePost.repository.test.ts
-  acl/__tests__/              Post.mapper.test.ts, FirestorePost.mapper.test.ts
+  __tests__/                 FakePost.repository.test.ts (includes save())
+  acl/__tests__/              Post.mapper.test.ts, FirestorePost.mapper.test.ts (includes toPersistence())
 ```
+
+`CreatePost.commandHandler.test.ts` mocks `PostRepository` and asserts
+both that a valid command builds and saves the right `Post` (captured
+via `ts-mockito`'s `capture()`) and that invalid fields still throw the
+normal value-object error before `save()` is ever reached.
 
 `Post.mapper.test.ts` and `FirestorePost.mapper.test.ts` are pure unit
 tests — hand-built markdown/`DocumentData` fixtures (the latter with a

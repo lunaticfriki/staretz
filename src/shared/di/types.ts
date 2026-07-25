@@ -1,10 +1,15 @@
 export const TYPES = {
   PostRepository: Symbol.for('PostRepository'),
   PostReadService: Symbol.for('PostReadService'),
+  PostWriteService: Symbol.for('PostWriteService'),
   PostStateService: Symbol.for('PostStateService'),
+  PostImageUploader: Symbol.for('PostImageUploader'),
   NotificationService: Symbol.for('NotificationService'),
   NotificationStateService: Symbol.for('NotificationStateService'),
   ErrorManager: Symbol.for('ErrorManager'),
   ThemeRepository: Symbol.for('ThemeRepository'),
   ThemeStateService: Symbol.for('ThemeStateService'),
+  AuthRepository: Symbol.for('AuthRepository'),
+  AuthStateService: Symbol.for('AuthStateService'),
+  PolicyService: Symbol.for('PolicyService'),
 }

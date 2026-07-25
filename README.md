@@ -12,7 +12,8 @@ domain-driven, hexagonal architecture with CQRS and vertical slicing.
 - **@preact/signals-core** for reactive state (isolated to each module's
   state service — see [Architecture](#architecture))
 - **InversifyJS** for dependency injection
-- **Firebase** (Cloud Firestore) as the post data source
+- **Firebase** (Cloud Firestore, Auth, Storage) as the post data source,
+  the dashboard's login, and uploaded post images
 - **marked** to render post content from Markdown
 - **Vitest** + **ts-mockito** + **@testing-library/preact** + **jsdom** for
   unit/integration testing
@@ -32,6 +33,26 @@ Posts are read from a Cloud Firestore **`posts`** collection (see
 will fail to load post data. Open the printed local URL: the dev server
 serves the home page, category browsing/search pages, an About page, and
 one page per post at `/blog/:slug`.
+
+## Dashboard (private)
+
+`/dashboard` is a private, login-gated screen for writing and
+publishing new posts — see [docs/modules/dashboard.md](docs/modules/dashboard.md),
+[docs/modules/shared-auth.md](docs/modules/shared-auth.md), and
+[docs/modules/shared-policies.md](docs/modules/shared-policies.md) for
+the full architecture. To actually use it, two things need setting up
+once in the Firebase Console (no CLI command does these — unlike
+Firestore/Storage, which auto-enable on `firebase deploy`):
+
+1. **Authentication → Sign-in method** → enable the Email/Password
+   provider.
+2. **Authentication → Users** → add at least one user (email +
+   password) — that's who can log in at `/login`.
+
+Firestore/Storage security rules (`firestore.rules`/`storage.rules`,
+deployed via `firebase deploy --only firestore:rules,storage`) already
+restrict writes to authenticated users and leave reads public, so the
+public blog keeps working with no account at all.
 
 ## Scripts
 
@@ -71,10 +92,14 @@ src/
         components/
     about/
       presentation/    — a fully static page, no other layers needed
+    dashboard/
+      presentation/    — private post-authoring screen, guarded by shared/policies
   shared/
+    auth/              — email/password login (Firebase Auth), AuthStateService
+    policies/           — PolicyService.can(name, context) authorization
     errors/            — DomainError/DomainWarning + ErrorManager
     notifications/     — Notification entity + NotificationService/StateService
-    presentation/      — Layout, Header, Footer, NotFoundPage
+    presentation/      — Layout, Header, Footer, NotFoundPage, RequirePolicy
     di/                — InversifyJS symbol tokens
   composition-root.ts  — wires every port to its concrete implementation
 ```

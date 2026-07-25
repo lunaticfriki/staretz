@@ -20,4 +20,8 @@ export class FakePostRepository extends PostRepository {
   async findBySlug(slug: Slug): Promise<Post | null> {
     return this.posts.find((post) => post.slug.equals(slug)) ?? null
   }
+
+  async save(post: Post): Promise<void> {
+    this.posts.push(post)
+  }
 }

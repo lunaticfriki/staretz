@@ -1,10 +1,10 @@
-import { collection, getDocs, limit, query, where } from 'firebase/firestore/lite'
+import { addDoc, collection, getDocs, limit, query, where } from 'firebase/firestore/lite'
 import { PostCollection } from '../domain/collections/Post.collection'
 import { Post } from '../domain/entities/Post.entity'
 import { PostRepository } from '../domain/repositories/Post.repository'
 import { Slug } from '../domain/value-objects/Slug.valueObject'
 import { FirestorePostMapper } from './acl/FirestorePost.mapper'
-import { firestore } from './firebaseApp'
+import { firestore } from './firestore'
 
 const POSTS_COLLECTION = 'posts'
 
@@ -21,5 +21,9 @@ export class FirebasePostRepository extends PostRepository {
     )
     const document = snapshot.docs[0]
     return document ? FirestorePostMapper.toDomain(document.data()) : null
+  }
+
+  async save(post: Post): Promise<void> {
+    await addDoc(collection(firestore, POSTS_COLLECTION), FirestorePostMapper.toPersistence(post))
   }
 }

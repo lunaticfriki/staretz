@@ -5,4 +5,5 @@ import { Slug } from '../value-objects/Slug.valueObject'
 export abstract class PostRepository {
   abstract findAll(): Promise<PostCollection>
   abstract findBySlug(slug: Slug): Promise<Post | null>
+  abstract save(post: Post): Promise<void>
 }

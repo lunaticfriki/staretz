@@ -1,6 +1,7 @@
 import { Timestamp } from 'firebase/firestore/lite'
 import { describe, expect, it } from 'vitest'
 import { InvalidCategoryError } from '../../../domain/value-objects/Category.valueObject'
+import { PostMother } from '../../../domain/entities/__tests__/Post.mother'
 import { FirestorePostMapper } from '../FirestorePost.mapper'
 
 function documentData(overrides: Partial<Record<string, unknown>> = {}) {
@@ -56,5 +57,27 @@ describe('FirestorePostMapper', () => {
     const post = FirestorePostMapper.toDomain(documentData())
 
     expect(post.image.toString()).toBe('https://picsum.photos/seed/hexagonal-architecture-explained/1200/800')
+  })
+
+  it('toPersistence() maps a Post back into a Firestore document shape', () => {
+    const post = PostMother.withSlug('my-new-post')
+
+    const data = FirestorePostMapper.toPersistence(post)
+
+    expect(data.slug).toBe('my-new-post')
+    expect(data.title).toBe(post.title.toString())
+    expect(data.category).toBe(post.category.toString())
+    expect(data.image).toBe(post.image.toString())
+    expect(data.publishedAt).toBeInstanceOf(Timestamp)
+  })
+
+  it('toPersistence() then toDomain() round-trips to an equivalent Post', () => {
+    const post = PostMother.withSlug('round-trip-post')
+
+    const roundTripped = FirestorePostMapper.toDomain(FirestorePostMapper.toPersistence(post))
+
+    expect(roundTripped.slug.toString()).toBe(post.slug.toString())
+    expect(roundTripped.title.toString()).toBe(post.title.toString())
+    expect(roundTripped.publishedAt.toISOString()).toBe(post.publishedAt.toISOString())
   })
 })

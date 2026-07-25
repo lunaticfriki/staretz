@@ -25,4 +25,17 @@ export class FirestorePostMapper {
       image: PostImage.create(data.image || postImagePlaceholderUrl(data.slug)),
     })
   }
+
+  static toPersistence(post: Post): DocumentData {
+    return {
+      slug: post.slug.toString(),
+      title: post.title.toString(),
+      excerpt: post.excerpt.toString(),
+      content: post.content.toString(),
+      author: post.author.toString(),
+      publishedAt: Timestamp.fromDate(post.publishedAt.toDate()),
+      category: post.category.toString(),
+      image: post.image.toString(),
+    }
+  }
 }

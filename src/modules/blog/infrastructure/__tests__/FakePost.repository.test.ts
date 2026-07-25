@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { PostMother } from '../../domain/entities/__tests__/Post.mother'
 import { Slug } from '../../domain/value-objects/Slug.valueObject'
 import { FakePostRepository } from '../FakePost.repository'
 
@@ -32,5 +33,17 @@ describe('FakePostRepository', () => {
     const timestamps = posts.map((post) => post.publishedAt.toDate().getTime())
 
     expect(new Set(timestamps).size).toBe(posts.length)
+  })
+
+  it('save() adds the post so it is immediately findable by slug', async () => {
+    const repository = new FakePostRepository()
+    const post = PostMother.withSlug('freshly-created-post')
+
+    await repository.save(post)
+    const found = await repository.findBySlug(Slug.create('freshly-created-post'))
+    const all = (await repository.findAll()).toArray()
+
+    expect(found).toBe(post)
+    expect(all).toHaveLength(21)
   })
 })
