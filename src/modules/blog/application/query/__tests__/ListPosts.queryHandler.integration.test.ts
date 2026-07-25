@@ -39,14 +39,18 @@ describe('ListPostsQueryHandler (integration, real seed data)', () => {
     expect(seenSlugs.size).toBe(firstPage.totalItems)
   })
 
-  it('filters the real seed data down to posts in a given category', async () => {
+  it('search matches by category, title, and content — not just an exact category filter', async () => {
     const handler = new ListPostsQueryHandler(new FakePostRepository())
 
     const page = await handler.handle(
       new ListPostsQuery(PaginationCriteria.create(1, 20), SearchCriteria.create('Architecture')),
     )
 
-    expect(page.totalItems).toBe(5)
-    expect(page.items.every((post) => post.category.toString() === 'Architecture')).toBe(true)
+    const categorized = page.items.filter((post) => post.category.toString() === 'Architecture')
+    const uncategorized = page.items.filter((post) => post.category.toString() !== 'Architecture')
+
+    expect(categorized).toHaveLength(5)
+    expect(uncategorized.length).toBeGreaterThan(0)
+    expect(uncategorized.some((post) => post.title.toString().includes('Architecture'))).toBe(true)
   })
 })

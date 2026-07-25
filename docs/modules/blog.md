@@ -88,11 +88,21 @@ collection-level domain behavior this module has:
   looks the right one up and negates it for `'desc'`. An empty criteria
   (`criteria.field === null`, i.e. `SortCriteria.none()`) returns the
   collection unchanged rather than sorting by nothing.
-- `filterByCategory(criteria: SearchCriteria): PostCollection` — keeps
-  posts where `criteria.matches(post.category.toString())`, using the
-  generic `SearchCriteria` primitive from
-  [shared-search.md](shared-search.md). An empty criteria matches
-  everything, so this doubles as "no filter."
+- `search(criteria: SearchCriteria): PostCollection` — keeps posts
+  where `criteria.matches(...)` against *any* of `title`, `author`,
+  `content`, or `category` (checked in that order, short-circuiting on
+  the first hit via `||`), using the generic `SearchCriteria` primitive
+  from [shared-search.md](shared-search.md). An empty criteria matches
+  everything, so this doubles as "no filter." This used to be
+  `filterByCategory()` (category only); it's genuinely a search now —
+  a term matches a post whether it's the exact category, part of the
+  title, the author's name, or somewhere in the post body, not just a
+  narrower "browse this one category" filter — see
+  [shared-search.md](shared-search.md#how-a-module-uses-it) for why one
+  method still covers both "click a category in the menu" and "type a
+  free-text term" without the header search box's component or copy
+  needing to change: only what the destination page's query matches
+  against got broader.
 - `categories(): CategoryCollection` — the distinct categories across
   every post in the collection (deduplicated case-insensitively), sorted
   alphabetically.
@@ -185,7 +195,8 @@ publish, edit, and delete posts.
 - **`ListPostsQueryHandler`**: takes a `ListPostsQuery { pagination:
   PaginationCriteria, search: SearchCriteria, sort:
   SortCriteria<PostSortField> = SortCriteria.none() }`, does `findAll()`,
-  filters by `query.search`, then branches on `query.sort.isEmpty` —
+  calls `.search(query.search)` (title/author/content/category, not
+  just category), then branches on `query.sort.isEmpty` —
   empty falls back to `.sortedByMostRecent()` (today's default, and the
   only behavior the public blog's `HomeContainer`/`CategoryPageContainer`
   ever see, since neither passes a `sort`); a real criteria goes through
@@ -604,6 +615,26 @@ alphabetical order instead. `Post.collection.test.ts`'s `sortBy()` cases
 "`SortCriteria.none()` returns the collection unchanged" case, using a
 new `PostMother.titled(title)` factory alongside the existing
 `.category()`/`.publishedAt()` ones.
+
+`Post.collection.test.ts`'s `search()` cases (renamed from
+`filterByCategory()`) cover all four matched fields individually —
+category, title, author, content — each via a pair of posts that share
+every *other* field, so a match can only be coming from the one field
+under test; plus the empty-criteria "matches everything" case. Two new
+`PostMother` factories, `.authored(author)` and `.withContent(content)`,
+exist purely to make those two fields independently variable for this
+test, alongside the existing `.titled()`/`.category()`. The real-seed
+integration test (below) was rewritten from "searching 'Architecture'
+returns exactly the 5 Architecture-categorized posts" (the old,
+category-only contract) to "returns those 5, *plus* at least one post
+that only matches by title" — searching the real 20-post seed for
+"Architecture" now also surfaces `writing-architecture-tests.md`
+(category `Testing`, title contains "Architecture") and
+`testing-application-services-with-mocks.md` (category `Testing`, the
+word appears in its body content) — both correct under the new
+contract, both would have *failed* the old exact-category assertion,
+which is exactly why that assertion had to change rather than being
+left as an accidental regression check.
 
 `Post.mapper.test.ts` and `FirestorePost.mapper.test.ts` are pure unit
 tests — hand-built markdown/`DocumentData` fixtures (the latter with a

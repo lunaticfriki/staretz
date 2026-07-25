@@ -70,22 +70,52 @@ describe('PostCollection', () => {
     expect(page.totalPages).toBe(2)
   })
 
-  it('filterByCategory() keeps only posts whose category matches the criteria', () => {
+  it('search() keeps posts whose category matches the criteria', () => {
     const architecture = PostMother.category('Architecture')
     const testing = PostMother.category('Testing')
     const collection = PostCollection.create([architecture, testing])
 
-    const filtered = collection.filterByCategory(SearchCriteria.create('arch'))
+    const filtered = collection.search(SearchCriteria.create('arch'))
 
     expect(filtered.toArray()).toEqual([architecture])
   })
 
-  it('filterByCategory() keeps everything when the criteria is empty', () => {
+  it('search() keeps posts whose title matches the criteria', () => {
+    const gould = PostMother.titled('Glenn Gould')
+    const other = PostMother.titled('Something Else')
+    const collection = PostCollection.create([gould, other])
+
+    const filtered = collection.search(SearchCriteria.create('gould'))
+
+    expect(filtered.toArray()).toEqual([gould])
+  })
+
+  it('search() keeps posts whose author matches the criteria', () => {
+    const marco = PostMother.authored('Marco Reyes')
+    const jane = PostMother.authored('Jane Doe')
+    const collection = PostCollection.create([marco, jane])
+
+    const filtered = collection.search(SearchCriteria.create('marco'))
+
+    expect(filtered.toArray()).toEqual([marco])
+  })
+
+  it('search() keeps posts whose content matches the criteria', () => {
+    const hexagonal = PostMother.withContent('An explanation of hexagonal architecture.')
+    const other = PostMother.withContent('Something unrelated.')
+    const collection = PostCollection.create([hexagonal, other])
+
+    const filtered = collection.search(SearchCriteria.create('hexagonal'))
+
+    expect(filtered.toArray()).toEqual([hexagonal])
+  })
+
+  it('search() keeps everything when the criteria is empty', () => {
     const architecture = PostMother.category('Architecture')
     const testing = PostMother.category('Testing')
     const collection = PostCollection.create([architecture, testing])
 
-    const filtered = collection.filterByCategory(SearchCriteria.empty())
+    const filtered = collection.search(SearchCriteria.empty())
 
     expect(filtered.length).toBe(2)
   })

@@ -63,7 +63,8 @@ on `query.sort.isEmpty`: empty falls back to the pre-existing
 `sortedByMostRecent()` default (unchanged public-blog behavior); a real
 criteria goes through `sortBy()` instead — see
 [blog.md](blog.md#application). Either way, sorting always happens
-*before* `paginate()`, the same ordering `filterByCategory` already
+*before* `paginate()`, the same ordering `search()` (formerly
+`filterByCategory()`, see [shared-search.md](shared-search.md)) already
 required — see
 [shared-pagination.md](shared-pagination.md#how-a-module-uses-it).
 

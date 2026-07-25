@@ -77,4 +77,30 @@ export class PostMother {
       image: PostImage.create('https://picsum.photos/seed/sample-post/1200/800'),
     })
   }
+
+  static authored(author: string): Post {
+    return Post.create({
+      slug: Slug.create('sample-post'),
+      title: PostTitle.create('Sample Post'),
+      excerpt: PostExcerpt.create('A sample excerpt used for tests.'),
+      content: PostContent.create('Sample post body content.'),
+      author: PostAuthor.create(author),
+      publishedAt: PublishedAt.create(new Date('2026-01-01T00:00:00Z')),
+      category: Category.create('Architecture'),
+      image: PostImage.create('https://picsum.photos/seed/sample-post/1200/800'),
+    })
+  }
+
+  static withContent(content: string): Post {
+    return Post.create({
+      slug: Slug.create('sample-post'),
+      title: PostTitle.create('Sample Post'),
+      excerpt: PostExcerpt.create('A sample excerpt used for tests.'),
+      content: PostContent.create(content),
+      author: PostAuthor.create('Jane Doe'),
+      publishedAt: PublishedAt.create(new Date('2026-01-01T00:00:00Z')),
+      category: Category.create('Architecture'),
+      image: PostImage.create('https://picsum.photos/seed/sample-post/1200/800'),
+    })
+  }
 }

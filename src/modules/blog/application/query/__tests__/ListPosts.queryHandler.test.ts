@@ -56,6 +56,20 @@ describe('ListPostsQueryHandler', () => {
     expect(page.totalItems).toBe(1)
   })
 
+  it('also matches by title, not just category', async () => {
+    const repository = mock<PostRepository>()
+    const gould = PostMother.titled('Glenn Gould')
+    const other = PostMother.titled('Something Else')
+    when(repository.findAll()).thenResolve(PostCollection.create([gould, other]))
+
+    const handler = new ListPostsQueryHandler(instance(repository))
+    const page = await handler.handle(
+      new ListPostsQuery(PaginationCriteria.create(1, 5), SearchCriteria.create('gould')),
+    )
+
+    expect(page.items).toEqual([gould])
+  })
+
   it('defaults to most-recent-first when no sort criteria is given', async () => {
     const repository = mock<PostRepository>()
     const oldest = PostMother.publishedAt(new Date('2026-01-01T00:00:00Z'))

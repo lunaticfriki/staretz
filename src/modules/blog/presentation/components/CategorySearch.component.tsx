@@ -1,7 +1,8 @@
-import { route } from 'preact-router'
 import { useEffect, useRef, useState } from 'preact/hooks'
-import { SearchCriteria } from '../../../../shared/search/domain/value-objects/SearchCriteria.valueObject'
+
 import type { Category } from '../../domain/value-objects/Category.valueObject'
+import { SearchCriteria } from '../../../../shared/search/domain/value-objects/SearchCriteria.valueObject'
+import { route } from 'preact-router'
 import { useCategoriesState } from '../useCategoriesState.hook'
 
 const DEBOUNCE_MS = 300
@@ -24,7 +25,11 @@ export function CategorySearch({ onNavigate }: CategorySearchProps) {
 
     const timeout = setTimeout(() => {
       const criteria = SearchCriteria.create(term)
-      setSuggestions(criteria.isEmpty ? [] : categoriesState.categories.matching(criteria).toArray())
+      setSuggestions(
+        criteria.isEmpty
+          ? []
+          : categoriesState.categories.matching(criteria).toArray(),
+      )
     }, DEBOUNCE_MS)
 
     return () => clearTimeout(timeout)
@@ -36,7 +41,10 @@ export function CategorySearch({ onNavigate }: CategorySearchProps) {
     }
 
     function handleClickOutside(event: MouseEvent) {
-      if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+      if (
+        containerRef.current &&
+        !containerRef.current.contains(event.target as Node)
+      ) {
         setOpen(false)
       }
     }
@@ -74,8 +82,8 @@ export function CategorySearch({ onNavigate }: CategorySearchProps) {
             setTerm((event.target as HTMLInputElement).value)
             setOpen(true)
           }}
-          placeholder="Cerca per categoria"
-          aria-label="Cerca per categoria"
+          placeholder="Cerca..."
+          aria-label="Cerca..."
           class="w-full rounded border border-gray-300 bg-transparent px-2 py-1 text-sm text-gray-900 placeholder:text-gray-400 focus:border-purple-500 focus:outline-none sm:w-44 dark:border-gray-700 dark:text-gray-100 dark:placeholder:text-gray-500"
         />
       </form>

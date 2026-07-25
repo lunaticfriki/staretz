@@ -39,8 +39,16 @@ export class PostCollection {
     return PostCollection.create([...this.posts].sort((a, b) => direction * comparator(a, b)))
   }
 
-  filterByCategory(criteria: SearchCriteria): PostCollection {
-    return PostCollection.create(this.posts.filter((post) => criteria.matches(post.category.toString())))
+  search(criteria: SearchCriteria): PostCollection {
+    return PostCollection.create(
+      this.posts.filter(
+        (post) =>
+          criteria.matches(post.title.toString()) ||
+          criteria.matches(post.author.toString()) ||
+          criteria.matches(post.content.toString()) ||
+          criteria.matches(post.category.toString()),
+      ),
+    )
   }
 
   categories(): CategoryCollection {
