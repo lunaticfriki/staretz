@@ -11,10 +11,11 @@ Feature: Browsing and searching by category
     And I should see the heading "Categoria: Testing"
     And I should see 3 post previews
 
-  Scenario: Searching for a category by typed text
+  Scenario: Searching for a category by typed text resolves to the matching category
     Given I am on the home page
     When I search for "front" in the category search box
-    Then I should be on the category page for "front"
+    Then I should be on the category page for "Frontend"
+    And I should see the heading "Categoria: Frontend"
     And I should see 5 post previews
 
   Scenario: Searching for a category with no matches

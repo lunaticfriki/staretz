@@ -60,7 +60,7 @@ describe('PostCollection', () => {
       PostMother.category('Testing'),
     ])
 
-    const categories = collection.categories().map((category) => category.toString())
+    const categories = collection.categories().toArray().map((category) => category.toString())
 
     expect(categories).toEqual(['Architecture', 'Testing'])
   })

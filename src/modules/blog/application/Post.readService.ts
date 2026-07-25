@@ -1,5 +1,5 @@
 import type { Page } from '../../../shared/pagination/domain/value-objects/Page.valueObject'
-import type { Category } from '../domain/value-objects/Category.valueObject'
+import type { CategoryCollection } from '../domain/collections/Category.collection'
 import { Post } from '../domain/entities/Post.entity'
 import { GetPostBySlugQuery } from './query/GetPostBySlug.query'
 import { GetPostBySlugQueryHandler } from './query/GetPostBySlug.queryHandler'
@@ -11,7 +11,7 @@ import { ListPostsQueryHandler } from './query/ListPosts.queryHandler'
 export abstract class PostReadService {
   abstract listPosts(query: ListPostsQuery): Promise<Page<Post>>
   abstract getBySlug(query: GetPostBySlugQuery): Promise<Post>
-  abstract listCategories(query: ListCategoriesQuery): Promise<Category[]>
+  abstract listCategories(query: ListCategoriesQuery): Promise<CategoryCollection>
 }
 
 export class PostReadServiceImpl extends PostReadService {
@@ -31,7 +31,7 @@ export class PostReadServiceImpl extends PostReadService {
     return this.getBySlugHandler.handle(query)
   }
 
-  listCategories(query: ListCategoriesQuery): Promise<Category[]> {
+  listCategories(query: ListCategoriesQuery): Promise<CategoryCollection> {
     return this.listCategoriesHandler.handle(query)
   }
 }

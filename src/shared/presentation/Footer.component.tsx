@@ -14,12 +14,12 @@ export function Footer() {
           <span class="text-purple-600 dark:text-purple-400">{year}</span>
         </a>
 
-        <div class="border border-gray-200 dark:border-gray-800">
+        <div class="">
           <a href="/">
             <img
               src="/logo-title-black.jpg"
               alt="Staretz"
-              class="h-20 w-auto invert dark:invert-0"
+              class="h-10 w-auto invert dark:invert-0"
             />
           </a>
         </div>

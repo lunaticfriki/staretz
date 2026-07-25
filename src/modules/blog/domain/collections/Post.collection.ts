@@ -1,7 +1,7 @@
 import { Page } from '../../../../shared/pagination/domain/value-objects/Page.valueObject'
 import type { PaginationCriteria } from '../../../../shared/pagination/domain/value-objects/PaginationCriteria.valueObject'
 import type { SearchCriteria } from '../../../../shared/search/domain/value-objects/SearchCriteria.valueObject'
-import { Category } from '../value-objects/Category.valueObject'
+import { CategoryCollection } from './Category.collection'
 import { Post } from '../entities/Post.entity'
 
 export class PostCollection {
@@ -23,9 +23,10 @@ export class PostCollection {
     return PostCollection.create(this.posts.filter((post) => criteria.matches(post.category.toString())))
   }
 
-  categories(): Category[] {
+  categories(): CategoryCollection {
     const unique = new Map(this.posts.map((post) => [post.category.toString().toLowerCase(), post.category]))
-    return [...unique.values()].sort((a, b) => a.toString().localeCompare(b.toString()))
+    const sorted = [...unique.values()].sort((a, b) => a.toString().localeCompare(b.toString()))
+    return CategoryCollection.create(sorted)
   }
 
   paginate(criteria: PaginationCriteria): Page<Post> {

@@ -20,6 +20,6 @@ describe('ListCategoriesQueryHandler', () => {
     const handler = new ListCategoriesQueryHandler(instance(repository))
     const categories = await handler.handle(new ListCategoriesQuery())
 
-    expect(categories.map((category) => category.toString())).toEqual(['Architecture', 'Testing'])
+    expect(categories.toArray().map((category) => category.toString())).toEqual(['Architecture', 'Testing'])
   })
 })

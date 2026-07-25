@@ -25,6 +25,7 @@ src/modules/blog/domain/
     Post.entity.ts
   collections/
     Post.collection.ts
+    Category.collection.ts
   value-objects/
     Slug.valueObject.ts
     PostTitle.valueObject.ts
@@ -65,9 +66,9 @@ collection-level domain behavior this module has:
   generic `SearchCriteria` primitive from
   [shared-search.md](shared-search.md). An empty criteria matches
   everything, so this doubles as "no filter."
-- `categories(): Category[]` — the distinct categories across every post
-  in the collection (deduplicated case-insensitively), sorted
-  alphabetically — powers the header's category dropdown.
+- `categories(): CategoryCollection` — the distinct categories across
+  every post in the collection (deduplicated case-insensitively), sorted
+  alphabetically.
 - `paginate(criteria: PaginationCriteria): Page<Post>` — slices the
   collection at `criteria.offset` for `criteria.perPage` items and
   reports the collection's full length as `totalItems`, using the
@@ -83,6 +84,16 @@ hiding an invariant), so presentation reads `Page.items` straight off
 without an extra `toArray()` step. See
 [01-domain-layer.md](../01-domain-layer.md#folder-structure-within-the-domain-layer)
 for when a collection is worth introducing over a plain array.
+
+**`CategoryCollection`** (`domain/collections/`) wraps `Category[]` —
+the result of `PostCollection.categories()` — and owns the one piece of
+collection-level behavior *it* has: `matching(criteria: SearchCriteria):
+CategoryCollection`, keeping categories whose name matches the criteria.
+This is what powers the header search box's live suggestions and its
+Enter-to-resolve behavior (see [Presentation](#presentation) below) —
+the actual filtering algorithm lives here, in the domain, not as a
+`.filter()` call inside `CategorySearch.component.tsx`. Same immutable/
+`toArray()` shape as `PostCollection`.
 
 **`PostRepository`** (port, `abstract class`) declares
 `findAll(): Promise<PostCollection>` and
@@ -137,18 +148,19 @@ authored through the UI).
   `findBySlug`; throws `PostNotFoundError` if `null`.
 - **`PostReadService`**: zero library dependencies, wraps all three
   handlers behind `listPosts()`/`getBySlug()`/`listCategories()`.
-  Because `Post`/`Category` are read-only, every method returns the
-  domain type directly (`Page<Post>`/`Post`/`Category[]`) — no
-  `Post.readModel.ts` DTO — see
+  Because `Post`/`CategoryCollection` are read-only, every method
+  returns the domain type directly (`Page<Post>`/`Post`/
+  `CategoryCollection`) — no `Post.readModel.ts` DTO — see
   [05-presentation-layer.md](../05-presentation-layer.md#read-models-are-optional--presentation-may-render-a-domain-entity-directly).
 - **`PostStateService`**: the only file here depending on
   `@preact/signals-core`. Three signals: `postsPage` (`PostsPageState` —
   `loading | loaded (Page<Post>) | error`), `postBySlug`
   (`PostBySlugState` — `loading | loaded (Post) | not-found`), and
-  `categories` (`CategoriesState` — `loading | loaded (Category[]) |
-  error`). `loadPosts`/`loadCategories` report genuine failures to
-  `ErrorManager` ([shared-errors.md](shared-errors.md)); `loadBySlug`
-  deliberately does not — see the `PostNotFoundError` note above.
+  `categories` (`CategoriesState` — `loading | loaded
+  (CategoryCollection) | error`). `loadPosts`/`loadCategories` report
+  genuine failures to `ErrorManager` ([shared-errors.md](shared-errors.md));
+  `loadBySlug` deliberately does not — see the `PostNotFoundError` note
+  above.
 
 ## Infrastructure
 
@@ -267,11 +279,21 @@ listener added only while open) or on selecting an entry — again
 ephemeral view state that has no business living in a state service.
 
 **`CategorySearch`**: the header's free-text input. Holds the typed
-value in local `useState`; on submit, calls `route()` (from
-`preact-router`) to navigate to `/category/<typed term, URL-encoded>` —
-no separate search state service, because "search" here *is* just
-"navigate to the category page with this term," and that page owns
-loading the actual results.
+value in local `useState`; a debounced (300ms) `useEffect` turns it into
+a `SearchCriteria` and calls `categories.matching(criteria)` (the
+already-loaded `CategoryCollection` from `useCategoriesState()`) to
+render a live suggestions dropdown — the component only owns *when* to
+ask (debounce timing, open/closed state) and *how* to render the
+answer, never *how matching works*, which stays on `CategoryCollection`
+in the domain. On submit (Enter, or clicking a suggestion), it resolves
+the same way — `categories.matching(criteria).toArray()[0]` — and
+navigates via `route()` (from `preact-router`) to
+`/category/<resolved category, URL-encoded>`. This is why typing "fro"
+and pressing Enter lands on `/category/Frontend`, not `/category/fro`:
+the URL always carries a real matched category name, never the raw
+fragment the user typed. No separate search state service — "search"
+here *is* just "navigate to the category page with this term," and that
+page owns loading the actual results.
 
 **`PostPageContainer`**: `usePostBySlugState(slug)` → `loading` /
 `not-found` / `loaded` renders `PostViewSkeleton` / `PostNotFound` /
@@ -324,7 +346,7 @@ handlers, all sharing the one `PostRepository` binding.
 ```
 domain/
   entities/__tests__/        Post.entity.test.ts, Post.mother.ts
-  collections/__tests__/     Post.collection.test.ts
+  collections/__tests__/     Post.collection.test.ts, Category.collection.test.ts
 application/
   query/__tests__/           ListPosts.queryHandler.test.ts (mocked repository)
                               ListPosts.queryHandler.integration.test.ts (real FakePostRepository)
