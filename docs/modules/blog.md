@@ -74,7 +74,20 @@ variants.
 collection-level domain behavior this module has:
 
 - `sortedByMostRecent()` (uses `PublishedAt.isAfter()`, returns a new
-  `PostCollection`, immutable like a value object).
+  `PostCollection`, immutable like a value object) — the default
+  ordering when nothing more specific was asked for (see
+  `ListPostsQueryHandler` below).
+- `sortBy(criteria: SortCriteria<PostSortField>): PostCollection` — an
+  explicit sort by `'title' | 'category' | 'publishedAt'`
+  (`PostSortField`, exported alongside `PostCollection`), either
+  direction, using the generic `SortCriteria<Field>` primitive from
+  [shared-sorting.md](shared-sorting.md). A module-local
+  `POST_COMPARATORS: Record<PostSortField, (a: Post, b: Post) => number>`
+  maps each field to its comparator (`title`/`category` via
+  `localeCompare`, `publishedAt` via millisecond difference); `sortBy()`
+  looks the right one up and negates it for `'desc'`. An empty criteria
+  (`criteria.field === null`, i.e. `SortCriteria.none()`) returns the
+  collection unchanged rather than sorting by nothing.
 - `filterByCategory(criteria: SearchCriteria): PostCollection` — keeps
   posts where `criteria.matches(post.category.toString())`, using the
   generic `SearchCriteria` primitive from
@@ -89,7 +102,7 @@ collection-level domain behavior this module has:
   generic `PaginationCriteria`/`Page` primitives from
   [shared-pagination.md](shared-pagination.md).
 
-All four return a new value rather than mutating. `toArray()` remains
+All five return a new value rather than mutating. `toArray()` remains
 the one sanctioned exit to a plain array for any future direct consumer
 of `PostCollection` — domain and application code never touch `Post[]`
 directly. `paginate()`'s own output already exposes `Page.items` as a
@@ -170,14 +183,26 @@ read-only until the [dashboard](dashboard.md) module needed a way to
 publish, edit, and delete posts.
 
 - **`ListPostsQueryHandler`**: takes a `ListPostsQuery { pagination:
-  PaginationCriteria, search: SearchCriteria }`, does `findAll()` then
-  `.filterByCategory(query.search).sortedByMostRecent().paginate(query.pagination)`
-  — filter, sort, and paginate each live on `PostCollection`
+  PaginationCriteria, search: SearchCriteria, sort:
+  SortCriteria<PostSortField> = SortCriteria.none() }`, does `findAll()`,
+  filters by `query.search`, then branches on `query.sort.isEmpty` —
+  empty falls back to `.sortedByMostRecent()` (today's default, and the
+  only behavior the public blog's `HomeContainer`/`CategoryPageContainer`
+  ever see, since neither passes a `sort`); a real criteria goes through
+  `.sortBy(query.sort)` instead — before finally `.paginate(query.pagination)`.
+  Filter, sort, and paginate each live on `PostCollection`
   ([shared-search.md](shared-search.md),
+  [shared-sorting.md](shared-sorting.md),
   [shared-pagination.md](shared-pagination.md)), the handler just
   sequences the calls and returns the resulting `Page<Post>`. Filtering
   runs before sorting/pagination so `totalItems`/`totalPages` on the
-  returned `Page` already reflect the filtered set.
+  returned `Page` already reflect the filtered set; sorting runs before
+  pagination so a sort always applies to the whole matching set, not
+  just whichever page was already sliced out. `sort`'s default parameter
+  is why every pre-existing call site (`usePostsPageState`'s public
+  callers, every existing test) keeps compiling and behaving unchanged —
+  only [dashboard.md](dashboard.md#presentation)'s `PostsListContainer`
+  passes an explicit one.
 - **`ListCategoriesQueryHandler`**: takes an empty `ListCategoriesQuery`
   (kept as a real type purely so `listCategories()` has the same
   query-object calling convention as every other read — see
@@ -569,6 +594,16 @@ the happy path (post replaced/removed, `findAll()`'s length reflects
 it) and the `PostNotFoundError` thrown for an unknown slug — the same
 contract `FirebasePostRepository` is documented (not tested, see below)
 to uphold.
+
+`ListPosts.queryHandler.test.ts` additionally asserts the sort
+behavior: no `sort` argument (the default) still returns
+most-recent-first, unchanged from before `sort` existed; an explicit
+`SortCriteria.create<PostSortField>('title', 'asc')` returns
+alphabetical order instead. `Post.collection.test.ts`'s `sortBy()` cases
+(also new) cover all three fields in both directions plus the
+"`SortCriteria.none()` returns the collection unchanged" case, using a
+new `PostMother.titled(title)` factory alongside the existing
+`.category()`/`.publishedAt()` ones.
 
 `Post.mapper.test.ts` and `FirestorePost.mapper.test.ts` are pure unit
 tests — hand-built markdown/`DocumentData` fixtures (the latter with a

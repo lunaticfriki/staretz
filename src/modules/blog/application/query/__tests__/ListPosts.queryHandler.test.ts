@@ -2,7 +2,8 @@ import { describe, expect, it } from 'vitest'
 import { instance, mock, when } from 'ts-mockito'
 import { PaginationCriteria } from '../../../../../shared/pagination/domain/value-objects/PaginationCriteria.valueObject'
 import { SearchCriteria } from '../../../../../shared/search/domain/value-objects/SearchCriteria.valueObject'
-import { PostCollection } from '../../../domain/collections/Post.collection'
+import { SortCriteria } from '../../../../../shared/sorting/domain/value-objects/SortCriteria.valueObject'
+import { PostCollection, type PostSortField } from '../../../domain/collections/Post.collection'
 import { PostMother } from '../../../domain/entities/__tests__/Post.mother'
 import type { PostRepository } from '../../../domain/repositories/Post.repository'
 import { ListPostsQuery } from '../ListPosts.query'
@@ -53,5 +54,35 @@ describe('ListPostsQueryHandler', () => {
 
     expect(page.items).toEqual([architecture])
     expect(page.totalItems).toBe(1)
+  })
+
+  it('defaults to most-recent-first when no sort criteria is given', async () => {
+    const repository = mock<PostRepository>()
+    const oldest = PostMother.publishedAt(new Date('2026-01-01T00:00:00Z'))
+    const newest = PostMother.publishedAt(new Date('2026-03-01T00:00:00Z'))
+    when(repository.findAll()).thenResolve(PostCollection.create([oldest, newest]))
+
+    const handler = new ListPostsQueryHandler(instance(repository))
+    const page = await handler.handle(new ListPostsQuery(PaginationCriteria.create(1, 5), SearchCriteria.empty()))
+
+    expect(page.items).toEqual([newest, oldest])
+  })
+
+  it('sorts by the given field and direction when a sort criteria is provided', async () => {
+    const repository = mock<PostRepository>()
+    const banana = PostMother.titled('Banana')
+    const apple = PostMother.titled('Apple')
+    when(repository.findAll()).thenResolve(PostCollection.create([banana, apple]))
+
+    const handler = new ListPostsQueryHandler(instance(repository))
+    const page = await handler.handle(
+      new ListPostsQuery(
+        PaginationCriteria.create(1, 5),
+        SearchCriteria.empty(),
+        SortCriteria.create<PostSortField>('title', 'asc'),
+      ),
+    )
+
+    expect(page.items).toEqual([apple, banana])
   })
 })

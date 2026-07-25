@@ -23,6 +23,8 @@ root [README's non-negotiables](../README.md#non-negotiables-summary)).
   pagination primitive, `shared/pagination/`.
 - [shared-search.md](shared-search.md) — the `SearchCriteria` filtering
   primitive, `shared/search/`.
+- [shared-sorting.md](shared-sorting.md) — the `SortCriteria<Field>`
+  ordering primitive, `shared/sorting/`.
 - [shared-auth.md](shared-auth.md) — email/password authentication,
   `shared/auth/`.
 - [shared-policies.md](shared-policies.md) — the `PolicyService.can()`

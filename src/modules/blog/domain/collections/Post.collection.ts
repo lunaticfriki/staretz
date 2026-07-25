@@ -1,8 +1,17 @@
 import { Page } from '../../../../shared/pagination/domain/value-objects/Page.valueObject'
 import type { PaginationCriteria } from '../../../../shared/pagination/domain/value-objects/PaginationCriteria.valueObject'
 import type { SearchCriteria } from '../../../../shared/search/domain/value-objects/SearchCriteria.valueObject'
+import type { SortCriteria } from '../../../../shared/sorting/domain/value-objects/SortCriteria.valueObject'
 import { CategoryCollection } from './Category.collection'
 import { Post } from '../entities/Post.entity'
+
+export type PostSortField = 'title' | 'category' | 'publishedAt'
+
+const POST_COMPARATORS: Record<PostSortField, (a: Post, b: Post) => number> = {
+  title: (a, b) => a.title.toString().localeCompare(b.title.toString()),
+  category: (a, b) => a.category.toString().localeCompare(b.category.toString()),
+  publishedAt: (a, b) => a.publishedAt.toDate().getTime() - b.publishedAt.toDate().getTime(),
+}
 
 export class PostCollection {
   private constructor(private readonly posts: Post[]) {}
@@ -17,6 +26,17 @@ export class PostCollection {
 
   sortedByMostRecent(): PostCollection {
     return PostCollection.create([...this.posts].sort((a, b) => (a.publishedAt.isAfter(b.publishedAt) ? -1 : 1)))
+  }
+
+  sortBy(criteria: SortCriteria<PostSortField>): PostCollection {
+    const field = criteria.field
+    if (field === null) {
+      return this
+    }
+
+    const comparator = POST_COMPARATORS[field]
+    const direction = criteria.direction === 'asc' ? 1 : -1
+    return PostCollection.create([...this.posts].sort((a, b) => direction * comparator(a, b)))
   }
 
   filterByCategory(criteria: SearchCriteria): PostCollection {

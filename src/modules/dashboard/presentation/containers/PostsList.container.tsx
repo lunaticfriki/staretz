@@ -2,19 +2,27 @@ import { useState } from 'preact/hooks'
 import type { RouteProps } from '../../../../shared/presentation/RouteProps'
 import { useAuthState } from '../../../../shared/presentation/useAuthState.hook'
 import { Pagination } from '../../../../shared/presentation/Pagination.component'
+import { SortCriteria } from '../../../../shared/sorting/domain/value-objects/SortCriteria.valueObject'
+import type { PostSortField } from '../../../blog/domain/collections/Post.collection'
 import { usePostsPageState } from '../../../blog/presentation/usePostsPageState.hook'
 import { usePostManagementState } from '../usePostManagementState.hook'
 import { DashboardNav } from '../components/DashboardNav.component'
 import { PostsTable } from '../components/PostsTable.component'
 
-const POSTS_PER_PAGE = 10
+const POSTS_PER_PAGE = 5
 
 export function PostsListContainer(_props: RouteProps) {
   const { logout } = useAuthState()
   const [page, setPage] = useState(1)
+  const [sort, setSort] = useState<SortCriteria<PostSortField>>(SortCriteria.none())
   const [refreshToken, setRefreshToken] = useState(0)
-  const state = usePostsPageState(page, POSTS_PER_PAGE, '', refreshToken)
+  const state = usePostsPageState(page, POSTS_PER_PAGE, '', sort, refreshToken)
   const { delete: deleteState, deletePost } = usePostManagementState()
+
+  function handleSortChange(nextSort: SortCriteria<PostSortField>) {
+    setSort(nextSort)
+    setPage(1)
+  }
 
   async function handleDelete(slug: string) {
     if (!window.confirm(`Segur que vols eliminar "${slug}"? Aquesta acció no es pot desfer.`)) {
@@ -37,6 +45,8 @@ export function PostsListContainer(_props: RouteProps) {
             posts={state.page.items}
             deletingSlug={deleteState.status === 'deleting' ? deleteState.slug : null}
             onDelete={handleDelete}
+            sort={sort}
+            onSortChange={handleSortChange}
           />
           <Pagination page={state.page.page} totalPages={state.page.totalPages} onPageChange={setPage} />
         </div>

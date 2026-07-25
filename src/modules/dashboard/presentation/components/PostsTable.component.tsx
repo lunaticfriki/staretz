@@ -1,12 +1,22 @@
+import type { PostSortField } from '../../../blog/domain/collections/Post.collection'
 import type { Post } from '../../../blog/domain/entities/Post.entity'
+import type { SortCriteria } from '../../../../shared/sorting/domain/value-objects/SortCriteria.valueObject'
 
 interface PostsTableProps {
   posts: Post[]
   deletingSlug: string | null
   onDelete: (slug: string) => void
+  sort: SortCriteria<PostSortField>
+  onSortChange: (sort: SortCriteria<PostSortField>) => void
 }
 
-export function PostsTable({ posts, deletingSlug, onDelete }: PostsTableProps) {
+const SORTABLE_COLUMNS: Array<{ field: PostSortField; label: string }> = [
+  { field: 'title', label: 'Títol' },
+  { field: 'category', label: 'Categoria' },
+  { field: 'publishedAt', label: 'Publicat' },
+]
+
+export function PostsTable({ posts, deletingSlug, onDelete, sort, onSortChange }: PostsTableProps) {
   if (posts.length === 0) {
     return <p class="text-gray-600 dark:text-gray-300">Encara no hi ha cap article.</p>
   }
@@ -16,9 +26,28 @@ export function PostsTable({ posts, deletingSlug, onDelete }: PostsTableProps) {
       <table class="w-full text-left text-sm">
         <thead>
           <tr class="border-b border-gray-200 text-gray-500 dark:border-gray-800 dark:text-gray-400">
-            <th class="py-2 pr-4 font-medium">Títol</th>
-            <th class="py-2 pr-4 font-medium">Categoria</th>
-            <th class="py-2 pr-4 font-medium">Publicat</th>
+            {SORTABLE_COLUMNS.map(({ field, label }) => {
+              const active = sort.field === field
+              const arrow = active ? (sort.direction === 'asc' ? '▲' : '▼') : '↕'
+
+              return (
+                <th key={field} class="py-2 pr-4 font-medium">
+                  <button
+                    type="button"
+                    onClick={() => onSortChange(sort.toggled(field))}
+                    aria-label={`Ordena per ${label}`}
+                    class={`flex items-center gap-1 hover:text-purple-700 dark:hover:text-purple-300 ${
+                      active ? 'text-purple-700 dark:text-purple-400' : ''
+                    }`}
+                  >
+                    {label}
+                    <span aria-hidden="true" class="text-xs">
+                      {arrow}
+                    </span>
+                  </button>
+                </th>
+              )
+            })}
             <th class="py-2 font-medium">Accions</th>
           </tr>
         </thead>

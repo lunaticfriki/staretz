@@ -248,14 +248,25 @@ edit through props rather than being two components:
   "Publicant..." vs. "Desa els canvis"/"Desant...").
 
 **`PostsTable`**: pure component, props `{ posts, deletingSlug,
-onDelete }`. Renders a row per post (title/category/published date)
-with an "Edita" link to `/dashboard/edit/<slug>` and an "Elimina"
-button; the button disables and reads "Eliminant..." only for the row
-matching `deletingSlug`, not the whole table, using the `slug` carried
-on `PostManagementStateService.delete`'s `deleting` variant. No
-knowledge of *how* delete works — `onDelete(slug)` is a plain
-callback, same shape as `PostGrid`'s `onPageChange`
-([blog.md](blog.md#presentation)).
+onDelete, sort, onSortChange }`. Renders a row per post
+(title/category/published date) with an "Edita" link to
+`/dashboard/edit/<slug>` and an "Elimina" button; the button disables
+and reads "Eliminant..." only for the row matching `deletingSlug`, not
+the whole table, using the `slug` carried on
+`PostManagementStateService.delete`'s `deleting` variant. No knowledge
+of *how* delete works — `onDelete(slug)` is a plain callback, same
+shape as `PostGrid`'s `onPageChange` ([blog.md](blog.md#presentation)).
+
+The three sortable columns ("Títol"/`title`, "Categoria"/`category`,
+"Publicat"/`publishedAt`) render as buttons instead of plain `<th>`
+text, each with an arrow (▲ ascending, ▼ descending, ↕ when that
+column isn't the active sort) built from `sort: SortCriteria<PostSortField>`
+([shared-sorting.md](shared-sorting.md)). Clicking one calls
+`onSortChange(sort.toggled(field))` — `PostsTable` never decides
+*whether* that's ascending or descending, `SortCriteria.toggled()`
+does (see [shared-sorting.md](shared-sorting.md#domain)); the component
+only renders whatever criteria it's handed and asks for the next one.
+"Accions" (Edita/Elimina) stays a plain, unsortable `<th>`.
 
 **`usePostManagementState`** follows the exact shape from
 [08-tech-preact-typescript.md](../08-tech-preact-typescript.md#presentation-a-thin-adapter-over-the-state-services-signal):
@@ -291,14 +302,30 @@ back to the list is this container's own view-level decision
 or command handler needs to know about.
 
 **`PostsListContainer`** (`/dashboard`): reuses `blog`'s own
-`usePostsPageState(page, perPage, search, refreshToken)` hook —
-identical to `HomeContainer`'s, just with a management-sized page size
-(10) and no search term. The fourth parameter, `refreshToken`, is new:
-a plain local `useState(0)` counter, added to the hook's effect
-dependency array (see [blog.md](blog.md#presentation)) purely so this
-screen can force a refetch of the *same* page after a mutation the
-public blog never triggers — bumping it after a successful delete is
-what makes the row disappear from the table without a full reload.
+`usePostsPageState(page, perPage, search, sort, refreshToken)` hook —
+identical to `HomeContainer`'s, same page size (5, its own
+`POSTS_PER_PAGE` constant — not shared with `HomeContainer`'s, just
+coincidentally equal), no search term, and two extra parameters
+`HomeContainer` never passes:
+
+- `sort: SortCriteria<PostSortField>` — held in a local
+  `useState<SortCriteria<PostSortField>>(SortCriteria.none())`, the
+  same "ephemeral, view-only state a container is allowed to hold
+  directly" category `page` already is
+  ([blog.md](blog.md#presentation)). `handleSortChange(nextSort)` sets
+  it *and* resets `page` back to `1` — changing the sort order while
+  sitting on page 3 of the old order would otherwise land on a
+  confusing, unrelated page of the new one. Passed straight through as
+  `PostsTable`'s `sort`/`onSortChange` props.
+- `refreshToken` — a plain local `useState(0)` counter, added to the
+  hook's effect dependency array (see
+  [blog.md](blog.md#presentation)) purely so this screen can force a
+  refetch of the *same* page after a mutation the public blog never
+  triggers — bumping it after a successful delete is what makes the
+  row disappear from the table without a full reload. Sorting doesn't
+  need this: changing `sort` itself is already a dependency-array
+  change, so the hook refetches on its own.
+
 Deleting asks for confirmation via a native `window.confirm()` before
 calling `deletePost(slug)` — a lightweight, dependency-free guard
 against an accidental click on a destructive, irreversible action.

@@ -1,8 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { PaginationCriteria } from '../../../../../shared/pagination/domain/value-objects/PaginationCriteria.valueObject'
 import { SearchCriteria } from '../../../../../shared/search/domain/value-objects/SearchCriteria.valueObject'
+import { SortCriteria } from '../../../../../shared/sorting/domain/value-objects/SortCriteria.valueObject'
 import { PostMother } from '../../entities/__tests__/Post.mother'
-import { PostCollection } from '../Post.collection'
+import { PostCollection, type PostSortField } from '../Post.collection'
 
 describe('PostCollection', () => {
   it('exposes its length', () => {
@@ -20,6 +21,42 @@ describe('PostCollection', () => {
     const sorted = collection.sortedByMostRecent().toArray()
 
     expect(sorted).toEqual([newest, middle, oldest])
+  })
+
+  it('sortBy() returns the same collection when the criteria is empty', () => {
+    const posts = [PostMother.titled('B'), PostMother.titled('A')]
+    const collection = PostCollection.create(posts)
+
+    const sorted = collection.sortBy(SortCriteria.none<PostSortField>())
+
+    expect(sorted.toArray()).toEqual(posts)
+  })
+
+  it('sortBy("title") orders alphabetically, ascending or descending', () => {
+    const b = PostMother.titled('Banana')
+    const a = PostMother.titled('Apple')
+    const c = PostMother.titled('Cherry')
+    const collection = PostCollection.create([b, a, c])
+
+    expect(collection.sortBy(SortCriteria.create('title', 'asc')).toArray()).toEqual([a, b, c])
+    expect(collection.sortBy(SortCriteria.create('title', 'desc')).toArray()).toEqual([c, b, a])
+  })
+
+  it('sortBy("category") orders alphabetically', () => {
+    const testing = PostMother.category('Testing')
+    const architecture = PostMother.category('Architecture')
+    const collection = PostCollection.create([testing, architecture])
+
+    expect(collection.sortBy(SortCriteria.create('category', 'asc')).toArray()).toEqual([architecture, testing])
+  })
+
+  it('sortBy("publishedAt") orders chronologically', () => {
+    const oldest = PostMother.publishedAt(new Date('2026-01-01T00:00:00Z'))
+    const newest = PostMother.publishedAt(new Date('2026-03-01T00:00:00Z'))
+    const collection = PostCollection.create([newest, oldest])
+
+    expect(collection.sortBy(SortCriteria.create('publishedAt', 'asc')).toArray()).toEqual([oldest, newest])
+    expect(collection.sortBy(SortCriteria.create('publishedAt', 'desc')).toArray()).toEqual([newest, oldest])
   })
 
   it('paginate() slices the collection according to the criteria', () => {

@@ -8,7 +8,9 @@ export class ListPostsQueryHandler {
 
   async handle(query: ListPostsQuery): Promise<Page<Post>> {
     const posts = await this.posts.findAll()
+    const filtered = posts.filterByCategory(query.search)
+    const sorted = query.sort.isEmpty ? filtered.sortedByMostRecent() : filtered.sortBy(query.sort)
 
-    return posts.filterByCategory(query.search).sortedByMostRecent().paginate(query.pagination)
+    return sorted.paginate(query.pagination)
   }
 }
