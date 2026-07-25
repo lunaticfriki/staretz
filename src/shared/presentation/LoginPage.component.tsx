@@ -26,7 +26,7 @@ export function LoginPage(_props: RouteProps) {
   }
 
   return (
-    <section class="mx-auto max-w-sm">
+    <section class="mx-auto w-full max-w-lg">
       <h1 class="text-2xl font-bold text-purple-700 dark:text-purple-400">Inicia sessió</h1>
       <form onSubmit={handleSubmit} class="mt-6 flex flex-col gap-4">
         <label class="flex flex-col gap-1 text-sm">

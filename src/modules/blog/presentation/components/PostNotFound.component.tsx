@@ -1,6 +1,6 @@
 export function PostNotFound() {
   return (
-    <section class="mx-auto max-w-3xl">
+    <section class="mx-auto w-full max-w-3xl">
       <h1 class="text-2xl font-bold text-purple-700 dark:text-purple-400">Article no trobat</h1>
       <p class="mt-4 text-gray-600 dark:text-gray-300">
         Aquest article no existeix o pot haver estat mogut.{' '}

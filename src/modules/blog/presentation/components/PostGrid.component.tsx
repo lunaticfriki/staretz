@@ -13,7 +13,7 @@ interface PostGridProps {
 
 export function PostGrid({ totalItems, items, page, totalPages, onPageChange, emptyMessage }: PostGridProps) {
   return (
-    <div class="mx-auto max-w-6xl">
+    <div class="mx-auto w-full max-w-6xl">
       <p class="mb-4 text-sm text-gray-500 dark:text-gray-400">
         Nombre de posts: <span class="font-semibold text-purple-700 dark:text-purple-400">{totalItems}</span>
       </p>

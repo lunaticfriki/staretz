@@ -2,7 +2,7 @@ import type { RouteProps } from '../../../shared/presentation/RouteProps'
 
 export function AboutPage(_props: RouteProps) {
   return (
-    <section class="mx-auto flex flex-row max-w-3xl flex-1 justify-center items-center gap-8">
+    <section class="mx-auto flex flex-col max-w-3xl flex-1 justify-center items-center gap-8 md:flex-row">
       <img
         src="/logo-title-black.jpg"
         alt="Staretz logo"
