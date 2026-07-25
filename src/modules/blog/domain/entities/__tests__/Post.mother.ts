@@ -3,6 +3,7 @@ import { Category } from '../../value-objects/Category.valueObject'
 import { PostAuthor } from '../../value-objects/PostAuthor.valueObject'
 import { PostContent } from '../../value-objects/PostContent.valueObject'
 import { PostExcerpt } from '../../value-objects/PostExcerpt.valueObject'
+import { PostImage } from '../../value-objects/PostImage.valueObject'
 import { PostTitle } from '../../value-objects/PostTitle.valueObject'
 import { PublishedAt } from '../../value-objects/PublishedAt.valueObject'
 import { Slug } from '../../value-objects/Slug.valueObject'
@@ -17,6 +18,7 @@ export class PostMother {
       author: PostAuthor.create('Jane Doe'),
       publishedAt: PublishedAt.create(new Date('2026-01-01T00:00:00Z')),
       category: Category.create('Architecture'),
+      image: PostImage.create('https://picsum.photos/seed/sample-post/1200/800'),
     })
   }
 
@@ -33,6 +35,7 @@ export class PostMother {
       author: PostAuthor.create('Jane Doe'),
       publishedAt: PublishedAt.create(new Date('2026-01-01T00:00:00Z')),
       category: Category.create('Architecture'),
+      image: PostImage.create(`https://picsum.photos/seed/${slug}/1200/800`),
     })
   }
 
@@ -45,6 +48,7 @@ export class PostMother {
       author: PostAuthor.create('Jane Doe'),
       publishedAt: PublishedAt.create(date),
       category: Category.create('Architecture'),
+      image: PostImage.create('https://picsum.photos/seed/sample-post/1200/800'),
     })
   }
 
@@ -57,6 +61,7 @@ export class PostMother {
       author: PostAuthor.create('Jane Doe'),
       publishedAt: PublishedAt.create(new Date('2026-01-01T00:00:00Z')),
       category: Category.create(category),
+      image: PostImage.create('https://picsum.photos/seed/sample-post/1200/800'),
     })
   }
 }

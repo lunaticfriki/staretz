@@ -12,6 +12,7 @@ domain-driven, hexagonal architecture with CQRS and vertical slicing.
 - **@preact/signals-core** for reactive state (isolated to each module's
   state service — see [Architecture](#architecture))
 - **InversifyJS** for dependency injection
+- **Firebase** (Cloud Firestore) as the post data source
 - **marked** to render post content from Markdown
 - **Vitest** + **ts-mockito** + **@testing-library/preact** + **jsdom** for
   unit/integration testing
@@ -22,11 +23,15 @@ domain-driven, hexagonal architecture with CQRS and vertical slicing.
 
 ```bash
 pnpm install
+cp .env.example .env   # fill in your Firebase project's web app config
 pnpm dev
 ```
 
-Open the printed local URL. The dev server serves the home page (latest 5
-posts), an About page, and one page per post at `/blog/:slug`.
+Posts are read from a Cloud Firestore **`posts`** collection (see
+[Architecture](#architecture) below) — without a valid `.env`, the app
+will fail to load post data. Open the printed local URL: the dev server
+serves the home page, category browsing/search pages, an About page, and
+one page per post at `/blog/:slug`.
 
 ## Scripts
 
@@ -59,7 +64,7 @@ src/
         query/
         Post.readService.ts    (no library dependencies)
         Post.stateService.ts   (the only file with a signals dependency)
-      infrastructure/  — FakePost.repository.ts + its Anti-Corruption Layer
+      infrastructure/  — FirebasePost.repository.ts (bound), FakePost.repository.ts (in-memory)
         acl/
       presentation/    — containers, components, skeletons, hooks
         containers/
@@ -101,15 +106,18 @@ Rules this project follows throughout:
   fields with `.toString()`.
 - **File naming**: `<Concept>.<kind>.ts` throughout — `Post.entity.ts`,
   `Slug.valueObject.ts`, `Home.container.tsx`, `PostPreview.component.tsx`,
-  `useRecentPostsState.hook.ts`, etc.
+  `usePostsPageState.hook.ts`, etc.
 - **Tests** live in a `__tests__/` folder co-located with what they test,
   never a project-wide test tree. Object Mothers (`Post.mother.ts`) live
   there too.
 
-The blog post seed data lives in `src/data/posts/*.md` (20 posts), loaded
-by `FakePost.repository.ts` via `import.meta.glob`. Swap that repository
-implementation for a Firebase-backed one behind the same `PostRepository`
-port when ready — nothing above the infrastructure layer needs to change.
+Posts are currently read from Cloud Firestore's `posts` collection via
+`FirebasePostRepository` — see [docs/modules/blog.md](docs/modules/blog.md#infrastructure)
+for the expected document shape. `FakePostRepository` (loading
+`src/data/posts/*.md` via `import.meta.glob`) is kept as an in-memory
+alternative behind the same `PostRepository` port; switching between
+them is a one-line change in `composition-root.ts`, nothing above the
+infrastructure layer needs to change.
 
 ## Testing
 
@@ -150,6 +158,17 @@ To add a scenario: write it in a `.feature` file, then implement any new
 Given/When/Then step in `e2e/step-definitions/` (reuse the existing
 navigation/assertion steps where the wording already fits — `cucumber-js`
 will report "undefined" steps if a Gherkin line doesn't match anything).
+
+**Current caveat**: several scenarios assert against the 20-post
+`FakePostRepository` seed catalog (exact post counts, specific titles,
+per-category counts). Now that `composition-root.ts` binds
+`FirebasePostRepository`, `pnpm test:e2e` runs against whatever is
+actually in the Firestore `posts` collection — those count/title-specific
+scenarios will fail unless the collection's content matches what they
+expect. This isn't a code bug; it's pending a decision on whether to seed
+Firestore with matching content, rewrite the scenarios around real
+content, or point e2e specifically at `FakePostRepository` regardless of
+what production binds.
 
 ## Git workflow
 

@@ -34,6 +34,7 @@ src/modules/blog/domain/
     PostAuthor.valueObject.ts
     PublishedAt.valueObject.ts
     Category.valueObject.ts
+    PostImage.valueObject.ts
   repositories/
     Post.repository.ts
   errors/
@@ -42,9 +43,9 @@ src/modules/blog/domain/
 
 **`Post`** is a read-only entity — every field `public readonly`, no
 behavior methods — built through `Post.create(...)`/`Post.empty()`. Its
-seven fields are all value objects, never primitives: `slug` (`Slug`,
+eight fields are all value objects, never primitives: `slug` (`Slug`,
 lowercase-kebab-case, validated by regex), `title`/`excerpt`/`content`/
-`author`/`category` (each a non-empty-string wrapper with its own
+`author`/`category`/`image` (each a non-empty-string wrapper with its own
 `InvalidXxxError`), `publishedAt` (`PublishedAt`, wraps a `Date`, exposes
 `isAfter()` for ordering and `toDate()`/`toISOString()` — never a bare
 `Date` escapes the value object).
@@ -55,6 +56,19 @@ lowercase-kebab-case, validated by regex), `title`/`excerpt`/`content`/
 URLs; the category-page route encodes the display value directly (see
 [Presentation](#presentation) below) rather than introducing a second
 "slug" concept for what's already a short, human-readable string.
+
+**`PostImage`** is the same non-empty-string-wrapper shape again, holding
+one image URL — the post's hero/preview image is domain data now, not a
+value presentation computes on the fly. Both ACL mappers populate it (see
+[Infrastructure](#infrastructure) below): a data source that has a real
+authored image sets it directly; one that doesn't (today, the markdown
+seed data) gets a deterministic placeholder generated *at the
+infrastructure boundary*, so the domain and presentation layers only
+ever see "this post has an image at this URL," never "this post might
+need a fallback." A single URL is stored, not a per-size set — `object-cover`
+handles both the small preview-card crop and the full-bleed hero from
+the one image, so there was nothing to gain from storing width/height
+variants.
 
 **`PostCollection`** (`domain/collections/`) wraps `Post[]` and owns the
 collection-level domain behavior this module has:
@@ -167,20 +181,43 @@ authored through the UI).
 ```
 src/modules/blog/infrastructure/
   FakePost.repository.ts
+  FirebasePost.repository.ts
+  firebaseApp.ts
   acl/
     Post.mapper.ts
     markdownFrontmatter.util.ts
+    FirestorePost.mapper.ts
+    postImagePlaceholder.util.ts
+    __tests__/
+      Post.mapper.test.ts
+      FirestorePost.mapper.test.ts
 ```
 
-**`FakePostRepository`** is the only `PostRepository` adapter — despite
-the "Fake" name (a holdover from when it was test-only), it's what
-production actually binds: `import.meta.glob('/src/data/posts/*.md', ...)`
-eagerly loads every file under
-[`src/data/posts/`](../../src/data/posts/) at build time, mapped through
-the ACL into `Post` entities held in memory. There's no HTTP/DB backend
-for posts in this app — swapping to one later means writing a new
-`PostRepository` implementation and changing one binding in
-`composition-root.ts`, nothing else.
+**`FirebasePostRepository`** is the `PostRepository` adapter currently
+bound in `composition-root.ts` — production reads from Cloud Firestore.
+`firebaseApp.ts` calls `initializeApp()`/`getFirestore()` once from
+`VITE_FIREBASE_*` env vars (see `.env.example` at the repo root; never
+hardcoded, never committed — `.env*` is gitignored) and exports the
+`firestore` instance. The repository reads/queries the **`posts`**
+collection: `findAll()` is `getDocs(collection(firestore, 'posts'))`;
+`findBySlug()` is a *query* — `getDocs(query(collection(firestore,
+'posts'), where('slug', '==', slug), limit(1)))` — not a direct document
+read, because the Firestore document id is **not** the slug (documents
+get Firestore-assigned random ids; `slug` is its own field like every
+other field). `findBySlug()` takes the first match.
+
+**`FakePostRepository`** is a second `PostRepository` adapter — the
+original one, kept in the codebase as the in-memory alternative: despite
+the "Fake" name (a holdover from when it was test-only),
+`import.meta.glob('/src/data/posts/*.md', ...)` eagerly loads every file
+under [`src/data/posts/`](../../src/data/posts/) at build time, mapped
+through the ACL into `Post` entities held in memory — no network calls,
+useful for offline development or if Firestore is ever unreachable. This
+is the "one implementation per port, swappable" case from
+[04-infrastructure-layer.md](../04-infrastructure-layer.md#one-implementation-per-port-swappable):
+neither `PostReadService` nor anything above it changes when the binding
+switches. Swapping back is the one-line change in `composition-root.ts`:
+`new FirebasePostRepository()` → `new FakePostRepository()`.
 
 **`markdownFrontmatter.util.ts`** splits a raw `.md` file into
 `{ frontmatter, body }` by regex-matching the leading `---`-delimited
@@ -190,6 +227,53 @@ block. **`PostMapper.toDomain(raw)`** takes that output and constructs a
 Anti-Corruption Layer: markdown/frontmatter vocabulary never leaks past
 this file. See
 [04-infrastructure-layer.md](../04-infrastructure-layer.md#the-anti-corruption-layer-acl).
+
+**`postImagePlaceholder.util.ts`** (`postImagePlaceholderUrl(seed, width
+= 1200, height = 800)`) builds a deterministic
+`https://picsum.photos/seed/<seed>/<w>/<h>` URL — the same seed always
+gets the same photo. Both ACL mappers below fall back to it when their
+data source doesn't provide a real image, seeding it with the post's
+slug so the placeholder is stable across reloads without being stored
+anywhere.
+
+**`PostMapper.toDomain(raw)`** sets `image: PostImage.create(frontmatter.image
+|| postImagePlaceholderUrl(frontmatter.slug))` — none of today's seed
+markdown files set an `image:` field, so every seeded post currently gets
+the generated placeholder; a post *could* set one and the mapper would
+use it as-is.
+
+**`FirestorePostMapper.toDomain(data)`** is `FirebasePostRepository`'s
+ACL — a second, independent translator for the same `Post` domain shape,
+proof that the domain has no idea markdown or Firestore exist. Every
+field, including `slug`, is read straight off `data` through the same
+value-object factories `PostMapper` uses — the Firestore document id is
+**not** used as the slug (an earlier version of this mapper assumed that;
+real documents here have Firestore-assigned random ids with `slug` as
+its own field, same as `title`/`author`/etc.), including the same
+`data.image || postImagePlaceholderUrl(data.slug)` fallback. The one
+piece of real translation logic beyond that: `data.publishedAt` is a
+Firestore `Timestamp` in production, converted via `.toDate()` before
+reaching `PublishedAt.create()` (which also accepts a plain `Date`/ISO
+string, so the mapper degrades gracefully if a document ever stores a
+string instead).
+
+Because the slug isn't the document id, `FirebasePostRepository.findBySlug()`
+is a query (`where('slug', '==', slug)`, `limit(1)`), not a direct
+document read — see [Infrastructure](#infrastructure) above.
+
+Expected Firestore document shape, collection `posts` (document id is
+whatever Firestore assigns — irrelevant to the domain):
+
+```
+slug: "hexagonal-architecture-explained"
+title: "Hexagonal Architecture Explained"
+excerpt: "A short summary shown in the preview card."
+content: "Markdown body, rendered through `marked` in PostView."
+author: "Marco Reyes"
+publishedAt: Timestamp(2026-01-19)
+category: "Architecture"
+image: "https://cdn.example.com/hexagonal-architecture.jpg"  # optional — falls back to a placeholder if absent
+```
 
 Post frontmatter shape (see any file in `src/data/posts/`):
 
@@ -201,6 +285,7 @@ excerpt: A short summary shown in the preview card.
 author: Marco Reyes
 publishedAt: 2026-01-01
 category: Architecture
+image: https://cdn.example.com/hexagonal-architecture.jpg  # optional — falls back to a placeholder if absent
 ---
 
 Markdown body, rendered through `marked` in `PostView`.
@@ -231,7 +316,6 @@ src/modules/blog/presentation/
   usePostsPageState.hook.ts
   usePostBySlugState.hook.ts
   useCategoriesState.hook.ts
-  postImageUrl.util.ts
   formatPublishedAt.util.ts
 ```
 
@@ -297,10 +381,11 @@ page owns loading the actual results.
 
 **`PostPageContainer`**: `usePostBySlugState(slug)` → `loading` /
 `not-found` / `loaded` renders `PostViewSkeleton` / `PostNotFound` /
-`PostView` respectively. `PostView` itself owns a full-bleed hero image
-(see [`postImageUrl.util.ts`](#postimageurlutilts) below) with the
-reading column (`mx-auto max-w-3xl`) only wrapping the body content
-underneath it, not the hero — see
+`PostView` respectively. `PostView` itself owns a full-bleed hero image,
+reading `post.image.toString()` straight off the domain entity (see
+[Domain](#domain) above — no presentation-layer URL building anymore),
+with the reading column (`mx-auto max-w-3xl`) only wrapping the body
+content underneath it, not the hero — see
 [shared-theme.md](shared-theme.md#layout-is-full-width-reading-pages-recenter-themselves)
 for the general full-width-shell-vs-centered-reading-column split this
 extends. `PostNotFound`/`PostViewSkeleton` each wrap themselves in
@@ -313,12 +398,10 @@ through `marked.parse()` into `dangerouslySetInnerHTML` on a
 with `prose-headings:`/`prose-a:` overrides so markdown headings/links
 pick up the site's purple accent instead of the plugin's default gray.
 
-**`postImageUrl.util.ts`** derives a deterministic
-`https://picsum.photos/seed/<slug>/<w>/<h>` URL from a post's `Slug` —
-the same post always gets the same placeholder photo, without storing an
-image URL anywhere. `PostPreview` uses it for the card thumbnail;
-`PostView` uses it (at a larger size) for the hero. Purely a rendering
-concern — no domain field, no frontmatter entry.
+**`PostPreview`** uses the same `post.image.toString()` for its card
+thumbnail — one URL, two different visual footprints (a `h-40` card crop
+vs. the hero's near-full-viewport height), both handled by `object-cover`
+rather than by requesting differently-sized images.
 
 All three hooks (`usePostsPageState`, `usePostBySlugState`,
 `useCategoriesState`) follow the exact shape from
@@ -339,7 +422,11 @@ three query handlers) → `PostStateService` (needs `PostReadService` +
 `PostRepository`, `PostReadService`, `PostStateService`. No new symbols
 were needed for categories/search — `ListCategoriesQueryHandler` is
 constructed inline in `composition-root.ts` exactly like the other two
-handlers, all sharing the one `PostRepository` binding.
+handlers, all sharing the one `PostRepository` binding — currently
+`new FirebasePostRepository()`. `FakePostRepository` exists as a
+fully-built in-memory alternative (see [Infrastructure](#infrastructure)
+above); switching back is a one-line change to that single binding,
+nothing else in this section moves.
 
 ## Tests
 
@@ -353,7 +440,23 @@ application/
                               ListCategories.queryHandler.test.ts (mocked repository)
 infrastructure/
   __tests__/                 FakePost.repository.test.ts
+  acl/__tests__/              Post.mapper.test.ts, FirestorePost.mapper.test.ts
 ```
+
+`Post.mapper.test.ts` and `FirestorePost.mapper.test.ts` are pure unit
+tests — hand-built markdown/`DocumentData` fixtures (the latter with a
+real `Timestamp.fromDate(...)`), no filesystem or Firestore connection
+needed. Between them they cover both mappers' `Timestamp`→`Date`
+conversion, that invalid data still throws through the normal
+value-object validation (`InvalidCategoryError`, etc.), and — for
+`image` — both the "explicit value wins" and "falls back to
+`postImagePlaceholderUrl` when absent" paths, on both mappers.
+`FirebasePostRepository` itself has no test: it's a thin sequence of
+Firestore SDK calls with no branching logic of its own beyond the
+`findBySlug()` query, and testing it for real would need the Firebase
+Local Emulator Suite, which isn't wired into this repo — add that if the
+SDK-call sequencing itself ever needs coverage beyond what the ACL test
+and manual verification against the real project already give it.
 
 The integration test is the one place production-looking code
 intentionally imports an infrastructure class from an application-layer

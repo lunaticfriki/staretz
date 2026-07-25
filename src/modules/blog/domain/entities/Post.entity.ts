@@ -2,6 +2,7 @@ import { Category } from '../value-objects/Category.valueObject'
 import { PostAuthor } from '../value-objects/PostAuthor.valueObject'
 import { PostContent } from '../value-objects/PostContent.valueObject'
 import { PostExcerpt } from '../value-objects/PostExcerpt.valueObject'
+import { PostImage } from '../value-objects/PostImage.valueObject'
 import { PostTitle } from '../value-objects/PostTitle.valueObject'
 import { PublishedAt } from '../value-objects/PublishedAt.valueObject'
 import { Slug } from '../value-objects/Slug.valueObject'
@@ -14,6 +15,7 @@ interface CreatePostParams {
   author: PostAuthor
   publishedAt: PublishedAt
   category: Category
+  image: PostImage
 }
 
 export class Post {
@@ -25,6 +27,7 @@ export class Post {
     public readonly author: PostAuthor,
     public readonly publishedAt: PublishedAt,
     public readonly category: Category,
+    public readonly image: PostImage,
   ) {}
 
   static create(params: CreatePostParams): Post {
@@ -36,6 +39,7 @@ export class Post {
       params.author,
       params.publishedAt,
       params.category,
+      params.image,
     )
   }
 
@@ -48,6 +52,7 @@ export class Post {
       PostAuthor.empty(),
       PublishedAt.empty(),
       Category.empty(),
+      PostImage.empty(),
     )
   }
 }

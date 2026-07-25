@@ -5,9 +5,9 @@ Feature: Site navigation
 
   Scenario: Navigating to the About page
     Given I am on the home page
-    When I click the "Quant a" link in the header
+    When I click the "Sobre Staretz" link in the header
     Then I should be on the about page
-    And I should see the heading "Quant a Staretz"
+    And I should see the heading "Sobre Staretz"
 
   Scenario: Navigating back home
     Given I am on the about page

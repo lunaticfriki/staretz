@@ -52,7 +52,7 @@ export function Header() {
               href="/about"
               class="hover:text-purple-900 dark:hover:text-purple-200"
             >
-              Quant a
+              Sobre Staretz
             </a>
             <CategoryMenu />
           </nav>
@@ -93,7 +93,7 @@ export function Header() {
               onClick={closeMobileMenu}
               class="hover:text-purple-900 dark:hover:text-purple-200"
             >
-              Quant a
+              Sobre Staretz
             </a>
             <CategoryMenu onNavigate={closeMobileMenu} />
           </nav>

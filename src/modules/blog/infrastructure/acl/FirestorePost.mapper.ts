@@ -1,3 +1,4 @@
+import { Timestamp, type DocumentData } from 'firebase/firestore'
 import { Post } from '../../domain/entities/Post.entity'
 import { Category } from '../../domain/value-objects/Category.valueObject'
 import { PostAuthor } from '../../domain/value-objects/PostAuthor.valueObject'
@@ -7,22 +8,21 @@ import { PostImage } from '../../domain/value-objects/PostImage.valueObject'
 import { PostTitle } from '../../domain/value-objects/PostTitle.valueObject'
 import { PublishedAt } from '../../domain/value-objects/PublishedAt.valueObject'
 import { Slug } from '../../domain/value-objects/Slug.valueObject'
-import { parseMarkdownWithFrontmatter } from './markdownFrontmatter.util'
 import { postImagePlaceholderUrl } from './postImagePlaceholder.util'
 
-export class PostMapper {
-  static toDomain(raw: string): Post {
-    const { frontmatter, body } = parseMarkdownWithFrontmatter(raw)
+export class FirestorePostMapper {
+  static toDomain(data: DocumentData): Post {
+    const publishedAt = data.publishedAt instanceof Timestamp ? data.publishedAt.toDate() : data.publishedAt
 
     return Post.create({
-      slug: Slug.create(frontmatter.slug),
-      title: PostTitle.create(frontmatter.title),
-      excerpt: PostExcerpt.create(frontmatter.excerpt),
-      content: PostContent.create(body),
-      author: PostAuthor.create(frontmatter.author),
-      publishedAt: PublishedAt.create(frontmatter.publishedAt),
-      category: Category.create(frontmatter.category),
-      image: PostImage.create(frontmatter.image || postImagePlaceholderUrl(frontmatter.slug)),
+      slug: Slug.create(data.slug),
+      title: PostTitle.create(data.title),
+      excerpt: PostExcerpt.create(data.excerpt),
+      content: PostContent.create(data.content),
+      author: PostAuthor.create(data.author),
+      publishedAt: PublishedAt.create(publishedAt),
+      category: Category.create(data.category),
+      image: PostImage.create(data.image || postImagePlaceholderUrl(data.slug)),
     })
   }
 }

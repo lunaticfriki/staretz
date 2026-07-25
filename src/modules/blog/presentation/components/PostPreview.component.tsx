@@ -1,6 +1,5 @@
 import type { Post } from '../../domain/entities/Post.entity'
 import { formatPublishedAt } from '../formatPublishedAt.util'
-import { postImageUrl } from '../postImageUrl.util'
 
 interface PostPreviewProps {
   post: Post
@@ -11,7 +10,7 @@ export function PostPreview({ post }: PostPreviewProps) {
     <article class="overflow-hidden rounded-lg border border-gray-200 transition hover:border-gray-300 dark:border-gray-800 dark:hover:border-gray-700">
       <a href={`/blog/${post.slug}`} class="block">
         <img
-          src={postImageUrl(post.slug, 480, 240)}
+          src={post.image.toString()}
           alt=""
           loading="lazy"
           class="h-40 w-full object-cover"

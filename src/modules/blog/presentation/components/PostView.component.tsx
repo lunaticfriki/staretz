@@ -1,7 +1,6 @@
 import type { Post } from '../../domain/entities/Post.entity'
 import { formatPublishedAt } from '../formatPublishedAt.util'
 import { marked } from 'marked'
-import { postImageUrl } from '../postImageUrl.util'
 
 interface PostViewProps {
   post: Post
@@ -12,7 +11,7 @@ export function PostView({ post }: PostViewProps) {
     <article>
       <div class="relative -mx-2 -mt-2 flex h-[calc(100dvh-var(--header-height))] items-end sm:-mx-6 lg:-mx-8">
         <img
-          src={postImageUrl(post.slug, 1600, 900)}
+          src={post.image.toString()}
           alt=""
           class="absolute inset-0 h-full w-full object-cover"
         />

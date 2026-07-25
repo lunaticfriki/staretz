@@ -6,7 +6,7 @@ import { GetPostBySlugQueryHandler } from './modules/blog/application/query/GetP
 import { ListCategoriesQueryHandler } from './modules/blog/application/query/ListCategories.queryHandler'
 import { ListPostsQueryHandler } from './modules/blog/application/query/ListPosts.queryHandler'
 import type { PostRepository } from './modules/blog/domain/repositories/Post.repository'
-import { FakePostRepository } from './modules/blog/infrastructure/FakePost.repository'
+import { FirebasePostRepository } from './modules/blog/infrastructure/FirebasePost.repository'
 import { ErrorManagerImpl, type ErrorManager } from './shared/errors/application/ErrorManager.service'
 import {
   NotificationServiceImpl,
@@ -25,7 +25,7 @@ const container = new Container()
 
 container
   .bind<PostRepository>(TYPES.PostRepository)
-  .toDynamicValue(() => new FakePostRepository())
+  .toDynamicValue(() => new FirebasePostRepository())
   .inSingletonScope()
 
 container
