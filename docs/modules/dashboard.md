@@ -223,7 +223,15 @@ lightweight equivalent of `blog`'s `PostGrid` being shared by
 `HomeContainer`/`CategoryPageContainer`
 ([blog.md](blog.md#presentation)). No routing/layout nesting involved:
 each container just renders `<DashboardNav onLogout={logout} />` as
-its first child.
+its first child. It calls `useRouter()` (from `preact-router`) itself to
+compare the current URL against `/dashboard` and `/dashboard/new`; the
+matching link renders in purple (`text-purple-600 dark:text-purple-400`,
+plus `aria-current="page"`), the other one and the "Tanca sessió" button
+stay neutral with only a purple hover — the same active/inactive split
+`Header`'s top-level links and `blog`'s `CategoryMenu` use
+([blog.md](blog.md#presentation)). `/dashboard/edit/:slug` (reached via
+"Edita" in `PostsTable`, not from this nav strip) doesn't match either
+link, so neither highlights while editing.
 
 **`PostForm`** is a self-contained, pure-ish component in the same
 mold as `CategorySearch`/`CategoryMenu` (see

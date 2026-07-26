@@ -1,12 +1,22 @@
 import { useLayoutEffect, useRef, useState } from 'preact/hooks'
+import { useRouter } from 'preact-router'
 
 import { CategoryMenu } from '../../modules/blog/presentation/components/CategoryMenu.component'
 import { CategorySearch } from '../../modules/blog/presentation/components/CategorySearch.component'
 import { ThemeToggle } from './ThemeToggle.component'
 
+function navLinkClass(active: boolean) {
+  return active ? 'text-purple-600 dark:text-purple-400' : 'hover:text-purple-900 dark:hover:text-purple-200'
+}
+
 export function Header() {
   const headerRef = useRef<HTMLElement>(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+  const [router] = useRouter()
+  const currentPath = router.url.split('?')[0]
+  const isHome = currentPath === '/'
+  const isBlog = currentPath === '/blog' || currentPath.startsWith('/blog/')
+  const isAbout = currentPath === '/about'
 
   useLayoutEffect(() => {
     const element = headerRef.current
@@ -42,22 +52,13 @@ export function Header() {
 
         <div class="hidden items-center gap-6 sm:flex">
           <nav class="flex gap-6 text-sm">
-            <a
-              href="/"
-              class="hover:text-purple-900 dark:hover:text-purple-200"
-            >
+            <a href="/" aria-current={isHome ? 'page' : undefined} class={navLinkClass(isHome)}>
               Inici
             </a>
-            <a
-              href="/blog"
-              class="hover:text-purple-900 dark:hover:text-purple-200"
-            >
+            <a href="/blog" aria-current={isBlog ? 'page' : undefined} class={navLinkClass(isBlog)}>
               Blog
             </a>
-            <a
-              href="/about"
-              class="hover:text-purple-900 dark:hover:text-purple-200"
-            >
+            <a href="/about" aria-current={isAbout ? 'page' : undefined} class={navLinkClass(isAbout)}>
               Sobre Staretz
             </a>
             <CategoryMenu />
@@ -90,21 +91,24 @@ export function Header() {
             <a
               href="/"
               onClick={closeMobileMenu}
-              class="hover:text-purple-900 dark:hover:text-purple-200"
+              aria-current={isHome ? 'page' : undefined}
+              class={navLinkClass(isHome)}
             >
               Inici
             </a>
             <a
               href="/blog"
               onClick={closeMobileMenu}
-              class="hover:text-purple-900 dark:hover:text-purple-200"
+              aria-current={isBlog ? 'page' : undefined}
+              class={navLinkClass(isBlog)}
             >
               Blog
             </a>
             <a
               href="/about"
               onClick={closeMobileMenu}
-              class="hover:text-purple-900 dark:hover:text-purple-200"
+              aria-current={isAbout ? 'page' : undefined}
+              class={navLinkClass(isAbout)}
             >
               Sobre Staretz
             </a>

@@ -1,14 +1,24 @@
 import { useEffect, useRef, useState } from 'preact/hooks'
+import { useRouter } from 'preact-router'
 import { useCategoriesState } from '../useCategoriesState.hook'
 
 interface CategoryMenuProps {
   onNavigate?: () => void
 }
 
+const CATEGORY_PATH_PREFIX = '/category/'
+
 export function CategoryMenu({ onNavigate }: CategoryMenuProps) {
   const [open, setOpen] = useState(false)
   const containerRef = useRef<HTMLDivElement>(null)
   const state = useCategoriesState()
+  const [router] = useRouter()
+
+  const currentPath = router.url.split('?')[0]
+  const isCategoryActive = currentPath.startsWith(CATEGORY_PATH_PREFIX)
+  const activeCategory = isCategoryActive
+    ? decodeURIComponent(currentPath.slice(CATEGORY_PATH_PREFIX.length))
+    : null
 
   useEffect(() => {
     if (!open) {
@@ -32,7 +42,12 @@ export function CategoryMenu({ onNavigate }: CategoryMenuProps) {
         onClick={() => setOpen((value) => !value)}
         aria-expanded={open}
         aria-haspopup="true"
-        class="text-purple-600 hover:text-purple-900 dark:text-purple-400 dark:hover:text-purple-200"
+        aria-current={isCategoryActive ? 'page' : undefined}
+        class={
+          isCategoryActive
+            ? 'text-purple-600 dark:text-purple-400'
+            : 'hover:text-purple-900 dark:hover:text-purple-200'
+        }
       >
         Categories ▾
       </button>
@@ -41,19 +56,27 @@ export function CategoryMenu({ onNavigate }: CategoryMenuProps) {
           {state.categories.length === 0 ? (
             <p class="px-4 py-2 text-sm text-gray-500 dark:text-gray-400">Sense categories</p>
           ) : (
-            state.categories.toArray().map((category) => (
-              <a
-                key={category.toString()}
-                href={`/category/${encodeURIComponent(category.toString())}`}
-                onClick={() => {
-                  setOpen(false)
-                  onNavigate?.()
-                }}
-                class="block px-4 py-2 text-sm text-purple-600 hover:bg-gray-100 dark:text-purple-400 dark:hover:bg-gray-900"
-              >
-                {category.toString()}
-              </a>
-            ))
+            state.categories.toArray().map((category) => {
+              const label = category.toString()
+              const isActive = label === activeCategory
+
+              return (
+                <a
+                  key={label}
+                  href={`/category/${encodeURIComponent(label)}`}
+                  onClick={() => {
+                    setOpen(false)
+                    onNavigate?.()
+                  }}
+                  aria-current={isActive ? 'page' : undefined}
+                  class={`block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-900 ${
+                    isActive ? 'text-purple-600 dark:text-purple-400' : 'hover:text-purple-900 dark:hover:text-purple-200'
+                  }`}
+                >
+                  {label}
+                </a>
+              )
+            })
           )}
         </div>
       )}

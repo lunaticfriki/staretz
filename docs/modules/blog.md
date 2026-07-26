@@ -545,6 +545,18 @@ links to `/category/<exact category, URL-encoded>`. Open/closed is its
 own local `useState`, closed on an outside click (a `document` click
 listener added only while open) or on selecting an entry — again
 ephemeral view state that has no business living in a state service.
+It also calls `useRouter()` (from `preact-router`) to read the current
+URL: the trigger button and whichever category entry's `href` matches
+the current `/category/<term>` path render in purple
+(`text-purple-600 dark:text-purple-400`, plus `aria-current="page"`),
+every other entry stays neutral with only a purple hover, the same
+active/inactive split `Header` itself uses for its own top-level links
+("Inici"/"Blog"/"Sobre Staretz"). `useRouter()` works here even though `CategoryMenu` renders outside
+`app.tsx`'s `<Router>` subtree (`Header` is `Layout`'s sibling to
+`{children}`, not a descendant) — `preact-router` falls back to a
+module-level subscriber list for exactly this "consumer outside the
+Router tree" case, so no extra plumbing (context, a lifted signal) was
+needed to make this reactive to client-side navigation.
 
 **`CategorySearch`**: the header's free-text input. Holds the typed
 value in local `useState`; a debounced (300ms) `useEffect` turns it into
