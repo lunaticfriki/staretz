@@ -49,6 +49,12 @@ export function Header() {
               Inici
             </a>
             <a
+              href="/blog"
+              class="hover:text-purple-900 dark:hover:text-purple-200"
+            >
+              Blog
+            </a>
+            <a
               href="/about"
               class="hover:text-purple-900 dark:hover:text-purple-200"
             >
@@ -87,6 +93,13 @@ export function Header() {
               class="hover:text-purple-900 dark:hover:text-purple-200"
             >
               Inici
+            </a>
+            <a
+              href="/blog"
+              onClick={closeMobileMenu}
+              class="hover:text-purple-900 dark:hover:text-purple-200"
+            >
+              Blog
             </a>
             <a
               href="/about"

@@ -1,21 +1,26 @@
 # Module: Blog
 
-The blog itself — the home page's paginated, filterable list of posts,
-the category browsing/search pages, and the individual post reading
-view. The reference implementation of the full domain → application →
-infrastructure → presentation shape in this codebase; read this
-alongside [01](../01-domain-layer.md)–[05](../05-presentation-layer.md)
-to see the general rules made concrete.
+The blog itself — the home page's "latest 5" preview, the full
+paginated/filterable post listing, the category browsing/search pages,
+and the individual post reading view. The reference implementation of
+the full domain → application → infrastructure → presentation shape in
+this codebase; read this alongside
+[01](../01-domain-layer.md)–[05](../05-presentation-layer.md) to see
+the general rules made concrete.
 
 ## Routes
 
 | Path | Container |
 |---|---|
 | `/` | `HomeContainer` |
+| `/blog` | `BlogPageContainer` |
 | `/blog/:slug` | `PostPageContainer` |
 | `/category/:term` | `CategoryPageContainer` |
 
-Registered in [`app.tsx`](../../src/app.tsx).
+Registered in [`app.tsx`](../../src/app.tsx). `/blog` and `/blog/:slug`
+don't collide — `preact-router` only matches `/blog/:slug` when a
+segment is actually present, so a bare `/blog` falls through to the
+listing route regardless of the two routes' declaration order.
 
 ## Domain
 
@@ -198,8 +203,9 @@ publish, edit, and delete posts.
   calls `.search(query.search)` (title/author/content/category, not
   just category), then branches on `query.sort.isEmpty` —
   empty falls back to `.sortedByMostRecent()` (today's default, and the
-  only behavior the public blog's `HomeContainer`/`CategoryPageContainer`
-  ever see, since neither passes a `sort`); a real criteria goes through
+  only behavior the public blog's `HomeContainer`/`BlogPageContainer`/
+  `CategoryPageContainer` ever see, since none of them pass a `sort`); a
+  real criteria goes through
   `.sortBy(query.sort)` instead — before finally `.paginate(query.pagination)`.
   Filter, sort, and paginate each live on `PostCollection`
   ([shared-search.md](shared-search.md),
@@ -443,6 +449,8 @@ sake.
 src/modules/blog/presentation/
   containers/
     Home.container.tsx
+    LatestPosts.container.tsx
+    BlogPage.container.tsx
     CategoryPage.container.tsx
     PostPage.container.tsx
   components/
@@ -470,23 +478,50 @@ matches), and `<Pagination>` underneath
 [shared-pagination.md](shared-pagination.md)) — a plain controlled
 component, no knowledge of `Post` beyond what's in its props.
 
-**`HomeContainer`**: holds the one piece of local UI state this module
-has per screen — `const [page, setPage] = useState(1)` — the currently
-selected page number. This isn't application state (it doesn't survive a
-reload, isn't shared with any other screen); it's exactly the kind of
+**`HomeContainer`** (`/`): purely a composition point now — a heading,
+a "Veure tots els articles →" link to `/blog`, and `<LatestPosts />`.
+Holds no state of its own and fetches nothing directly; it exists so
+`/blog`'s full listing and the home page's "latest 5" teaser stay two
+separate call sites into `LatestPosts`/`BlogPageContainer` rather than
+one container branching on "am I paginated or not."
+
+**`LatestPosts`**: the piece that actually renders the "latest 5"
+teaser, extracted into its own component specifically so `HomeContainer`
+doesn't inline data-fetching logic (mirroring every other container in
+this module: containers own state/fetching, `Home.container.tsx` just
+composes one). Calls `usePostsPageState(1, LATEST_POSTS_COUNT)`
+(`LATEST_POSTS_COUNT = 5`, page fixed at `1`, `search` left at its
+default `''`) — the same default-sort path as every other list screen,
+so "latest 5" falls out of `ListPostsQueryHandler`'s
+`.sortedByMostRecent()` fallback rather than any bespoke sorting logic
+here. Branches on `status` like the other list screens (`loading`
+renders 5 `PostPreviewSkeleton`s, `error` renders the message, an empty
+`loaded` page renders an empty-state message), but on the `loaded` path
+renders `state.page.items` directly through `PostPreview` in a bare
+grid — deliberately not `<PostGrid>`, since `PostGrid` always renders a
+"Nombre de posts" count and a `<Pagination>` control, neither of which
+belongs on a fixed-size, non-paginated teaser.
+
+**`BlogPageContainer`** (`/blog`): the full paginated listing — the
+shape `HomeContainer` used to be before `LatestPosts` was extracted,
+and the same shape as `CategoryPageContainer` below minus the search
+term: its own `const [page, setPage] = useState(1)` — the currently
+selected page number. This isn't application state (it doesn't survive
+a reload, isn't shared with any other screen); it's exactly the kind of
 ephemeral, view-only state a container is allowed to hold directly, the
 same way `SplashScreen` holds its own fade timer (see
 [shared-theme.md](shared-theme.md) for the equivalent local-state
 precedent). `usePostsPageState(page, POSTS_PER_PAGE)` (`POSTS_PER_PAGE =
-5`, `search` left at its default `''`) re-queries whenever `page`
-changes and branches on `status`: `loading` renders 5
-`PostPreviewSkeleton`s in the same grid `PostGrid` uses (so nothing
-jumps), `error` renders the message, `loaded` hands `state.page.items`/
-`state.page.page`/`state.page.totalItems`/`state.page.totalPages`
-straight to `<PostGrid>`.
+5`) re-queries whenever `page` changes and branches on `status`:
+`loading` renders 5 `PostPreviewSkeleton`s in the same grid `PostGrid`
+uses (so nothing jumps), `error` renders the message, `loaded` hands
+`state.page.items`/`state.page.page`/`state.page.totalItems`/
+`state.page.totalPages` straight to `<PostGrid>` — the unfiltered
+counterpart to `CategoryPageContainer` below, paging through every
+post instead of one category's subset.
 
 **`CategoryPageContainer`** (`/category/:term`): same shape as
-`HomeContainer` — its own `[page, setPage]` state — but calls
+`BlogPageContainer` — its own `[page, setPage]` state — but calls
 `usePostsPageState(page, POSTS_PER_PAGE, decodeURIComponent(term))`,
 passing the route param through as the search term, and renders a
 `Categoria: {term}` heading above the same loading/error/loaded branches
@@ -668,5 +703,6 @@ unit-tested in this app at all, see
 [07-testing-strategy.md](../07-testing-strategy.md#presentation-is-not-unit-tested).
 Covered end-to-end instead, by
 [`e2e/features/home.feature`](../../e2e/features/home.feature),
+[`blog.feature`](../../e2e/features/blog.feature),
 [`category.feature`](../../e2e/features/category.feature), and
 [`post.feature`](../../e2e/features/post.feature).

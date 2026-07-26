@@ -10,6 +10,10 @@ Given('I am on the about page', async function (this: PlaywrightWorld) {
   await this.page.goto('/about')
 })
 
+Given('I am on the blog page', async function (this: PlaywrightWorld) {
+  await this.page.goto('/blog')
+})
+
 Given('I am on the post page for {string}', async function (this: PlaywrightWorld, slug: string) {
   await this.page.goto(`/blog/${slug}`)
 })
@@ -22,12 +26,20 @@ When('I click on the post titled {string}', async function (this: PlaywrightWorl
   await this.page.getByRole('link', { name: title }).click()
 })
 
+When('I click the {string} link', async function (this: PlaywrightWorld, label: string) {
+  await this.page.getByRole('link', { name: label }).click()
+})
+
 Then('I should be on the home page', async function (this: PlaywrightWorld) {
   await expect(this.page).toHaveURL(/\/$/)
 })
 
 Then('I should be on the about page', async function (this: PlaywrightWorld) {
   await expect(this.page).toHaveURL(/\/about$/)
+})
+
+Then('I should be on the blog page', async function (this: PlaywrightWorld) {
+  await expect(this.page).toHaveURL(/\/blog$/)
 })
 
 Then('I should be on the post page for {string}', async function (this: PlaywrightWorld, slug: string) {

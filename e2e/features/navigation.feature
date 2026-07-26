@@ -14,3 +14,9 @@ Feature: Site navigation
     When I click the "Inici" link in the header
     Then I should be on the home page
     And I should see 5 post previews
+
+  Scenario: Navigating to the Blog page
+    Given I am on the home page
+    When I click the "Blog" link in the header
+    Then I should be on the blog page
+    And I should see the heading "Blog"

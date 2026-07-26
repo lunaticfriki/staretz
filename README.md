@@ -31,7 +31,8 @@ pnpm dev
 Posts are read from a Cloud Firestore **`posts`** collection (see
 [Architecture](#architecture) below) — without a valid `.env`, the app
 will fail to load post data. Open the printed local URL: the dev server
-serves the home page, category browsing/search pages, an About page, and
+serves the home page (the 5 most recent posts), the full paginated post
+listing at `/blog`, category browsing/search pages, an About page, and
 one page per post at `/blog/:slug`.
 
 ## Dashboard (private)

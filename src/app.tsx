@@ -2,6 +2,7 @@ import '@preact/signals'
 
 import { Router } from 'preact-router'
 import { AboutPage } from './modules/about/presentation/AboutPage.component'
+import { BlogPageContainer } from './modules/blog/presentation/containers/BlogPage.container'
 import { CategoryPageContainer } from './modules/blog/presentation/containers/CategoryPage.container'
 import { HomeContainer } from './modules/blog/presentation/containers/Home.container'
 import { PostPageContainer } from './modules/blog/presentation/containers/PostPage.container'
@@ -23,6 +24,7 @@ export function App() {
         <Router>
           <HomeContainer path="/" />
           <AboutPage path="/about" />
+          <BlogPageContainer path="/blog" />
           <PostPageContainer path="/blog/:slug" />
           <CategoryPageContainer path="/category/:term" />
           <LoginPage path="/login" />
