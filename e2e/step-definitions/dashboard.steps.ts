@@ -1,4 +1,4 @@
-import { Given, Then } from '@cucumber/cucumber'
+import { Given, Then, When } from '@cucumber/cucumber'
 import { expect } from '@playwright/test'
 import type { PlaywrightWorld } from '../support/world'
 
@@ -26,4 +26,17 @@ Then('I should see the posts as a table', async function (this: PlaywrightWorld)
 Then('I should see the posts as cards', async function (this: PlaywrightWorld) {
   await expect(this.page.getByRole('table')).toBeHidden()
   await expect(this.page.getByRole('list')).toBeVisible()
+})
+
+When('I search for {string} in the posts search box', async function (this: PlaywrightWorld, term: string) {
+  await this.page.getByRole('searchbox', { name: 'Cerca articles' }).fill(term)
+})
+
+Then('I should see {int} post(s) in the table', async function (this: PlaywrightWorld, count: number) {
+  if (count === 0) {
+    await expect(this.page.getByRole('table')).toBeHidden()
+    return
+  }
+
+  await expect(this.page.getByRole('table').getByRole('row')).toHaveCount(count + 1)
 })

@@ -212,6 +212,7 @@ src/modules/dashboard/presentation/
     DashboardNav.component.tsx
     PostForm.component.tsx
     PostsTable.component.tsx
+    PostsSearch.component.tsx
   usePostManagementState.hook.ts
 ```
 
@@ -250,8 +251,29 @@ edit through props rather than being two components:
 - `submitLabel`/`submittingLabel` — cosmetic only ("Publica"/
   "Publicant..." vs. "Desa els canvis"/"Desant...").
 
+**`PostsSearch`**: a dashboard-local, pure input component in the same
+"owns its own field state, emits a plain callback" mold as `PostForm`/
+`CategorySearch` ([blog.md](blog.md#presentation)). Unlike
+`CategorySearch`, it has no suggestions dropdown and never calls
+`route()` — the dashboard already re-renders `/dashboard` in place on
+state change, so there's nothing to navigate to. It holds the typed
+`term` in local `useState`, debounces 300ms (`DEBOUNCE_MS`, the same
+constant name and value `CategorySearch` uses) via a `useEffect`/
+`setTimeout` pair, and calls `onSearch(term)` on every settle — it
+never touches `SearchCriteria` itself; that construction happens one
+layer down, inside `usePostsPageState` ([blog.md](blog.md#presentation)),
+the same division of labor `CategorySearch` has with
+`useCategoriesState`.
+
 **`PostsTable`**: pure component, props `{ posts, deletingSlug,
-onDelete, sort, onSortChange }`. Renders two alternative layouts of the
+onDelete, sort, onSortChange, emptyMessage }`. When `posts` is empty it
+renders `emptyMessage` instead of either layout — no table/list markup
+at all in that case — the same `emptyMessage`-prop shape `PostGrid`
+uses for its own "a category/search with no matches" case
+([blog.md](blog.md#presentation)); `PostsListContainer` computes it as
+"Encara no hi ha cap article." with no search active, or "No s'han
+trobat articles per a \"<term>\"." once a search term has narrowed the
+list to nothing. Otherwise renders two alternative layouts of the
 same data from the same props — a `hidden sm:block` `<table>` (a row
 per post: title/category/published date, an "Edita" link to
 `/dashboard/edit/<slug>`, and an "Elimina" button) and a `sm:hidden`
@@ -316,9 +338,25 @@ or command handler needs to know about.
 `usePostsPageState(page, perPage, search, sort, refreshToken)` hook —
 identical to `HomeContainer`'s, same page size (5, its own
 `POSTS_PER_PAGE` constant — not shared with `HomeContainer`'s, just
-coincidentally equal), no search term, and two extra parameters
-`HomeContainer` never passes:
+coincidentally equal), and three extra parameters `HomeContainer`
+never passes:
 
+- `search: string` — a plain local `useState('')`, the same "ephemeral,
+  view-only state a container is allowed to hold directly" category
+  `page`/`sort` already are. `<PostsSearch onSearch={handleSearchChange} />`
+  renders next to the "Articles" heading; `handleSearchChange(term)` sets
+  it *and* resets `page` back to `1`, the same reset `handleSortChange`
+  already does, for the same reason (a stale page number from before the
+  filter narrowed the results would be confusing). This is the same
+  `search` parameter `CategoryPageContainer` passes from its `:term`
+  route param ([blog.md](blog.md#presentation)) — the dashboard just
+  sources it from local component state instead of a URL segment, since
+  there's no shareable "search results" URL to support here, only a
+  live-filtered admin table. No `shared/search/` changes were needed:
+  `SearchCriteria`/`PostCollection.search()`/`ListPostsQueryHandler` were
+  already fully generic (see [shared-search.md](shared-search.md)) —
+  wiring a real value through what used to be a hardcoded `''` was the
+  whole change.
 - `sort: SortCriteria<PostSortField>` — held in a local
   `useState<SortCriteria<PostSortField>>(SortCriteria.none())`, the
   same "ephemeral, view-only state a container is allowed to hold
@@ -380,16 +418,21 @@ transition, the success notification, and the reset-to-`idle` +
 `deletePost()`'s assertions additionally check the `slug` carried on
 the `deleting`/`deleted` signal values.
 
-`PostForm`/`PostsTable`/`DashboardNav`/the three containers have no
-dedicated *unit* tests — presentation isn't unit-tested in this app,
-see [07-testing-strategy.md](../07-testing-strategy.md#presentation-is-not-unit-tested).
+`PostForm`/`PostsTable`/`PostsSearch`/`DashboardNav`/the three
+containers have no dedicated *unit* tests — presentation isn't
+unit-tested in this app, see
+[07-testing-strategy.md](../07-testing-strategy.md#presentation-is-not-unit-tested).
 Unlike the rest of this module (documented as having no coverage at all
 in earlier revisions of this doc), `PostsListContainer`/`PostsTable` are
 now covered end-to-end by
 [`e2e/features/dashboard.feature`](../../e2e/features/dashboard.feature):
-logging in redirects to `/dashboard`, and the posts list renders as a
-`<table>` at desktop width vs. a card `<ul>` at mobile width (see
-[Presentation](#presentation) above). This was blocked for a while by
+logging in redirects to `/dashboard`, the posts list renders as a
+`<table>` at desktop width vs. a card `<ul>` at mobile width, typing a
+term into the posts search box (`getByRole('searchbox', { name: 'Cerca
+articles' })`, same query shape `category.steps.ts` uses for the blog's
+own search box) narrows the table to matching rows, and a term with no
+matches falls back to the "No s'han trobat articles..." `emptyMessage`
+(see [Presentation](#presentation) above). This was blocked for a while by
 `/dashboard` being login-gated with no way to authenticate in a
 CI-friendly way — solved by emulating Firebase Auth and swapping
 `PostRepository`/`PostImageUploader` for their in-memory `Fake*`

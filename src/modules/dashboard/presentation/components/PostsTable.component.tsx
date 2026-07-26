@@ -8,6 +8,7 @@ interface PostsTableProps {
   onDelete: (slug: string) => void
   sort: SortCriteria<PostSortField>
   onSortChange: (sort: SortCriteria<PostSortField>) => void
+  emptyMessage: string
 }
 
 const SORTABLE_COLUMNS: Array<{ field: PostSortField; label: string }> = [
@@ -16,9 +17,9 @@ const SORTABLE_COLUMNS: Array<{ field: PostSortField; label: string }> = [
   { field: 'publishedAt', label: 'Publicat' },
 ]
 
-export function PostsTable({ posts, deletingSlug, onDelete, sort, onSortChange }: PostsTableProps) {
+export function PostsTable({ posts, deletingSlug, onDelete, sort, onSortChange, emptyMessage }: PostsTableProps) {
   if (posts.length === 0) {
-    return <p class="text-gray-600 dark:text-gray-300">Encara no hi ha cap article.</p>
+    return <p class="text-gray-600 dark:text-gray-300">{emptyMessage}</p>
   }
 
   return (
