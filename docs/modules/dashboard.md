@@ -189,12 +189,15 @@ via `uploadBytes()`, then resolves the public URL via
 one-line pattern as `blog`'s `firestore.ts` — see
 [blog.md](blog.md#infrastructure)) and the *full* `firebase/storage`
 import (no lite variant exists for Storage, unlike Firestore).
-**`FakePostImageUploader`** is its in-memory-development counterpart:
+**`FakePostImageUploader`** is its in-memory counterpart:
 `URL.createObjectURL(file)` returns a local blob URL good for the
 current browser session only — no real upload, no network call, pairs
-with `blog`'s `FakePostRepository` for offline development. Swapping
-between them is the same one-line `composition-root.ts` change as any
-other port
+with `blog`'s `FakePostRepository` for both offline development and
+`pnpm test:e2e` (which binds both Fake adapters together via
+`VITE_USE_FAKE_REPOSITORIES` — see
+[12-e2e-testing.md](../12-e2e-testing.md#auth-emulator-and-fake-repositories-why-dashboard-e2e-needs-both)).
+Swapping between real and fake is the same one-line `composition-root.ts`
+change as any other port
 ([04-infrastructure-layer.md](../04-infrastructure-layer.md#one-implementation-per-port-swappable)).
 
 ## Presentation
@@ -248,25 +251,33 @@ edit through props rather than being two components:
   "Publicant..." vs. "Desa els canvis"/"Desant...").
 
 **`PostsTable`**: pure component, props `{ posts, deletingSlug,
-onDelete, sort, onSortChange }`. Renders a row per post
-(title/category/published date) with an "Edita" link to
-`/dashboard/edit/<slug>` and an "Elimina" button; the button disables
-and reads "Eliminant..." only for the row matching `deletingSlug`, not
-the whole table, using the `slug` carried on
-`PostManagementStateService.delete`'s `deleting` variant. No knowledge
-of *how* delete works — `onDelete(slug)` is a plain callback, same
-shape as `PostGrid`'s `onPageChange` ([blog.md](blog.md#presentation)).
+onDelete, sort, onSortChange }`. Renders two alternative layouts of the
+same data from the same props — a `hidden sm:block` `<table>` (a row
+per post: title/category/published date, an "Edita" link to
+`/dashboard/edit/<slug>`, and an "Elimina" button) and a `sm:hidden`
+`<ul>` of cards (one `<li>` per post, same info stacked instead of
+columned, same two actions) — the same breakpoint convention
+`Header`'s desktop-nav-vs-mobile-menu split uses. Only one is ever in
+the accessibility tree/visible at a time; both stay mounted so there's
+no layout thrash or refetch crossing the breakpoint. In both layouts,
+the "Elimina" button disables and reads "Eliminant..." only for the
+one post matching `deletingSlug`, not the whole list, using the `slug`
+carried on `PostManagementStateService.delete`'s `deleting` variant. No
+knowledge of *how* delete works — `onDelete(slug)` is a plain callback,
+same shape as `PostGrid`'s `onPageChange` ([blog.md](blog.md#presentation)).
 
-The three sortable columns ("Títol"/`title`, "Categoria"/`category`,
-"Publicat"/`publishedAt`) render as buttons instead of plain `<th>`
-text, each with an arrow (▲ ascending, ▼ descending, ↕ when that
-column isn't the active sort) built from `sort: SortCriteria<PostSortField>`
-([shared-sorting.md](shared-sorting.md)). Clicking one calls
+The three sortable fields ("Títol"/`title`, "Categoria"/`category`,
+"Publicat"/`publishedAt`) render as buttons in both layouts — `<th>`
+buttons in the table header, a row of pill buttons above the card list
+— sharing the same `SORTABLE_COLUMNS` list and the same arrow logic (▲
+ascending, ▼ descending, ↕ when that field isn't the active sort) built
+from `sort: SortCriteria<PostSortField>`
+([shared-sorting.md](shared-sorting.md)). Clicking either calls
 `onSortChange(sort.toggled(field))` — `PostsTable` never decides
 *whether* that's ascending or descending, `SortCriteria.toggled()`
 does (see [shared-sorting.md](shared-sorting.md#domain)); the component
 only renders whatever criteria it's handed and asks for the next one.
-"Accions" (Edita/Elimina) stays a plain, unsortable `<th>`.
+"Accions" (Edita/Elimina) stays unsortable in both layouts.
 
 **`usePostManagementState`** follows the exact shape from
 [08-tech-preact-typescript.md](../08-tech-preact-typescript.md#presentation-a-thin-adapter-over-the-state-services-signal):
@@ -370,8 +381,26 @@ transition, the success notification, and the reset-to-`idle` +
 the `deleting`/`deleted` signal values.
 
 `PostForm`/`PostsTable`/`DashboardNav`/the three containers have no
-dedicated tests — presentation isn't unit-tested in this app, see
-[07-testing-strategy.md](../07-testing-strategy.md#presentation-is-not-unit-tested).
+dedicated *unit* tests — presentation isn't unit-tested in this app,
+see [07-testing-strategy.md](../07-testing-strategy.md#presentation-is-not-unit-tested).
+Unlike the rest of this module (documented as having no coverage at all
+in earlier revisions of this doc), `PostsListContainer`/`PostsTable` are
+now covered end-to-end by
+[`e2e/features/dashboard.feature`](../../e2e/features/dashboard.feature):
+logging in redirects to `/dashboard`, and the posts list renders as a
+`<table>` at desktop width vs. a card `<ul>` at mobile width (see
+[Presentation](#presentation) above). This was blocked for a while by
+`/dashboard` being login-gated with no way to authenticate in a
+CI-friendly way — solved by emulating Firebase Auth and swapping
+`PostRepository`/`PostImageUploader` for their in-memory `Fake*`
+adapters during e2e builds, see
+[12-e2e-testing.md](../12-e2e-testing.md#auth-emulator-and-fake-repositories-why-dashboard-e2e-needs-both)
+for the full mechanics and why both have to change together.
+`PostForm`/`NewPostContainer`/`EditPostContainer` (create/edit/delete
+actually mutating a post) remain untested even at the e2e level — the
+Fake adapters make it possible now, but no scenario exercises that path
+yet.
+
 `PolicyService`/`AuthStateService`, which the guarded routes and the
 logout button depend on, are tested where they're actually defined —
 see [shared-policies.md](shared-policies.md#tests),

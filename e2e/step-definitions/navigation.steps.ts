@@ -42,6 +42,10 @@ Then('I should be on the blog page', async function (this: PlaywrightWorld) {
   await expect(this.page).toHaveURL(/\/blog$/)
 })
 
+Then('I should be on the dashboard page', async function (this: PlaywrightWorld) {
+  await expect(this.page).toHaveURL(/\/dashboard$/)
+})
+
 Then('I should be on the post page for {string}', async function (this: PlaywrightWorld, slug: string) {
   await expect(this.page).toHaveURL(new RegExp(`/blog/${slug}$`))
 })

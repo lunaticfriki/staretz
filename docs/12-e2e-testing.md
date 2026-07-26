@@ -25,13 +25,23 @@ in purely as the thing that drives the browser inside it.
 e2e/
   features/
     home.feature
+    blog.feature
+    category.feature
+    dashboard.feature
+    navigation.feature
     post.feature
+    branding.feature
+    splash.feature
   step-definitions/
     home.steps.ts
     navigation.steps.ts
+    category.steps.ts
+    dashboard.steps.ts
+    branding.steps.ts
+    splash.steps.ts
   support/
     world.ts            — the Cucumber World, carrying the Playwright Page
-    hooks.ts             — Before/After: browser and page lifecycle
+    hooks.ts             — Before/After: browser/page lifecycle, the default step timeout
 cucumber.cjs              — config, auto-detected by the cucumber-js CLI
 tsconfig.e2e.json          — separate from the app's tsc project references
 ```
@@ -68,11 +78,16 @@ other — no shared cookies/storage), close down afterward:
 
 ```ts
 // e2e/support/hooks.ts
-import { After, AfterAll, Before, BeforeAll } from '@cucumber/cucumber'
+import { After, AfterAll, Before, BeforeAll, setDefaultTimeout } from '@cucumber/cucumber'
 import { chromium, type Browser, type BrowserContext } from '@playwright/test'
 import type { PlaywrightWorld } from './world'
 
 const BASE_URL = process.env.BASE_URL ?? 'http://localhost:4173'
+
+// Cucumber's own 5000ms default step timeout can be tighter than a real
+// network round trip to Firestore takes under load — raise it so a slow
+// read fails on its own assertion message, not a generic step timeout.
+setDefaultTimeout(15000)
 
 let browser: Browser
 let context: BrowserContext
@@ -140,11 +155,17 @@ The point of E2E is testing what actually ships. The run script:
 
 1. Type-checks `e2e/` on its own (fast, catches typos before spending time
    on a build).
-2. Builds the app for production.
-3. Serves that build (`vite preview`, not `vite dev`) on a fixed port.
-4. Polls until the server responds.
-5. Runs every `.feature` file against it.
-6. Tears the server down in a trap, regardless of pass/fail.
+2. Starts the Firebase **Auth emulator** and seeds one fixed admin user
+   (see [Auth emulator and fake repositories](#auth-emulator-and-fake-repositories-why-dashboard-e2e-needs-both)
+   below).
+3. Builds the app for production, with `VITE_FIREBASE_AUTH_EMULATOR_HOST`
+   and `VITE_USE_FAKE_REPOSITORIES=true` set so the build points at the
+   emulator and the in-memory `Fake*` adapters instead of real Firebase.
+4. Serves that build (`vite preview`, not `vite dev`) on a fixed port.
+5. Polls until the server responds.
+6. Runs every `.feature` file against it.
+7. Tears both the preview server and the emulator down in a trap,
+   regardless of pass/fail.
 
 ```bash
 #!/usr/bin/env bash
@@ -153,14 +174,48 @@ set -eu
 PORT=4173
 BASE_URL="http://localhost:$PORT"
 
+AUTH_EMULATOR_HOST="127.0.0.1:9099"
+FIREBASE_PROJECT="${VITE_FIREBASE_PROJECT_ID:-staretz-e2e}"
+E2E_ADMIN_EMAIL="${E2E_ADMIN_EMAIL:-e2e@staretz.test}"
+E2E_ADMIN_PASSWORD="${E2E_ADMIN_PASSWORD:-e2e-test-password}"
+
 pnpm typecheck:e2e
-pnpm build
+
+pnpm exec firebase emulators:start --only auth --project "$FIREBASE_PROJECT" &
+EMULATOR_PID=$!
+
+cleanup() {
+  kill "$SERVER_PID" 2>/dev/null || true
+  kill "$EMULATOR_PID" 2>/dev/null || true
+}
+trap cleanup EXIT
+
+EMULATOR_READY=0
+for _ in $(seq 1 60); do
+  if curl -sSf "http://$AUTH_EMULATOR_HOST/" > /dev/null 2>&1; then
+    EMULATOR_READY=1
+    break
+  fi
+  sleep 0.5
+done
+
+if [ "$EMULATOR_READY" -ne 1 ]; then
+  echo "Auth emulator did not become ready at $AUTH_EMULATOR_HOST" >&2
+  exit 1
+fi
+
+# Seed the fixed admin user the "logged in as an admin" step signs in as.
+# EMAIL_EXISTS on a rerun against an emulator that kept its state is fine —
+# the account just already exists from a previous run.
+curl -s -o /dev/null -X POST \
+  "http://$AUTH_EMULATOR_HOST/identitytoolkit.googleapis.com/v1/accounts:signUp?key=fake-api-key" \
+  -H "Content-Type: application/json" \
+  -d "{\"email\":\"$E2E_ADMIN_EMAIL\",\"password\":\"$E2E_ADMIN_PASSWORD\",\"returnSecureToken\":true}"
+
+VITE_FIREBASE_AUTH_EMULATOR_HOST="$AUTH_EMULATOR_HOST" VITE_USE_FAKE_REPOSITORIES=true pnpm build
 
 pnpm exec vite preview --port "$PORT" --strictPort &
 SERVER_PID=$!
-
-cleanup() { kill "$SERVER_PID" 2>/dev/null || true; }
-trap cleanup EXIT
 
 READY=0
 for _ in $(seq 1 60); do
@@ -176,7 +231,8 @@ if [ "$READY" -ne 1 ]; then
   exit 1
 fi
 
-BASE_URL="$BASE_URL" NODE_OPTIONS="--import tsx" pnpm exec cucumber-js "$@"
+BASE_URL="$BASE_URL" E2E_ADMIN_EMAIL="$E2E_ADMIN_EMAIL" E2E_ADMIN_PASSWORD="$E2E_ADMIN_PASSWORD" \
+  NODE_OPTIONS="--import tsx" pnpm exec cucumber-js "$@"
 ```
 
 Start the backgrounded server with `pnpm exec vite preview`, not
@@ -186,7 +242,61 @@ running *as* a `pnpm run <script>` makes pnpm log its own
 the trap's `kill` reaches it — harmless (the actual script's exit code is
 unaffected), but it reads exactly like a failure report sitting right
 under a "32 steps passed" summary. `pnpm exec` runs the binary directly,
-with no script-lifecycle wrapper to log anything when it's killed.
+with no script-lifecycle wrapper to log anything when it's killed. Same
+reasoning for `pnpm exec firebase` over a bare `firebase` — no global
+install assumed, uses the `firebase-tools` devDependency directly.
+
+## Auth emulator and fake repositories: why dashboard e2e needs both
+
+`/dashboard` is guarded by `RequirePolicy`
+([shared-policies.md](modules/shared-policies.md)), so any scenario that
+reaches it has to log in for real first — there's no way to skip
+`RequireAuthenticationPolicy` from a `.feature` file, nor should there
+be, since the login screen and the guard are exactly what's under test.
+Logging in for real against a *real* Firebase project would mean either
+committing test credentials (never — `.env*` is gitignored on purpose,
+see [blog.md](modules/blog.md#infrastructure)) or requiring every
+CI run/contributor to have a real Firebase project with a real user
+provisioned. Neither is acceptable for a suite that's supposed to run
+anywhere with `pnpm test:e2e` and nothing else.
+
+The Firebase **Auth emulator** (`firebase emulators:start --only auth`)
+solves this: it's pure Node, no Java/JVM dependency (unlike the
+Firestore/Storage/Realtime-Database emulators), starts in a couple of
+seconds, and accepts the exact same `signInWithEmailAndPassword` calls
+`FirebaseAuthRepository` already makes
+([shared-auth.md](modules/shared-auth.md#infrastructure)) — the app code
+under test is unmodified; only `src/shared/firebase/auth.ts` gains a
+`connectAuthEmulator(auth, ...)` call, gated behind
+`VITE_FIREBASE_AUTH_EMULATOR_HOST` so it's a no-op in `pnpm dev`/`pnpm build`
+where that variable is never set. `scripts/e2e.sh` seeds one fixed
+`e2e@staretz.test` user into the emulator via its REST API
+(`accounts:signUp`) before the build, so
+`Given I am logged in as an admin`
+([dashboard.steps.ts](../e2e/step-definitions/dashboard.steps.ts)) has
+someone to log in as.
+
+The catch: an ID token issued by the Auth emulator does **not** validate
+against a real Firestore/Storage project — it's signed for a fictitious
+local project, not the real one Firestore checks against. Once logged
+in, every Firestore read/write from the app was failing with
+`permission-denied`, even public reads that work fine
+unauthenticated — the *malformed* credential on the request, not the
+security rule content, is what Firestore rejects. So emulating Auth
+alone doesn't just leave Firestore untested while logged in, it actively
+breaks it. The fix is the same `VITE_USE_FAKE_REPOSITORIES` flag
+mentioned above: when set, `composition-root.ts` binds
+`FakePostRepository`/`FakePostImageUploader`
+([blog.md](modules/blog.md#infrastructure),
+[dashboard.md](modules/dashboard.md#infrastructure)) instead of the real
+Firebase adapters, so nothing post-login ever touches real Firestore/
+Storage at all — no token-validation mismatch possible, and every
+scenario (dashboard or otherwise) now asserts against the same known
+20-post seed catalog instead of whatever a real Firestore project
+happens to contain. Running the *real* adapters end-to-end (against a
+real Firebase project a CI job is authorized for) would need the
+Firestore/Storage emulators as well, which do require Java — not wired
+up here; add them if that level of coverage is ever needed.
 
 ## TypeScript/tooling specifics
 

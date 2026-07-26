@@ -348,18 +348,26 @@ Uploading a post's image file is no longer this module's concern —
 domain/infrastructure now; see [dashboard.md](dashboard.md#infrastructure).
 
 **`FakePostRepository`** is a second `PostRepository` adapter — the
-original one, kept in the codebase as the in-memory alternative: despite
-the "Fake" name (a holdover from when it was test-only),
+original one, kept in the codebase as the in-memory alternative: the
+"Fake" name predates it being test-only, and has come back around to
+being accurate again for a different reason —
 `import.meta.glob('/src/data/posts/*.md', ...)` eagerly loads every file
 under [`src/data/posts/`](../../src/data/posts/) at build time, mapped
 through the ACL into `Post` entities held in memory — no network calls,
-useful for offline development or if Firestore is ever unreachable. This
-is the "one implementation per port, swappable" case from
+useful for offline development, if Firestore is ever unreachable, *and*
+now for `pnpm test:e2e`, which binds it in place of
+`FirebasePostRepository` so e2e assertions run against this fixed
+20-post catalog instead of whatever's actually in a real Firestore
+project — see
+[12-e2e-testing.md](../12-e2e-testing.md#auth-emulator-and-fake-repositories-why-dashboard-e2e-needs-both).
+This is the "one implementation per port, swappable" case from
 [04-infrastructure-layer.md](../04-infrastructure-layer.md#one-implementation-per-port-swappable):
 neither `PostReadService` nor anything above it changes when the binding
-switches. Swapping back is the one-line change in `composition-root.ts`:
-`new FirebasePostRepository()` → `new FakePostRepository()`. Its
-`update()`/`delete()` operate on the same in-memory `Post[]` `save()`
+switches. The binding itself is now a runtime branch on the
+`VITE_USE_FAKE_REPOSITORIES` build-time flag rather than a hardcoded
+`new FirebasePostRepository()` — `pnpm dev`/`pnpm build` never set the
+flag (real Firebase, unchanged default), `pnpm test:e2e` always does.
+Its `update()`/`delete()` operate on the same in-memory `Post[]` `save()`
 already pushes into — `findIndex()` by `slug.equals()`, then splice-
 replace or splice-remove; both throw `PostNotFoundError` for an unknown
 slug, matching `FirebasePostRepository`'s contract exactly (see
@@ -602,11 +610,11 @@ three query handlers) / `PostWriteService` (composes
 symbols were needed for categories/search —
 `ListCategoriesQueryHandler` is constructed inline in
 `composition-root.ts` exactly like the other query handlers, all
-sharing the one `PostRepository` binding — currently
-`new FirebasePostRepository()`. `FakePostRepository` exists as a
-fully-built in-memory alternative (see [Infrastructure](#infrastructure)
-above); switching back is a one-line change to that single binding,
-nothing else in this section moves. `PostImageUploader`'s own binding
+sharing the one `PostRepository` binding — `FirebasePostRepository`
+unless `VITE_USE_FAKE_REPOSITORIES` is set, in which case
+`FakePostRepository` (see [Infrastructure](#infrastructure) above and
+[12-e2e-testing.md](../12-e2e-testing.md#auth-emulator-and-fake-repositories-why-dashboard-e2e-needs-both)
+for who sets that flag and why). `PostImageUploader`'s own binding
 now lives in `dashboard`'s section of `composition-root.ts` — see
 [dashboard.md](dashboard.md#di-wiring).
 

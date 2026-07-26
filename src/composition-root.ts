@@ -10,6 +10,7 @@ import { GetPostBySlugQueryHandler } from './modules/blog/application/query/GetP
 import { ListCategoriesQueryHandler } from './modules/blog/application/query/ListCategories.queryHandler'
 import { ListPostsQueryHandler } from './modules/blog/application/query/ListPosts.queryHandler'
 import type { PostRepository } from './modules/blog/domain/repositories/Post.repository'
+import { FakePostRepository } from './modules/blog/infrastructure/FakePost.repository'
 import { FirebasePostRepository } from './modules/blog/infrastructure/FirebasePost.repository'
 import { EditPostCommandHandler } from './modules/dashboard/application/command/EditPost.commandHandler'
 import { PublishPostCommandHandler } from './modules/dashboard/application/command/PublishPost.commandHandler'
@@ -19,6 +20,7 @@ import {
 } from './modules/dashboard/application/PostManagement.stateService'
 import { DASHBOARD_ACCESS_POLICY } from './modules/dashboard/dashboardPolicy'
 import type { PostImageUploader } from './modules/dashboard/domain/repositories/PostImageUploader.repository'
+import { FakePostImageUploader } from './modules/dashboard/infrastructure/FakePostImageUploader.repository'
 import { FirebasePostImageUploader } from './modules/dashboard/infrastructure/FirebasePostImageUploader.repository'
 import { AuthStateServiceImpl, type AuthStateService } from './shared/auth/application/Auth.stateService'
 import type { AuthRepository } from './shared/auth/domain/repositories/Auth.repository'
@@ -42,9 +44,16 @@ import { TYPES } from './shared/di/types'
 
 const container = new Container()
 
+// e2e builds point these at the in-memory Fake* adapters instead of real
+// Firebase — real Firestore rejects reads/writes carrying an ID token
+// issued by the local Auth emulator (see scripts/e2e.sh), so testing the
+// dashboard against a real project isn't possible without also running
+// the Firestore/Storage emulators (Java-dependent, not wired up here).
+const useFakeRepositories = import.meta.env.VITE_USE_FAKE_REPOSITORIES === 'true'
+
 container
   .bind<PostRepository>(TYPES.PostRepository)
-  .toDynamicValue(() => new FirebasePostRepository())
+  .toDynamicValue(() => (useFakeRepositories ? new FakePostRepository() : new FirebasePostRepository()))
   .inSingletonScope()
 
 container
@@ -73,7 +82,7 @@ container
 
 container
   .bind<PostImageUploader>(TYPES.PostImageUploader)
-  .toDynamicValue(() => new FirebasePostImageUploader())
+  .toDynamicValue(() => (useFakeRepositories ? new FakePostImageUploader() : new FirebasePostImageUploader()))
   .inSingletonScope()
 
 container

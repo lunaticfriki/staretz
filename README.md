@@ -55,6 +55,10 @@ deployed via `firebase deploy --only firestore:rules,storage`) already
 restrict writes to authenticated users and leave reads public, so the
 public blog keeps working with no account at all.
 
+None of this manual setup is needed to run `pnpm test:e2e`, though —
+see [End-to-end testing](#end-to-end-testing) below for how the
+dashboard is covered using a locally emulated admin user instead.
+
 ## Scripts
 
 | Command                | What it does                                                                        |
@@ -145,8 +149,14 @@ Posts are currently read from Cloud Firestore's `posts` collection via
 for the expected document shape. `FakePostRepository` (loading
 `src/data/posts/*.md` via `import.meta.glob`) is kept as an in-memory
 alternative behind the same `PostRepository` port; switching between
-them is a one-line change in `composition-root.ts`, nothing above the
-infrastructure layer needs to change.
+them is a one-line change in `composition-root.ts` — in practice a
+build-time flag (`VITE_USE_FAKE_REPOSITORIES`), since `pnpm dev`/`pnpm build`
+use the real Firebase adapters and `pnpm test:e2e` sets the flag to use
+the Fake ones instead (see [End-to-end testing](#end-to-end-testing)
+below). Nothing above the infrastructure layer needs to change either
+way. `PostImageUploader` has the same real/fake pair
+(`FirebasePostImageUploader`/`FakePostImageUploader`) switched by the
+same flag.
 
 ## Testing
 
@@ -188,16 +198,24 @@ Given/When/Then step in `e2e/step-definitions/` (reuse the existing
 navigation/assertion steps where the wording already fits — `cucumber-js`
 will report "undefined" steps if a Gherkin line doesn't match anything).
 
-**Current caveat**: several scenarios assert against the 20-post
-`FakePostRepository` seed catalog (exact post counts, specific titles,
-per-category counts). Now that `composition-root.ts` binds
-`FirebasePostRepository`, `pnpm test:e2e` runs against whatever is
-actually in the Firestore `posts` collection — those count/title-specific
-scenarios will fail unless the collection's content matches what they
-expect. This isn't a code bug; it's pending a decision on whether to seed
-Firestore with matching content, rewrite the scenarios around real
-content, or point e2e specifically at `FakePostRepository` regardless of
-what production binds.
+**Data and auth in e2e builds**: `pnpm test:e2e` builds with
+`VITE_USE_FAKE_REPOSITORIES=true`, which flips `composition-root.ts`'s
+`PostRepository`/`PostImageUploader` bindings to the in-memory
+`FakePostRepository`/`FakePostImageUploader` instead of the real Firebase
+adapters — so scenarios asserting exact post counts/titles/per-category
+counts run against the known 20-post seed catalog every time, never
+against whatever happens to be in a real Firestore project. `scripts/e2e.sh`
+also starts the Firebase **Auth emulator** (`firebase emulators:start
+--only auth`, no Java dependency, unlike the Firestore/Storage emulators)
+and seeds one fixed admin user via its REST API before the build, so
+`Given I am logged in as an admin` ([e2e/step-definitions/dashboard.steps.ts](e2e/step-definitions/dashboard.steps.ts))
+can log into `/dashboard` for real, without a real Firebase project or
+credentials. Auth is emulated independently of Firestore/Storage
+specifically because a token issued by the Auth emulator doesn't validate
+against a *real* Firestore/Storage project — mixing "real Firestore" with
+"emulated Auth" fails every read/write with `permission-denied` once
+logged in, which is the other reason `PostRepository`/`PostImageUploader`
+switch to their Fake adapters together with Auth, not independently.
 
 ## Git workflow
 

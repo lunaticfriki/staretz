@@ -101,6 +101,14 @@ domain/value-objects/__tests__/    AuthUser.valueObject.test.ts
 application/__tests__/             Auth.stateService.test.ts (mocked AuthRepository)
 ```
 
-`FirebaseAuthRepository` has no test — same reasoning as
+`FirebaseAuthRepository` has no dedicated unit test — same reasoning as
 `FirebasePostRepository` in [blog.md](blog.md#tests): a thin sequence
 of SDK calls, would need the Firebase Auth emulator to test for real.
+That emulator is now wired up, but for e2e, not a unit test: `pnpm
+test:e2e` runs the Auth emulator and this exact
+`signInWithEmailAndPassword`/`onAuthStateChanged` code path for real via
+`Given I am logged in as an admin`
+([12-e2e-testing.md](../12-e2e-testing.md#auth-emulator-and-fake-repositories-why-dashboard-e2e-needs-both),
+[`dashboard.feature`](../../e2e/features/dashboard.feature)) — a real
+integration exercise of `FirebaseAuthRepository`, just not an isolated
+unit test of it.
