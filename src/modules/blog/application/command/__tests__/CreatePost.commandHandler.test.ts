@@ -5,7 +5,10 @@ import type { PostRepository } from '../../../domain/repositories/Post.repositor
 import { CreatePostCommand } from '../CreatePost.command'
 import { CreatePostCommandHandler } from '../CreatePost.commandHandler'
 
-function validCommand(overrides: Partial<Record<string, string>> = {}): CreatePostCommand {
+function validCommand(
+  overrides: Partial<Record<string, string>> = {},
+  gallery: string[] = [],
+): CreatePostCommand {
   const fields = {
     slug: 'my-new-post',
     title: 'My New Post',
@@ -26,6 +29,7 @@ function validCommand(overrides: Partial<Record<string, string>> = {}): CreatePo
     fields.category,
     fields.publishedAt,
     fields.image,
+    gallery,
   )
 }
 
@@ -50,5 +54,16 @@ describe('CreatePostCommandHandler', () => {
     const handler = new CreatePostCommandHandler(instance(repository))
 
     await expect(handler.handle(validCommand({ category: '' }))).rejects.toThrow(InvalidCategoryError)
+  })
+
+  it('carries the gallery image URLs onto the saved post', async () => {
+    const repository = mock<PostRepository>()
+    when(repository.save(anything())).thenResolve()
+
+    const handler = new CreatePostCommandHandler(instance(repository))
+    await handler.handle(validCommand({}, ['https://example.com/one.jpg', 'https://example.com/two.jpg']))
+
+    const [savedPost] = capture(repository.save).last()
+    expect(savedPost.gallery.toArray()).toEqual(['https://example.com/one.jpg', 'https://example.com/two.jpg'])
   })
 })

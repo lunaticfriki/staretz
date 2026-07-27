@@ -3,6 +3,7 @@ import { Category } from '../../value-objects/Category.valueObject'
 import { PostAuthor } from '../../value-objects/PostAuthor.valueObject'
 import { PostContent } from '../../value-objects/PostContent.valueObject'
 import { PostExcerpt } from '../../value-objects/PostExcerpt.valueObject'
+import { PostGallery } from '../../value-objects/PostGallery.valueObject'
 import { PostImage } from '../../value-objects/PostImage.valueObject'
 import { PostTitle } from '../../value-objects/PostTitle.valueObject'
 import { PublishedAt } from '../../value-objects/PublishedAt.valueObject'
@@ -19,6 +20,7 @@ export class PostMother {
       publishedAt: PublishedAt.create(new Date('2026-01-01T00:00:00Z')),
       category: Category.create('Architecture'),
       image: PostImage.create('https://picsum.photos/seed/sample-post/1200/800'),
+      gallery: PostGallery.empty(),
     })
   }
 
@@ -36,6 +38,7 @@ export class PostMother {
       publishedAt: PublishedAt.create(new Date('2026-01-01T00:00:00Z')),
       category: Category.create('Architecture'),
       image: PostImage.create(`https://picsum.photos/seed/${slug}/1200/800`),
+      gallery: PostGallery.empty(),
     })
   }
 
@@ -49,6 +52,7 @@ export class PostMother {
       publishedAt: PublishedAt.create(date),
       category: Category.create('Architecture'),
       image: PostImage.create('https://picsum.photos/seed/sample-post/1200/800'),
+      gallery: PostGallery.empty(),
     })
   }
 
@@ -62,6 +66,7 @@ export class PostMother {
       publishedAt: PublishedAt.create(new Date('2026-01-01T00:00:00Z')),
       category: Category.create(category),
       image: PostImage.create('https://picsum.photos/seed/sample-post/1200/800'),
+      gallery: PostGallery.empty(),
     })
   }
 
@@ -75,6 +80,7 @@ export class PostMother {
       publishedAt: PublishedAt.create(new Date('2026-01-01T00:00:00Z')),
       category: Category.create('Architecture'),
       image: PostImage.create('https://picsum.photos/seed/sample-post/1200/800'),
+      gallery: PostGallery.empty(),
     })
   }
 
@@ -88,6 +94,7 @@ export class PostMother {
       publishedAt: PublishedAt.create(new Date('2026-01-01T00:00:00Z')),
       category: Category.create('Architecture'),
       image: PostImage.create('https://picsum.photos/seed/sample-post/1200/800'),
+      gallery: PostGallery.empty(),
     })
   }
 
@@ -101,6 +108,21 @@ export class PostMother {
       publishedAt: PublishedAt.create(new Date('2026-01-01T00:00:00Z')),
       category: Category.create('Architecture'),
       image: PostImage.create('https://picsum.photos/seed/sample-post/1200/800'),
+      gallery: PostGallery.empty(),
+    })
+  }
+
+  static withGallery(urls: string[]): Post {
+    return Post.create({
+      slug: Slug.create('sample-post'),
+      title: PostTitle.create('Sample Post'),
+      excerpt: PostExcerpt.create('A sample excerpt used for tests.'),
+      content: PostContent.create('Sample post body content.'),
+      author: PostAuthor.create('Jane Doe'),
+      publishedAt: PublishedAt.create(new Date('2026-01-01T00:00:00Z')),
+      category: Category.create('Architecture'),
+      image: PostImage.create('https://picsum.photos/seed/sample-post/1200/800'),
+      gallery: PostGallery.create(urls),
     })
   }
 }

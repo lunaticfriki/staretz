@@ -3,6 +3,7 @@ import type { PostWriteService } from '../../../blog/application/Post.writeServi
 import { MissingPostImageError } from '../../domain/errors/MissingPostImage.error'
 import type { PostImageUploader } from '../../domain/repositories/PostImageUploader.repository'
 import { PublishPostCommand } from './PublishPost.command'
+import { resolveGalleryPlaceholders } from './resolveGalleryPlaceholders.util'
 
 export class PublishPostCommandHandler {
   constructor(
@@ -16,17 +17,20 @@ export class PublishPostCommandHandler {
     }
 
     const image = await this.imageUploader.upload(command.imageFile)
+    const gallery = await this.imageUploader.uploadMany(command.galleryFiles)
+    const content = resolveGalleryPlaceholders(command.content, gallery)
 
     await this.postWriteService.createPost(
       new CreatePostCommand(
         command.slug,
         command.title,
         command.excerpt,
-        command.content,
+        content,
         command.author,
         command.category,
         command.publishedAt,
         image,
+        gallery,
       ),
     )
   }

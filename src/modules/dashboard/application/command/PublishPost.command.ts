@@ -8,5 +8,6 @@ export class PublishPostCommand {
     readonly category: string,
     readonly publishedAt: string,
     readonly imageFile: File | null,
+    readonly galleryFiles: File[] = [],
   ) {}
 }

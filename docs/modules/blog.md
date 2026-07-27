@@ -40,6 +40,7 @@ src/modules/blog/domain/
     PublishedAt.valueObject.ts
     Category.valueObject.ts
     PostImage.valueObject.ts
+    PostGallery.valueObject.ts
   repositories/
     Post.repository.ts
   errors/
@@ -48,12 +49,12 @@ src/modules/blog/domain/
 
 **`Post`** is a read-only entity — every field `public readonly`, no
 behavior methods — built through `Post.create(...)`/`Post.empty()`. Its
-eight fields are all value objects, never primitives: `slug` (`Slug`,
+nine fields are all value objects, never primitives: `slug` (`Slug`,
 lowercase-kebab-case, validated by regex), `title`/`excerpt`/`content`/
 `author`/`category`/`image` (each a non-empty-string wrapper with its own
 `InvalidXxxError`), `publishedAt` (`PublishedAt`, wraps a `Date`, exposes
 `isAfter()` for ordering and `toDate()`/`toISOString()` — never a bare
-`Date` escapes the value object).
+`Date` escapes the value object), `gallery` (`PostGallery`, see below).
 
 **`Category`** is a plain non-empty-string wrapper (same shape as
 `PostAuthor`) — `create(value)` trims and rejects empty,
@@ -74,6 +75,29 @@ need a fallback." A single URL is stored, not a per-size set — `object-cover`
 handles both the small preview-card crop and the full-bleed hero from
 the one image, so there was nothing to gain from storing width/height
 variants.
+
+**`PostGallery`** wraps `readonly string[]` — the extra images an author
+adds beyond the hero. Unlike every other value object here it's allowed
+to be empty (`create([])`/`empty()` both succeed; most posts have no
+gallery), but any URL that *is* present must be non-empty, same
+`InvalidPostGalleryError` shape as the rest. It intentionally does **not**
+carry position or caption data — where an image appears "along the text"
+is decided by the post author placing standard `![alt](url)` Markdown
+directly inside `content`, using one of `gallery`'s URLs, exactly like any
+other Markdown image; `marked` (already parsing `content` in `PostView`,
+see [Presentation](#presentation) below) renders it inline for free, no
+placeholder-token syntax needed *in the domain*. A `gallery:N`
+placeholder syntax does exist, but only as an authoring convenience one
+layer up, in `dashboard`'s `PostForm`/command handlers — resolved to a
+real URL before `content` ever reaches this module's
+`CreatePostCommand`/`UpdatePostCommand` (see
+[dashboard.md](dashboard.md#application)'s
+`resolveGalleryPlaceholders` note); by the time a `Post` is constructed
+here, `content` only ever contains ordinary `![alt](url)` Markdown.
+`gallery` itself is a manifest of the
+images that belong to the post (what the dashboard's gallery upload UI
+lists/lets you remove — see [dashboard.md](dashboard.md#presentation)) —
+it is read but never auto-rendered by `PostView`.
 
 **`PostCollection`** (`domain/collections/`) wraps `Post[]` and owns the
 collection-level domain behavior this module has:
@@ -428,7 +452,13 @@ author: "Marco Reyes"
 publishedAt: Timestamp(2026-01-19)
 category: "Architecture"
 image: "https://cdn.example.com/hexagonal-architecture.jpg"  # optional — falls back to a placeholder if absent
+gallery: ["https://cdn.example.com/one.jpg", "https://cdn.example.com/two.jpg"]  # optional — array of strings, defaults to []
 ```
+
+`gallery` entries are referenced inside `content` itself via Markdown
+image syntax (`![alt](https://cdn.example.com/one.jpg)`) wherever the
+author wants them to appear — see the `PostGallery` note under
+[Domain](#domain) above.
 
 Post frontmatter shape (see any file in `src/data/posts/`):
 
@@ -445,6 +475,12 @@ image: https://cdn.example.com/hexagonal-architecture.jpg  # optional — falls 
 
 Markdown body, rendered through `marked` in `PostView`.
 ```
+
+Frontmatter parsing (`parseMarkdownWithFrontmatter`) only understands flat
+`key: value` lines, not arrays — seeded markdown posts always get an empty
+`PostGallery` (`Post.mapper.ts` passes `PostGallery.empty()` directly,
+never reading a `gallery` key from frontmatter). `gallery` is a
+Firestore-only field today.
 
 Every seeded post carries one of five categories (`Architecture`,
 `Domain-Driven Design`, `Frontend`, `Testing`, `Tooling`) — chosen per
@@ -593,6 +629,11 @@ through `marked.parse()` into `dangerouslySetInnerHTML` on a
 `prose prose-gray ... dark:prose-invert` container (Tailwind Typography),
 with `prose-headings:`/`prose-a:` overrides so markdown headings/links
 pick up the site's purple accent instead of the plugin's default gray.
+`post.gallery` is not read here at all — gallery images that an author
+places inside `content` as ordinary `![alt](url)` Markdown render through
+this same `marked.parse()` call, styled by Tailwind Typography's default
+`img` rules; `gallery` only exists to tell the dashboard which URLs
+belong to the post (see [dashboard.md](dashboard.md#presentation)).
 
 **`PostPreview`** uses the same `post.image.toString()` for its card
 thumbnail — one URL, two different visual footprints (a `h-40` card crop
@@ -652,7 +693,10 @@ infrastructure/
 mock `PostRepository` and assert both that a valid command builds and
 saves/updates the right `Post` (captured via `ts-mockito`'s
 `capture()`) and that invalid fields still throw the normal
-value-object error before `save()`/`update()` is ever reached.
+value-object error before `save()`/`update()` is ever reached, plus a
+case asserting the command's `gallery: string[]` (defaults to `[]`)
+lands on `savedPost.gallery.toArray()`/`updatedPost.gallery.toArray()`
+unchanged.
 `DeletePost.commandHandler.test.ts` asserts the resolved `Slug` reaches
 `repository.delete()` and that an invalid slug throws before it does.
 `FakePost.repository.test.ts`'s `update()`/`delete()` cases cover both

@@ -2,6 +2,7 @@ import { Category } from '../value-objects/Category.valueObject'
 import { PostAuthor } from '../value-objects/PostAuthor.valueObject'
 import { PostContent } from '../value-objects/PostContent.valueObject'
 import { PostExcerpt } from '../value-objects/PostExcerpt.valueObject'
+import { PostGallery } from '../value-objects/PostGallery.valueObject'
 import { PostImage } from '../value-objects/PostImage.valueObject'
 import { PostTitle } from '../value-objects/PostTitle.valueObject'
 import { PublishedAt } from '../value-objects/PublishedAt.valueObject'
@@ -16,6 +17,7 @@ interface CreatePostParams {
   publishedAt: PublishedAt
   category: Category
   image: PostImage
+  gallery: PostGallery
 }
 
 export class Post {
@@ -28,6 +30,7 @@ export class Post {
     public readonly publishedAt: PublishedAt,
     public readonly category: Category,
     public readonly image: PostImage,
+    public readonly gallery: PostGallery,
   ) {}
 
   static create(params: CreatePostParams): Post {
@@ -40,6 +43,7 @@ export class Post {
       params.publishedAt,
       params.category,
       params.image,
+      params.gallery,
     )
   }
 
@@ -53,6 +57,7 @@ export class Post {
       PublishedAt.empty(),
       Category.empty(),
       PostImage.empty(),
+      PostGallery.empty(),
     )
   }
 }

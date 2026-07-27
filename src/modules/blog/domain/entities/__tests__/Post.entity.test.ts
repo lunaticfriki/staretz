@@ -10,6 +10,21 @@ describe('Post', () => {
     expect(post.slug.toString()).toBe('hello-world')
   })
 
+  it('defaults to an empty gallery when none is provided', () => {
+    const post = PostMother.withSlug('hello-world')
+
+    expect(post.gallery.toArray()).toEqual([])
+  })
+
+  it('carries the gallery image URLs when provided', () => {
+    const post = PostMother.withGallery([
+      'https://cdn.example.com/one.jpg',
+      'https://cdn.example.com/two.jpg',
+    ])
+
+    expect(post.gallery.toArray()).toEqual(['https://cdn.example.com/one.jpg', 'https://cdn.example.com/two.jpg'])
+  })
+
   it('rejects an empty title', () => {
     expect(() => PostTitle.create('   ')).toThrow(InvalidPostTitleError)
   })

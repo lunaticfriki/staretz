@@ -55,6 +55,13 @@ uploading is a distinct technical operation from persisting a `Post`,
 so it gets its own port rather than `PostRepository.save()`/`update()`
 growing a `File` parameter they don't otherwise need. One upload port
 serves both create and edit — nothing about it is create-specific.
+The abstract class also has one *concrete* method,
+`uploadMany(files: File[]): Promise<string[]>` — `Promise.all(files.map(f
+=> this.upload(f)))`, gallery images just being "several of the same
+upload." It's implemented once on the base class rather than duplicated
+in both adapters below, so neither `FirebasePostImageUploader` nor
+`FakePostImageUploader` needed to change when the gallery feature was
+added.
 
 **`MissingPostImageError`** (`extends DomainError`) is thrown by
 `PublishPostCommandHandler` when creating a post with no file selected
@@ -86,9 +93,11 @@ src/modules/dashboard/application/
     PublishPost.commandHandler.ts
     EditPost.command.ts
     EditPost.commandHandler.ts
+    resolveGalleryPlaceholders.util.ts
     __tests__/
       PublishPost.commandHandler.test.ts
       EditPost.commandHandler.test.ts
+      resolveGalleryPlaceholders.util.test.ts
   PostManagement.stateService.ts
   __tests__/
     PostManagement.stateService.test.ts
@@ -107,27 +116,76 @@ whether it does anything").
 **`PublishPostCommand`**: raw primitives (`slug`, `title`, `excerpt`,
 `content`, `author`, `category`, `publishedAt` — all `string`) plus
 `imageFile: File | null` — the one field `blog`'s `CreatePostCommand`
-doesn't have, because uploading it is this module's job, not `blog`'s.
+doesn't have, because uploading it is this module's job, not `blog`'s —
+plus `galleryFiles: File[] = []`, the new gallery images selected on
+the create form.
 
 **`PublishPostCommandHandler`**: `1)` if `command.imageFile` is `null`,
 throws `MissingPostImageError` immediately — no upload attempted; `2)`
 `PostImageUploader.upload(command.imageFile)` resolves to a real URL;
-`3)` builds `blog`'s `CreatePostCommand` (with that URL as `image`) and
+`3)` `PostImageUploader.uploadMany(command.galleryFiles)` resolves the
+gallery URLs, in parallel with nothing else since there's no "existing
+gallery" to merge with on create; `4)`
+`resolveGalleryPlaceholders(command.content, gallery)` — see below —
+before `5)` builds `blog`'s `CreatePostCommand` (with that URL as
+`image`, the resolved content, and the resolved array as `gallery`) and
 calls `PostWriteService.createPost()` ([blog.md](blog.md#application)).
+
+**`resolveGalleryPlaceholders(content, uploadedGalleryUrls)`**: the fix
+for a real ordering problem — the author writes `content` in `PostForm`
+*before* the gallery files they just picked have been uploaded, so
+there's no URL yet to paste into `![alt](url)`. Instead they write
+`![alt](gallery:0)`, `![alt](gallery:1)`, ... — `0`-indexed by the
+order they selected files in the `<input type="file" multiple>` picker
+(`PostForm` numbers each new-file thumbnail with its `gallery:N` label
+so the author can see which index is which — see
+[Presentation](#presentation) below). Both command handlers call this
+*after* `uploadMany()` resolves, replacing every `gallery:N` substring
+with `uploadedGalleryUrls[N]` via one regex pass
+(`/gallery:(\d+)/g`); an index with no matching upload (typo, or more
+placeholders than files) is left untouched rather than throwing, so a
+mistake there degrades to a visibly broken image link instead of
+failing the whole publish/edit. By the time `blog`'s
+`CreatePostCommandHandler`/`UpdatePostCommandHandler` see `content`, it
+already contains only real URLs — `blog`'s domain has no notion of
+`gallery:N` placeholders at all, see the `PostGallery` note in
+[blog.md](blog.md#domain).
 
 **`EditPostCommand`**: the same primitives as `PublishPostCommand`
 minus `slug` isn't editable — it's still there (identifying which post
 to update) but `PostForm` renders it read-only in edit mode (see
 [Presentation](#presentation) below) — plus `currentImage: string`
 (the post's existing image URL) alongside `imageFile: File | null`
-(an optional replacement).
+(an optional replacement), and the gallery equivalent:
+`keptGalleryUrls: string[] = []` (the post's existing gallery URLs the
+user didn't remove in the form) plus `newGalleryFiles: File[] = []`
+(new files added this edit). There's no `currentGallery` field the way
+there's a `currentImage` — unlike the single hero image, "keep as-is"
+for a gallery is expressed by *which* existing URLs survive into
+`keptGalleryUrls`, decided in `PostForm` (see
+[Presentation](#presentation) below), not by the command needing to
+know the full previous gallery to diff against.
 
 **`EditPostCommandHandler`**: `1)` `command.imageFile ? await
 imageUploader.upload(command.imageFile) : command.currentImage` — a
 new file re-uploads and replaces the image; no file keeps the existing
-URL as-is, no upload attempted; `2)` builds `blog`'s `UpdatePostCommand`
-(with that resolved URL) and calls `PostWriteService.updatePost()`
-([blog.md](blog.md#application)).
+URL as-is, no upload attempted; `2)`
+`imageUploader.uploadMany(command.newGalleryFiles)`, then
+`[...command.keptGalleryUrls, ...uploadedGalleryUrls]` — kept URLs
+first, newly uploaded ones appended, so a re-edit that adds one more
+image doesn't reorder the ones already referenced from `content`; `3)`
+`resolveGalleryPlaceholders(command.content, uploadedGalleryUrls)` (see
+above) — indexed against `uploadedGalleryUrls` only, *not* the merged
+`gallery` array, since `keptGalleryUrls` already have real URLs the
+author could already reference directly, and giving them a `gallery:N`
+slot too would make the same index mean two different things depending
+on whether a post was just created or is being re-edited; `4)` builds
+`blog`'s `UpdatePostCommand` (with that resolved image URL, resolved
+content, and gallery array) and calls `PostWriteService.updatePost()`
+([blog.md](blog.md#application)). Passing `gallery: []` here (rather
+than the previous gallery) would silently wipe it on every edit — this
+is why `keptGalleryUrls` exists on the command instead of leaving
+gallery handling to `blog`'s `UpdatePostCommand` alone.
 
 Both handlers are the sanctioned cross-module shape from
 [06-vertical-slicing.md](../06-vertical-slicing.md#rules): `dashboard`'s
@@ -237,19 +295,44 @@ link, so neither highlights while editing.
 mold as `CategorySearch`/`CategoryMenu` (see
 [blog.md](blog.md#presentation)): it owns its own field state via
 `useState` and emits a plain `PostFormValues` object (including the
-raw `File | null`) through `onSubmit`. It now serves both create and
-edit through props rather than being two components:
+raw `File | null`/`File[]`) through `onSubmit`. It now serves both
+create and edit through props rather than being two components:
 
-- `initialValues?: Omit<PostFormValues, 'imageFile'>` — when given
-  (edit mode), pre-fills every text field and marks the slug as
-  already "touched" so title edits don't clobber it via
-  auto-derivation; when absent (create mode), fields start empty and
-  slug auto-derives from the title (kebab-cased) until edited directly.
+- `initialValues?: Omit<PostFormValues, 'imageFile' | 'galleryFiles' |
+  'keptGalleryUrls'>` — when given (edit mode), pre-fills every text
+  field and marks the slug as already "touched" so title edits don't
+  clobber it via auto-derivation; when absent (create mode), fields
+  start empty and slug auto-derives from the title (kebab-cased) until
+  edited directly.
 - `currentImage?: string` — when given, renders a small thumbnail
   ("Imatge actual — deixa-ho en blanc per mantenir-la") above the file
   input and makes the file input optional (`required={!currentImage}`);
   when absent, the file input stays required, unchanged from before
   this feature.
+- `currentGallery?: string[] = []` — the post's existing gallery URLs
+  (edit mode only; `NewPostContainer` doesn't pass it, so it's always
+  `[]` on create). Each renders as a thumbnail plus a read-only,
+  select-on-focus URL field (so the author can copy a URL to paste as
+  `![alt](url)` into the "Contingut" textarea — see the `PostGallery`
+  note in [blog.md](blog.md#domain) for why positioning happens there,
+  not in this form) and an "Elimina"/"Recupera" toggle button. Removal
+  is local `useState` (`removedGalleryUrls: string[]`) — nothing is
+  deleted from storage or Firestore until submit, when
+  `handleSubmit` computes `keptGalleryUrls =
+  currentGallery.filter(url => !removedGalleryUrls.includes(url))`. A
+  second, always-present `<input type="file" multiple>` collects new
+  gallery images into `galleryFiles`; actual upload happens in
+  `EditPostCommandHandler`/`PublishPostCommandHandler` on submit (see
+  [Application](#application) above), so a newly added gallery image's
+  real URL isn't known until *after* a save. Rather than blocking on
+  that, a `useEffect` keyed on `galleryFiles` builds one local
+  `URL.createObjectURL(file)` preview per selected file (revoked on
+  cleanup/re-selection, so nothing leaks), rendered as a thumbnail
+  labeled `gallery:0`, `gallery:1`, ... in selection order — the same
+  index `resolveGalleryPlaceholders` consumes on submit (see
+  [Application](#application) above). The author writes
+  `![alt](gallery:0)` directly into `content` against that label
+  *before* saving; no second edit needed once the real URL exists.
 - `slugEditable = true` — `EditPostContainer` passes `false`: the slug
   is the routing identity (`/blog/:slug`, `/dashboard/edit/:slug`) and
   changing it out from under a live URL isn't supported, so the field
@@ -334,13 +417,15 @@ application, per [03-application-layer-cqrs.md](../03-application-layer-cqrs.md)
 exact same hook `PostPageContainer` uses for the public reading view
 ([blog.md](blog.md#presentation)) — rendering `loading`/`not-found`/
 `loaded` branches, and only mounts `<PostForm>` once `loaded`, passing
-`initialValues`/`currentImage` built from the domain `Post`. On submit,
-builds an `EditPostCommand` (carrying the still-loaded post's current
-image as the fallback) and calls `editPost()`. A `useEffect` watching
-`edit.status === 'submitted'` calls `route('/dashboard')` — navigating
-back to the list is this container's own view-level decision
-(routing is a browser/router concern), not something the state service
-or command handler needs to know about.
+`initialValues`/`currentImage`/`currentGallery` (`postState.post.gallery
+.toArray()`) built from the domain `Post`. On submit, builds an
+`EditPostCommand` (carrying the still-loaded post's current image as
+the fallback, plus the form's `keptGalleryUrls`/`galleryFiles`) and
+calls `editPost()`. A `useEffect` watching `edit.status === 'submitted'`
+calls `route('/dashboard')` — navigating back to the list is this
+container's own view-level decision (routing is a browser/router
+concern), not something the state service or command handler needs to
+know about.
 
 **`PostsListContainer`** (`/dashboard`): reuses `blog`'s own
 `usePostsPageState(page, perPage, search, sort, refreshToken)` hook —
@@ -408,18 +493,34 @@ directly for `deletePost()`, plus `NotificationStateService` +
 application/
   command/__tests__/   PublishPost.commandHandler.test.ts (mocked PostImageUploader + PostWriteService)
                         EditPost.commandHandler.test.ts (mocked PostImageUploader + PostWriteService)
+                        resolveGalleryPlaceholders.util.test.ts (pure function, no mocks)
   __tests__/            PostManagement.stateService.test.ts (mocked handlers + PostWriteService + NotificationStateService + ErrorManager)
 ```
 
 `PublishPost.commandHandler.test.ts` asserts the happy path (upload
 runs, its resolved URL ends up as `CreatePostCommand.image`, captured
-via `ts-mockito`'s `capture()`) and that a missing file throws
+via `ts-mockito`'s `capture()`), that gallery files passed through
+`uploadMany` land as `CreatePostCommand.gallery`, that a `gallery:0`
+placeholder in `content` is resolved to the one uploaded gallery URL
+on `CreatePostCommand.content`, and that a missing file throws
 `MissingPostImageError` *without* calling either the uploader or
 `PostWriteService.createPost()`. `EditPost.commandHandler.test.ts`
-asserts both branches: no file selected reuses `currentImage` and
-never calls the uploader; a file selected uploads it and uses the
-resolved URL, in both cases captured off `PostWriteService.updatePost()`'s
-argument. `PostManagement.stateService.test.ts` asserts, for each of
+asserts both hero-image branches: no file selected reuses
+`currentImage` and never calls the uploader; a file selected uploads it
+and uses the resolved URL — plus a case asserting `keptGalleryUrls`
+and the URLs `uploadMany` resolves for `newGalleryFiles` are
+concatenated (kept first) onto `UpdatePostCommand.gallery`, and a
+case mirroring the create-side one, asserting a `gallery:0` placeholder
+resolves against `newGalleryFiles`' uploaded URL on
+`UpdatePostCommand.content` — in all cases captured off
+`PostWriteService.updatePost()`'s argument.
+`resolveGalleryPlaceholders.util.test.ts` tests the function directly,
+with no handler/mock involved: multiple placeholders in one string each
+resolve to their own index's URL, content with no placeholders passes
+through unchanged, and an out-of-range index (more placeholders than
+uploaded URLs) is left as literal text rather than throwing or
+substituting `undefined`.
+`PostManagement.stateService.test.ts` asserts, for each of
 `publishPost`/`editPost`/`deletePost`, the in-flight → terminal state
 transition, the success notification, and the reset-to-`idle` +
 `ErrorManager.handle()` call (not a direct notification) on failure —

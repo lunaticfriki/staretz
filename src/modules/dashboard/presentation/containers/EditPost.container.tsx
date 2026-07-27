@@ -39,6 +39,8 @@ export function EditPostContainer({ slug = '' }: EditPostContainerProps) {
         values.publishedAt,
         postState.post.image.toString(),
         values.imageFile,
+        values.keptGalleryUrls,
+        values.galleryFiles,
       ),
     )
   }
@@ -66,6 +68,7 @@ export function EditPostContainer({ slug = '' }: EditPostContainerProps) {
               publishedAt: postState.post.publishedAt.toISOString().slice(0, 10),
             }}
             currentImage={postState.post.image.toString()}
+            currentGallery={postState.post.gallery.toArray()}
             slugEditable={false}
             submitLabel="Desa els canvis"
             submittingLabel="Desant..."

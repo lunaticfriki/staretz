@@ -20,6 +20,7 @@ export function NewPostContainer(_props: RouteProps) {
         values.category,
         values.publishedAt,
         values.imageFile,
+        values.galleryFiles,
       ),
     )
   }

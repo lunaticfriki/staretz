@@ -5,7 +5,10 @@ import type { PostRepository } from '../../../domain/repositories/Post.repositor
 import { UpdatePostCommand } from '../UpdatePost.command'
 import { UpdatePostCommandHandler } from '../UpdatePost.commandHandler'
 
-function validCommand(overrides: Partial<Record<string, string>> = {}): UpdatePostCommand {
+function validCommand(
+  overrides: Partial<Record<string, string>> = {},
+  gallery: string[] = [],
+): UpdatePostCommand {
   const fields = {
     slug: 'my-existing-post',
     title: 'My Updated Post',
@@ -26,6 +29,7 @@ function validCommand(overrides: Partial<Record<string, string>> = {}): UpdatePo
     fields.category,
     fields.publishedAt,
     fields.image,
+    gallery,
   )
 }
 
@@ -49,5 +53,16 @@ describe('UpdatePostCommandHandler', () => {
     const handler = new UpdatePostCommandHandler(instance(repository))
 
     await expect(handler.handle(validCommand({ category: '' }))).rejects.toThrow(InvalidCategoryError)
+  })
+
+  it('carries the gallery image URLs onto the updated post', async () => {
+    const repository = mock<PostRepository>()
+    when(repository.update(anything())).thenResolve()
+
+    const handler = new UpdatePostCommandHandler(instance(repository))
+    await handler.handle(validCommand({}, ['https://example.com/one.jpg']))
+
+    const [updatedPost] = capture(repository.update).last()
+    expect(updatedPost.gallery.toArray()).toEqual(['https://example.com/one.jpg'])
   })
 })

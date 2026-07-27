@@ -3,6 +3,7 @@ import { Category } from '../../domain/value-objects/Category.valueObject'
 import { PostAuthor } from '../../domain/value-objects/PostAuthor.valueObject'
 import { PostContent } from '../../domain/value-objects/PostContent.valueObject'
 import { PostExcerpt } from '../../domain/value-objects/PostExcerpt.valueObject'
+import { PostGallery } from '../../domain/value-objects/PostGallery.valueObject'
 import { PostImage } from '../../domain/value-objects/PostImage.valueObject'
 import { PostTitle } from '../../domain/value-objects/PostTitle.valueObject'
 import { PublishedAt } from '../../domain/value-objects/PublishedAt.valueObject'
@@ -23,6 +24,7 @@ export class CreatePostCommandHandler {
       category: Category.create(command.category),
       publishedAt: PublishedAt.create(command.publishedAt),
       image: PostImage.create(command.image),
+      gallery: PostGallery.create(command.gallery),
     })
 
     await this.posts.save(post)

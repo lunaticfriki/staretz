@@ -9,5 +9,7 @@ export class EditPostCommand {
     readonly publishedAt: string,
     readonly currentImage: string,
     readonly imageFile: File | null,
+    readonly keptGalleryUrls: string[] = [],
+    readonly newGalleryFiles: File[] = [],
   ) {}
 }

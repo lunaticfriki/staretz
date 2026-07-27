@@ -59,25 +59,41 @@ describe('FirestorePostMapper', () => {
     expect(post.image.toString()).toBe('https://picsum.photos/seed/hexagonal-architecture-explained/1200/800')
   })
 
+  it('reads the gallery image URLs when present', () => {
+    const post = FirestorePostMapper.toDomain(
+      documentData({ gallery: ['https://cdn.example.com/one.jpg', 'https://cdn.example.com/two.jpg'] }),
+    )
+
+    expect(post.gallery.toArray()).toEqual(['https://cdn.example.com/one.jpg', 'https://cdn.example.com/two.jpg'])
+  })
+
+  it('defaults to an empty gallery when the field is missing', () => {
+    const post = FirestorePostMapper.toDomain(documentData())
+
+    expect(post.gallery.toArray()).toEqual([])
+  })
+
   it('toPersistence() maps a Post back into a Firestore document shape', () => {
-    const post = PostMother.withSlug('my-new-post')
+    const post = PostMother.withGallery(['https://cdn.example.com/one.jpg'])
 
     const data = FirestorePostMapper.toPersistence(post)
 
-    expect(data.slug).toBe('my-new-post')
+    expect(data.slug).toBe('sample-post')
     expect(data.title).toBe(post.title.toString())
     expect(data.category).toBe(post.category.toString())
     expect(data.image).toBe(post.image.toString())
+    expect(data.gallery).toEqual(['https://cdn.example.com/one.jpg'])
     expect(data.publishedAt).toBeInstanceOf(Timestamp)
   })
 
   it('toPersistence() then toDomain() round-trips to an equivalent Post', () => {
-    const post = PostMother.withSlug('round-trip-post')
+    const post = PostMother.withGallery(['https://cdn.example.com/one.jpg', 'https://cdn.example.com/two.jpg'])
 
     const roundTripped = FirestorePostMapper.toDomain(FirestorePostMapper.toPersistence(post))
 
     expect(roundTripped.slug.toString()).toBe(post.slug.toString())
     expect(roundTripped.title.toString()).toBe(post.title.toString())
     expect(roundTripped.publishedAt.toISOString()).toBe(post.publishedAt.toISOString())
+    expect(roundTripped.gallery.toArray()).toEqual(post.gallery.toArray())
   })
 })

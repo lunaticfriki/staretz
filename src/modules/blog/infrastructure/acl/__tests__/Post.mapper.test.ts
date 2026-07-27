@@ -36,4 +36,10 @@ describe('PostMapper', () => {
 
     expect(post.image.toString()).toBe('https://cdn.example.com/hexagonal-architecture.jpg')
   })
+
+  it('defaults to an empty gallery, since frontmatter does not support arrays', () => {
+    const post = PostMapper.toDomain(markdown())
+
+    expect(post.gallery.toArray()).toEqual([])
+  })
 })

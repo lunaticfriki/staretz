@@ -1,4 +1,4 @@
-import { useState } from 'preact/hooks'
+import { useEffect, useState } from 'preact/hooks'
 import { useCategoriesState } from '../../../blog/presentation/useCategoriesState.hook'
 
 export interface PostFormValues {
@@ -10,13 +10,18 @@ export interface PostFormValues {
   category: string
   publishedAt: string
   imageFile: File | null
+  galleryFiles: File[]
+  keptGalleryUrls: string[]
 }
+
+type PostFormInitialValues = Omit<PostFormValues, 'imageFile' | 'galleryFiles' | 'keptGalleryUrls'>
 
 interface PostFormProps {
   onSubmit: (values: PostFormValues) => void
   submitting: boolean
-  initialValues?: Omit<PostFormValues, 'imageFile'>
+  initialValues?: PostFormInitialValues
   currentImage?: string
+  currentGallery?: string[]
   slugEditable?: boolean
   submitLabel?: string
   submittingLabel?: string
@@ -38,6 +43,7 @@ export function PostForm({
   submitting,
   initialValues,
   currentImage,
+  currentGallery = [],
   slugEditable = true,
   submitLabel = 'Publica',
   submittingLabel = 'Publicant...',
@@ -54,6 +60,17 @@ export function PostForm({
     () => initialValues?.publishedAt ?? new Date().toISOString().slice(0, 10),
   )
   const [imageFile, setImageFile] = useState<File | null>(null)
+  const [galleryFiles, setGalleryFiles] = useState<File[]>([])
+  const [galleryPreviewUrls, setGalleryPreviewUrls] = useState<string[]>([])
+  const [removedGalleryUrls, setRemovedGalleryUrls] = useState<string[]>([])
+
+  useEffect(() => {
+    const previewUrls = galleryFiles.map((file) => URL.createObjectURL(file))
+    setGalleryPreviewUrls(previewUrls)
+    return () => {
+      previewUrls.forEach((url) => URL.revokeObjectURL(url))
+    }
+  }, [galleryFiles])
 
   function handleTitleInput(value: string) {
     setTitle(value)
@@ -62,9 +79,27 @@ export function PostForm({
     }
   }
 
+  function toggleGalleryRemoval(url: string) {
+    setRemovedGalleryUrls((current) =>
+      current.includes(url) ? current.filter((removedUrl) => removedUrl !== url) : [...current, url],
+    )
+  }
+
   function handleSubmit(event: Event) {
     event.preventDefault()
-    onSubmit({ slug, title, excerpt, content, author, category, publishedAt, imageFile })
+    const keptGalleryUrls = currentGallery.filter((url) => !removedGalleryUrls.includes(url))
+    onSubmit({
+      slug,
+      title,
+      excerpt,
+      content,
+      author,
+      category,
+      publishedAt,
+      imageFile,
+      galleryFiles,
+      keptGalleryUrls,
+    })
   }
 
   return (
@@ -170,6 +205,57 @@ export function PostForm({
           onInput={(event) => setImageFile((event.target as HTMLInputElement).files?.[0] ?? null)}
           class="text-sm"
         />
+      </label>
+      <label class="flex flex-col gap-1 text-sm">
+        Galeria d'imatges
+        <span class="text-xs text-gray-500 dark:text-gray-400">
+          Imatges addicionals per posar al llarg del text amb Markdown: ![alt](url). Les imatges noves
+          encara no tenen URL — referencia-les al contingut amb ![alt](gallery:0), ![alt](gallery:1)...
+          segons l'ordre de selecció (veure els números sota cada miniatura); es converteixen en la URL
+          real en desar.
+        </span>
+        {currentGallery.length > 0 && (
+          <div class="mt-1 flex flex-wrap gap-3">
+            {currentGallery.map((url) => {
+              const removed = removedGalleryUrls.includes(url)
+              return (
+                <div key={url} class="flex w-28 flex-col items-center gap-1">
+                  <img src={url} alt="" class={`h-16 w-24 rounded object-cover ${removed ? 'opacity-30' : ''}`} />
+                  <input
+                    readOnly
+                    value={url}
+                    onFocus={(event) => (event.target as HTMLInputElement).select()}
+                    class="w-full rounded border border-gray-300 bg-transparent px-1 py-0.5 text-[10px] dark:border-gray-700"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => toggleGalleryRemoval(url)}
+                    class="text-xs text-purple-600 hover:underline dark:text-purple-400"
+                  >
+                    {removed ? 'Recupera' : 'Elimina'}
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        )}
+        <input
+          type="file"
+          accept="image/*"
+          multiple
+          onInput={(event) => setGalleryFiles(Array.from((event.target as HTMLInputElement).files ?? []))}
+          class="mt-1 text-sm"
+        />
+        {galleryFiles.length > 0 && (
+          <div class="mt-1 flex flex-wrap gap-3">
+            {galleryFiles.map((file, index) => (
+              <div key={`${file.name}-${index}`} class="flex w-28 flex-col items-center gap-1">
+                <img src={galleryPreviewUrls[index]} alt="" class="h-16 w-24 rounded object-cover" />
+                <code class="text-[10px] text-gray-500 dark:text-gray-400">gallery:{index}</code>
+              </div>
+            ))}
+          </div>
+        )}
       </label>
       <button
         type="submit"

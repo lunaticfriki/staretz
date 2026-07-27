@@ -8,5 +8,6 @@ export class CreatePostCommand {
     readonly category: string,
     readonly publishedAt: string,
     readonly image: string,
+    readonly gallery: string[] = [],
   ) {}
 }

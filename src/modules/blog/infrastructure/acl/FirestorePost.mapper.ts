@@ -4,6 +4,7 @@ import { Category } from '../../domain/value-objects/Category.valueObject'
 import { PostAuthor } from '../../domain/value-objects/PostAuthor.valueObject'
 import { PostContent } from '../../domain/value-objects/PostContent.valueObject'
 import { PostExcerpt } from '../../domain/value-objects/PostExcerpt.valueObject'
+import { PostGallery } from '../../domain/value-objects/PostGallery.valueObject'
 import { PostImage } from '../../domain/value-objects/PostImage.valueObject'
 import { PostTitle } from '../../domain/value-objects/PostTitle.valueObject'
 import { PublishedAt } from '../../domain/value-objects/PublishedAt.valueObject'
@@ -23,6 +24,7 @@ export class FirestorePostMapper {
       publishedAt: PublishedAt.create(publishedAt),
       category: Category.create(data.category),
       image: PostImage.create(data.image || postImagePlaceholderUrl(data.slug)),
+      gallery: PostGallery.create(Array.isArray(data.gallery) ? data.gallery : []),
     })
   }
 
@@ -36,6 +38,7 @@ export class FirestorePostMapper {
       publishedAt: Timestamp.fromDate(post.publishedAt.toDate()),
       category: post.category.toString(),
       image: post.image.toString(),
+      gallery: post.gallery.toArray(),
     }
   }
 }
