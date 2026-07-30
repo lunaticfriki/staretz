@@ -13,9 +13,7 @@ pub trait ProcessRunner {
     fn start(&self, command: &ShellCommand, cwd: &Path) -> Result<Box<dyn RunningHandle>, ProcessError>;
 }
 
-/// Handle to a background job started via `ProcessRunner::start`.
 pub trait RunningHandle {
-    /// Returns every output line received since the last call.
     fn drain_output(&mut self) -> Vec<String>;
 
     /// Non-blocking check for whether the process has exited.

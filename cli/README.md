@@ -44,15 +44,6 @@ useful for one-off commands you don't want to leave the TUI for. It's
 marked `interactive = true` for the same reason `Claude`/`OpenCode` are:
 a shell needs a real TTY to prompt for input.
 
-### The `Git` tab
-
-`Git` runs [`scripts/git-menu.sh`](../scripts/git-menu.sh), a small text
-menu (status / diff / commit / push / pull / log) instead of a raw shell.
-It's marked `interactive = true` because `commit` and `push` need a real
-TTY — they trigger this repo's husky hooks (`prepare-commit-msg`,
-`commit-msg`, `pre-push`, see the root [README](../README.md#git-workflow)),
-which prompt interactively and would silently no-op without one.
-
 ## Two focus modes
 
 The TUI has two places your keystrokes can go, shown in the status line at

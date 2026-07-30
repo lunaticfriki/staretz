@@ -34,9 +34,3 @@ name = "OpenCode"
 command = "opencode"
 cwd = ".."
 interactive = true
-
-[[entry]]
-name = "Git"
-command = "bash scripts/git-menu.sh"
-cwd = ".."
-interactive = true

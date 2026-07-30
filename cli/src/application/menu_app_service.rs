@@ -108,15 +108,12 @@ impl MenuAppService {
             .handle(&mut self.menu, &mut self.pty_handles, StartPtyTabCommand { tab_id, size })
     }
 
-    /// Forwards raw input bytes (already translated from a key event) to
-    /// the selected tab's pty.
     pub fn write_to_selected_pty(&mut self, bytes: Vec<u8>) {
         let tab_id = self.menu.selected().id().clone();
         self.write_to_pty_tab
             .handle(&mut self.pty_handles, WriteToPtyTabCommand { tab_id, bytes });
     }
 
-    /// Tells the selected tab's pty its pane changed size.
     pub fn resize_selected_pty(&mut self, size: PtySize) {
         let tab_id = self.menu.selected().id().clone();
         self.resize_pty_tab

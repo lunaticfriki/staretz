@@ -16,13 +16,11 @@ pub trait PtyRunner {
     fn start(&self, command: &ShellCommand, cwd: &Path, size: PtySize) -> Result<Box<dyn PtyHandle>, ProcessError>;
 }
 
-/// Handle to a program started via `PtyRunner::start`.
 pub trait PtyHandle {
     /// Forwards raw input bytes (already translated from a key event) to
     /// the program, as if typed at a real terminal.
     fn write_input(&mut self, bytes: &[u8]) -> Result<(), ProcessError>;
 
-    /// Tells the program its pane changed size.
     fn resize(&mut self, size: PtySize);
 
     /// Feeds any newly-arrived output through the terminal emulator and

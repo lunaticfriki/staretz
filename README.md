@@ -86,10 +86,6 @@ Tabs are read from `cli/menu.toml`. Entries marked `interactive = true`
 (e.g. `claude`, `opencode`) hand the real terminal over to that program when
 launched, since they're full-screen TUIs themselves; other entries (dev
 server, test watchers) stream their output live in the pane below the tabs.
-A `Git` tab is included too, running a small status/diff/commit/push/pull/log
-menu ([`scripts/git-menu.sh`](scripts/git-menu.sh)) instead of raw shell
-commands — see [`cli/README.md`](cli/README.md#the-git-tab) for why it needs
-to be interactive.
 
 The crate itself follows the same hexagonal/DDD layering as the main app
 (`domain` / `application` / `infrastructure` / `presentation`), adapted for
