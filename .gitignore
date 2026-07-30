@@ -25,6 +25,9 @@ e2e/reports
 firebase-debug.log
 firestore-debug.log
 
+# rust cli
+cli/target
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

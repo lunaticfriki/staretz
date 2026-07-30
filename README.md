@@ -72,6 +72,41 @@ dashboard is covered using a locally emulated admin user instead.
 | `pnpm typecheck:e2e`    | Type-check the `e2e/` folder on its own (also run automatically by `test:e2e`)      |
 | `pnpm dev:tmux`         | Open a tmux session split into server / tests / empty panes (`scripts/dev-tmux.sh`) |
 
+### `cli/` — Rust dev menu
+
+A small Rust TUI (`ratatui` + `crossterm`) that offers the same actions as
+the table above (and more) behind a horizontal tab bar, so you don't have to
+remember or retype commands:
+
+```sh
+cd cli && cargo run
+```
+
+Tabs are read from `cli/menu.toml`. Entries marked `interactive = true`
+(e.g. `claude`, `opencode`) hand the real terminal over to that program when
+launched, since they're full-screen TUIs themselves; other entries (dev
+server, test watchers) stream their output live in the pane below the tabs.
+A `Git` tab is included too, running a small status/diff/commit/push/pull/log
+menu ([`scripts/git-menu.sh`](scripts/git-menu.sh)) instead of raw shell
+commands — see [`cli/README.md`](cli/README.md#the-git-tab) for why it needs
+to be interactive.
+
+The crate itself follows the same hexagonal/DDD layering as the main app
+(`domain` / `application` / `infrastructure` / `presentation`), adapted for
+Rust — see [`cli/ARCHITECTURE.md`](cli/ARCHITECTURE.md) for the full layout,
+what's deliberately different from `/docs` and why, and how to add a new
+command. For how to actually use the TUI — including how to detach from
+an interactive tab like `claude`/`opencode` and switch to another one
+without stopping it — see [`cli/README.md`](cli/README.md).
+
+| Key            | Action                                                      |
+| -------------- | -------------------------------------------------------------- |
+| `Tab` / `←→`   | Switch tabs                                                 |
+| `Enter`        | Run the selected tab's command (focuses its pane if interactive) |
+| `k`            | Stop the selected tab's running process                     |
+| `q` / `Ctrl-C` | Quit (stops all running processes)                          |
+| `Ctrl+o`       | While focused inside an interactive tab (`claude`/`opencode`): detach back to the tab bar without stopping it |
+
 ## Architecture
 
 The codebase follows a strict layering per feature module, organized by

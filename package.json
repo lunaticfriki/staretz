@@ -14,7 +14,8 @@
     "arch-test": "depcruise src",
     "dev:tmux": "bash scripts/dev-tmux.sh",
     "prepare": "husky",
-    "deploy": "pnpm build && firebase deploy --only hosting"
+    "deploy": "pnpm build && firebase deploy --only hosting",
+    "cli": "cargo run --manifest-path cli/Cargo.toml"
   },
   "dependencies": {
     "@preact/signals": "^2.9.4",

@@ -1,0 +1,42 @@
+# Menu entries for the staretz-cli TUI.
+# Each entry becomes a horizontal tab. `command` is run through the shell,
+# with `cwd` resolved relative to the repo root (parent of this cli/ crate).
+
+[[entry]]
+name = "Terminal"
+command = "$SHELL"
+cwd = ".."
+interactive = true
+
+[[entry]]
+name = "Server"
+command = "pnpm dev"
+cwd = ".."
+
+[[entry]]
+name = "Tests"
+command = "pnpm test:watch"
+cwd = ".."
+
+[[entry]]
+name = "E2E"
+command = "pnpm test:e2e"
+cwd = ".."
+
+[[entry]]
+name = "Claude"
+command = "claude"
+cwd = ".."
+interactive = true
+
+[[entry]]
+name = "OpenCode"
+command = "opencode"
+cwd = ".."
+interactive = true
+
+[[entry]]
+name = "Git"
+command = "bash scripts/git-menu.sh"
+cwd = ".."
+interactive = true
