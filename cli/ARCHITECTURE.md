@@ -178,6 +178,28 @@ choice at this scale — trait objects make hand-rolled fakes trivial to
 write, and there's no equivalent ubiquitous mocking convention to reach
 for instead.
 
+### The `Docs` tab lives outside `Menu`/`MenuEntry`, entirely in presentation
+
+Every other tab is a `MenuEntry` read from `menu.toml`, tracked by `Menu`/
+`Tab` through a real run/stop process lifecycle. `Docs` (browsing `/docs`,
+rendering the selected file as markdown) has no process at all — nothing
+to start, stop, or stream output from. Rather than stretch `Tab` to
+half-support a lifecycle-less tab (a nullable process, name-based
+special-casing in `MenuAppService`), it's built as a fully independent
+vertical slice with its own port (`DocsRepository`), adapter
+(`FsDocsRepository`), and facade (`DocsAppService`) — see
+`docs_repository.rs`, `fs_docs_repository.rs`, `docs_app_service.rs`. None
+of it touches `Menu`, `Tab`, `MenuEntry`, or `menu.toml`.
+
+`presentation/tui.rs` is the only place that knows `Docs` exists: it's
+rendered as one extra tab-bar slot appended after `service.tabs()`, and a
+presentation-only `docs_selected: bool` + `DocsView` enum (`List` /
+`Content`) drive it. `select_next_including_docs`/
+`select_previous_including_docs` in `tui.rs` widen tab-bar navigation to
+include that extra slot without `Menu`'s `select_next`/`select_previous`
+(or any of its tests) changing at all — `Menu` still only ever knows about
+its own, uniformly process-backed tabs.
+
 ### No arch-test automation yet
 
 The main app enforces the dependency rule in CI via `dependency-cruiser`.

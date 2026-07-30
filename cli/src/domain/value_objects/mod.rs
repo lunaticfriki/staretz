@@ -1,3 +1,4 @@
+pub mod doc_entry;
 pub mod menu_entry;
 pub mod process_status;
 pub mod pty_size;

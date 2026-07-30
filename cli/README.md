@@ -79,6 +79,11 @@ the bottom:
 | `k`              | Stop the selected tab's running process             |
 | `q` / `Ctrl+C`   | Quit the whole app (stops every running process first) |
 
+On the `Docs` tab specifically, `↓`/`j`/`↑`/`K` browse the file list (or
+scroll an open file) and `Enter`/`Esc` open/close a file — see
+[The `Docs` tab](#the-docs-tab) above; `k` and the run-on-`Enter` behavior
+don't apply there, since there's no process.
+
 ### Pty pane focus (inside `claude` / `opencode`)
 
 | Key      | Action                                                                 |
@@ -95,3 +100,15 @@ any time.
 Note: detaching only happens via `Ctrl+o`. If the process behind an
 interactive tab exits on its own (e.g. you quit `claude` from inside it),
 focus automatically returns to the tab bar.
+
+### The `Docs` tab
+
+`Docs` is always the last tab and, unlike every other tab, isn't
+configured in `menu.toml` — it browses the project's own
+[`/docs`](../docs/README.md) directory and renders whichever file you pick
+as formatted markdown, right in the pane. There's nothing to run or stop:
+`↑`/`↓` (or `j`/`K`) move through the file list, `Enter` opens the
+highlighted file, and `Esc`/`Backspace` goes back to the list. Once a file
+is open, `↑`/`↓` (or `j`/`K`) scroll its rendered content instead. `Tab`/
+`Shift+Tab`/arrows switch away from `Docs` to any other tab the same way
+they always do.

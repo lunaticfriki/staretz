@@ -8,6 +8,6 @@ pub mod presentation;
 pub(crate) mod test_support;
 
 pub fn run() -> anyhow::Result<()> {
-    let service = composition_root::bootstrap()?;
-    presentation::tui::run(service)
+    let (service, docs) = composition_root::bootstrap()?;
+    presentation::tui::run(service, docs)
 }
