@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'preact/hooks'
 import type { Post } from '../../domain/entities/Post.entity'
 import { formatPublishedAt } from '../formatPublishedAt.util'
 import { marked } from 'marked'
@@ -7,8 +8,20 @@ interface PostViewProps {
 }
 
 export function PostView({ post }: PostViewProps) {
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    setVisible(false)
+    const frame = requestAnimationFrame(() => setVisible(true))
+    return () => cancelAnimationFrame(frame)
+  }, [post.slug])
+
   return (
-    <article>
+    <article
+      class={`transition-all duration-700 ease-out ${
+        visible ? 'translate-y-0 opacity-100' : 'translate-y-6 opacity-0'
+      }`}
+    >
       <div class="relative -mx-2 -mt-2 flex h-[calc(100dvh-var(--header-height))] items-end sm:-mx-6 lg:-mx-8">
         <img
           src={post.image.toString()}
