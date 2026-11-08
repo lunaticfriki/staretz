@@ -6,11 +6,9 @@ import { gsap } from './gsap'
 gsap.registerPlugin(Draggable, InertiaPlugin)
 
 export interface HorizontalLoopConfig {
-  /** Pixels per second multiplier (1 = 100px/s). */
   speed?: number
   paused?: boolean
   repeat?: number
-  /** Extra space after the last item, usually the gap between items. */
   paddingRight?: number
   snap?: number | false
   draggable?: boolean
@@ -26,11 +24,6 @@ export interface HorizontalLoop {
   destroy: () => void
 }
 
-/**
- * Seamless, draggable horizontal loop of `items` — adapted from GreenSock's
- * `horizontalLoop` helper (https://gsap.com/docs/v3/HelperFunctions/helpers/seamlessLoop).
- * Items are moved with xPercent so the layout (and hit-testing) stays intact.
- */
 export function horizontalLoop(items: HTMLElement[], config: HorizontalLoopConfig = {}): HorizontalLoop {
   const { onChange } = config
   const length = items.length

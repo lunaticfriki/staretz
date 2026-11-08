@@ -28,7 +28,6 @@ export function PostSlider({ posts }: PostSliderProps) {
     const slides = Array.from(track.querySelectorAll<HTMLElement>('[data-slide]'))
     const reducedMotion = prefersReducedMotion()
 
-    // fromTo (not from) so an interrupted entrance never becomes the end state.
     const entrance = gsap.context(() => {
       if (!reducedMotion) {
         gsap.fromTo(
@@ -39,7 +38,6 @@ export function PostSlider({ posts }: PostSliderProps) {
       }
     }, track)
 
-    // Looping only makes sense when the slides overflow the viewport.
     if (slides.length < 2 || track.scrollWidth <= track.clientWidth) {
       setLooping(false)
       return () => entrance.revert()

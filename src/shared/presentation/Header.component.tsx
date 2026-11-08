@@ -45,7 +45,7 @@ export function Header() {
 
   useGsap(headerRef, () => {
     gsap
-      .timeline({ delay: ENTRANCE_DELAY_S, defaults: { ease: 'power3.out' } })
+      .timeline({ delay: ENTRANCE_DELAY_S, defaults: { ease: 'power3.out', clearProps: 'transform' } })
       .from('[data-anim="logo"]', { y: -20, autoAlpha: 0, duration: 0.8 })
       .from('[data-anim="nav"] > *', { y: -12, autoAlpha: 0, duration: 0.6, stagger: 0.08 }, '-=0.5')
       .from('[data-anim="controls"] > *', { y: -12, autoAlpha: 0, duration: 0.6, stagger: 0.08 }, '-=0.4')

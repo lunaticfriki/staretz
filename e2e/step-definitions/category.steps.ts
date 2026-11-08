@@ -1,24 +1,41 @@
 import { Then, When } from '@cucumber/cucumber'
-import { expect } from '@playwright/test'
+
 import type { PlaywrightWorld } from '../support/world'
+import { expect } from '@playwright/test'
 
 When('I open the category menu', async function (this: PlaywrightWorld) {
   await this.page.getByRole('button', { name: 'Categories' }).click()
 })
 
-When('I click the {string} category in the menu', async function (this: PlaywrightWorld, category: string) {
-  await this.page.getByRole('link', { name: category, exact: true }).click()
-})
+When(
+  'I click the {string} category in the menu',
+  async function (this: PlaywrightWorld, category: string) {
+    await this.page.getByRole('link', { name: category, exact: true }).click()
+  },
+)
 
-When('I search for {string} in the category search box', async function (this: PlaywrightWorld, term: string) {
-  const toggle = this.page.getByRole('button', { name: 'Obre la cerca' })
-  if (await toggle.isVisible()) {
-    await toggle.click()
-  }
-  await this.page.getByRole('searchbox', { name: 'Cerca per categoria' }).fill(term)
-  await this.page.keyboard.press('Enter')
-})
+When(
+  'I search for {string} in the category search box',
+  async function (this: PlaywrightWorld, term: string) {
+    const toggle = this.page.getByRole('button', { name: 'Obre la cerca' })
+    const searchbox = this.page.getByRole('searchbox', {
+      name: 'Cerca per categoria',
+    })
+    const entryPoint = toggle.or(searchbox).filter({ visible: true }).first()
+    await entryPoint.waitFor()
+    if (await toggle.isVisible()) {
+      await toggle.click()
+    }
+    await searchbox.fill(term)
+    await this.page.keyboard.press('Enter')
+  },
+)
 
-Then('I should be on the category page for {string}', async function (this: PlaywrightWorld, term: string) {
-  await expect(this.page).toHaveURL(new RegExp(`/category/${encodeURIComponent(term)}$`))
-})
+Then(
+  'I should be on the category page for {string}',
+  async function (this: PlaywrightWorld, term: string) {
+    await expect(this.page).toHaveURL(
+      new RegExp(`/category/${encodeURIComponent(term)}$`),
+    )
+  },
+)

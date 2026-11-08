@@ -3,11 +3,6 @@ import { useEffect, useRef } from 'preact/hooks'
 
 import { gsap, prefersReducedMotion, ScrollTrigger } from './gsap'
 
-/**
- * Enables Lenis smooth scrolling for the whole page and keeps GSAP's
- * ScrollTrigger in sync with it. Returns a function that jumps to the top,
- * used on route changes.
- */
 export function useSmoothScroll() {
   const lenisRef = useRef<Lenis | null>(null)
 
