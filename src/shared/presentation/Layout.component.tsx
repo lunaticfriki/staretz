@@ -1,4 +1,7 @@
 import type { ComponentChildren } from 'preact'
+import { useEffect } from 'preact/hooks'
+import { useRouter } from 'preact-router'
+import { useSmoothScroll } from './animation/useSmoothScroll.hook'
 import { Footer } from './Footer.component'
 import { Header } from './Header.component'
 import { NotificationCenter } from './NotificationCenter.component'
@@ -8,6 +11,14 @@ interface LayoutProps {
 }
 
 export function Layout({ children }: LayoutProps) {
+  const scrollToTop = useSmoothScroll()
+  const [router] = useRouter()
+  const currentPath = router.url.split('?')[0]
+
+  useEffect(() => {
+    scrollToTop()
+  }, [currentPath])
+
   return (
     <div class="flex min-h-screen flex-col bg-background text-gray-900 dark:text-gray-100">
       <Header />

@@ -1,6 +1,6 @@
 import { Pagination } from '../../../../shared/presentation/Pagination.component'
 import type { Post } from '../../domain/entities/Post.entity'
-import { PostPreview } from './PostPreview.component'
+import { PostSlider } from './PostSlider.component'
 
 interface PostGridProps {
   totalItems: number
@@ -20,11 +20,7 @@ export function PostGrid({ totalItems, items, page, totalPages, onPageChange, em
       {items.length === 0 ? (
         <p class="text-gray-600 dark:text-gray-300">{emptyMessage}</p>
       ) : (
-        <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {items.map((post) => (
-            <PostPreview key={post.slug.toString()} post={post} />
-          ))}
-        </div>
+        <PostSlider posts={items} />
       )}
       <Pagination page={page} totalPages={totalPages} onPageChange={onPageChange} />
     </div>

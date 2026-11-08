@@ -4,6 +4,8 @@ import type { Category } from '../../domain/value-objects/Category.valueObject'
 import { SearchCriteria } from '../../../../shared/search/domain/value-objects/SearchCriteria.valueObject'
 import { route } from 'preact-router'
 import { useCategoriesState } from '../useCategoriesState.hook'
+import { gsap } from '../../../../shared/presentation/animation/gsap'
+import { useGsap } from '../../../../shared/presentation/animation/useGsap.hook'
 import { PixelSearchIcon } from '../../../../shared/presentation/icons/PixelSearchIcon.component'
 
 const DEBOUNCE_MS = 300
@@ -38,6 +40,18 @@ export function CategorySearch({ onNavigate, collapsible = false }: CategorySear
 
     return () => clearTimeout(timeout)
   }, [term, categoriesState])
+
+  useGsap(
+    containerRef,
+    ({ scope }) => {
+      if (!collapsible || !expanded) {
+        return
+      }
+      gsap.from(scope.querySelector('form'), { width: 0, autoAlpha: 0, duration: 0.4, ease: 'power3.out' })
+      gsap.from(scope.querySelector('button'), { rotate: -90, duration: 0.4, ease: 'back.out(2)' })
+    },
+    [collapsible, expanded],
+  )
 
   useEffect(() => {
     if (collapsible && expanded) {
@@ -101,7 +115,7 @@ export function CategorySearch({ onNavigate, collapsible = false }: CategorySear
           <PixelSearchIcon />
         </button>
       )}
-      <form onSubmit={handleSubmit} role="search" hidden={!expanded} class="w-full">
+      <form onSubmit={handleSubmit} role="search" hidden={!expanded} class="w-full overflow-hidden sm:w-44">
         <input
           ref={inputRef}
           type="search"

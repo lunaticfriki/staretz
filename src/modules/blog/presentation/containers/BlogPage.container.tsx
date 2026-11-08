@@ -1,7 +1,7 @@
 import { useState } from 'preact/hooks'
 import type { RouteProps } from '../../../../shared/presentation/RouteProps'
 import { PostGrid } from '../components/PostGrid.component'
-import { PostPreviewSkeleton } from '../components/PostPreview.skeleton'
+import { PostSliderSkeleton } from '../components/PostSlider.skeleton'
 import { usePostsPageState } from '../usePostsPageState.hook'
 
 const POSTS_PER_PAGE = 5
@@ -14,11 +14,7 @@ export function BlogPageContainer(_props: RouteProps) {
     <div>
       <h1 class="mx-auto mb-6 max-w-6xl text-2xl font-bold text-purple-700 dark:text-purple-400">Blog</h1>
       {state.status === 'loading' && (
-        <div class="mx-auto grid max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {Array.from({ length: POSTS_PER_PAGE }).map((_, index) => (
-            <PostPreviewSkeleton key={index} />
-          ))}
-        </div>
+        <PostSliderSkeleton count={POSTS_PER_PAGE} />
       )}
       {state.status === 'error' && <p class="text-red-600 dark:text-red-400">{state.message}</p>}
       {state.status === 'loaded' && (

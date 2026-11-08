@@ -1,5 +1,5 @@
-import { PostPreview } from '../components/PostPreview.component'
-import { PostPreviewSkeleton } from '../components/PostPreview.skeleton'
+import { PostSlider } from '../components/PostSlider.component'
+import { PostSliderSkeleton } from '../components/PostSlider.skeleton'
 import { usePostsPageState } from '../usePostsPageState.hook'
 
 const LATEST_POSTS_COUNT = 5
@@ -9,11 +9,7 @@ export function LatestPosts() {
 
   if (state.status === 'loading') {
     return (
-      <div class="mx-auto grid w-full max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        {Array.from({ length: LATEST_POSTS_COUNT }).map((_, index) => (
-          <PostPreviewSkeleton key={index} />
-        ))}
-      </div>
+      <PostSliderSkeleton count={LATEST_POSTS_COUNT} />
     )
   }
 
@@ -26,10 +22,6 @@ export function LatestPosts() {
   }
 
   return (
-    <div class="mx-auto grid w-full max-w-6xl grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-      {state.page.items.map((post) => (
-        <PostPreview key={post.slug.toString()} post={post} />
-      ))}
-    </div>
+    <PostSlider posts={state.page.items} />
   )
 }
