@@ -6,7 +6,9 @@ import { CategorySearch } from '../../modules/blog/presentation/components/Categ
 import { ThemeToggle } from './ThemeToggle.component'
 
 function navLinkClass(active: boolean) {
-  return active ? 'text-purple-600 dark:text-purple-400' : 'hover:text-purple-900 dark:hover:text-purple-200'
+  return active
+    ? 'text-purple-600 dark:text-purple-400'
+    : 'hover:text-purple-900 dark:hover:text-purple-200'
 }
 
 export function Header() {
@@ -41,8 +43,12 @@ export function Header() {
 
   return (
     <header ref={headerRef} class="">
-      <div class="flex items-center justify-between gap-4 px-4 py-4 mb-2 sm:px-6 lg:px-8">
-        <a href="/" class="flex items-center" onClick={closeMobileMenu}>
+      <div class="flex items-center justify-between gap-4 px-4 py-4 mb-2 sm:grid sm:grid-cols-[1fr_auto_1fr] sm:px-6 lg:px-8">
+        <a
+          href="/"
+          class="flex items-center justify-self-start"
+          onClick={closeMobileMenu}
+        >
           <img
             src="/title-black.jpg"
             alt="Staretz"
@@ -50,20 +56,33 @@ export function Header() {
           />
         </a>
 
-        <div class="hidden items-center gap-6 sm:flex">
-          <nav class="flex gap-6 text-sm">
-            <a href="/" aria-current={isHome ? 'page' : undefined} class={navLinkClass(isHome)}>
-              Inici
-            </a>
-            <a href="/blog" aria-current={isBlog ? 'page' : undefined} class={navLinkClass(isBlog)}>
-              Blog
-            </a>
-            <a href="/about" aria-current={isAbout ? 'page' : undefined} class={navLinkClass(isAbout)}>
-              Sobre Staretz
-            </a>
-            <CategoryMenu />
-          </nav>
-          <CategorySearch />
+        <nav class="hidden gap-6 text-sm sm:flex">
+          <a
+            href="/"
+            aria-current={isHome ? 'page' : undefined}
+            class={navLinkClass(isHome)}
+          >
+            Inici
+          </a>
+          <a
+            href="/blog"
+            aria-current={isBlog ? 'page' : undefined}
+            class={navLinkClass(isBlog)}
+          >
+            Blog
+          </a>
+          <a
+            href="/about"
+            aria-current={isAbout ? 'page' : undefined}
+            class={navLinkClass(isAbout)}
+          >
+            Sobre Staretz
+          </a>
+          <CategoryMenu />
+        </nav>
+
+        <div class="hidden items-center gap-4 justify-self-end sm:flex">
+          <CategorySearch collapsible />
           <ThemeToggle />
         </div>
 

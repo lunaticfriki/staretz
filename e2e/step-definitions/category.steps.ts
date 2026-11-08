@@ -11,6 +11,10 @@ When('I click the {string} category in the menu', async function (this: Playwrig
 })
 
 When('I search for {string} in the category search box', async function (this: PlaywrightWorld, term: string) {
+  const toggle = this.page.getByRole('button', { name: 'Obre la cerca' })
+  if (await toggle.isVisible()) {
+    await toggle.click()
+  }
   await this.page.getByRole('searchbox', { name: 'Cerca per categoria' }).fill(term)
   await this.page.keyboard.press('Enter')
 })
